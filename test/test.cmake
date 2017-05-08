@@ -15,6 +15,12 @@ macro(test_expect_eq X Y)
     endif()
 endmacro()
 
+macro(test_expect_file FILE)
+    if(NOT EXISTS ${FILE})
+        message(FATAL_ERROR "EXPECT FILE: ${FILE}")
+    endif()
+endmacro()
+
 function(test_exec)
     execute_process(${ARGN} RESULT_VARIABLE RESULT)
     if(NOT RESULT EQUAL 0)
