@@ -130,7 +130,7 @@ function(rocm_export_targets)
     endif()
 
     if(PARSE_TARGETS)
-        rocm_write_package_template_function(${CONFIG_TEMPLATE} include "\${NAME}_TARGET_FILE")
+        rocm_write_package_template_function(${CONFIG_TEMPLATE} include "\${${NAME}_TARGET_FILE}")
         foreach(NAME ${PACKAGE_NAME} ${PACKAGE_NAME_UPPER} ${PACKAGE_NAME_LOWER})
             rocm_write_package_template_function(${CONFIG_TEMPLATE} set ${NAME}_LIBRARIES ${EXPORT_LIB_TARGETS})
             rocm_write_package_template_function(${CONFIG_TEMPLATE} set ${NAME}_LIBRARY ${EXPORT_LIB_TARGETS})
@@ -141,7 +141,7 @@ function(rocm_export_targets)
         ${CONFIG_TEMPLATE}
         ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}.cmake
         INSTALL_DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR}
-        PATH_VARS LIB_INSTALL_DIR INCLUDE_INSTALL_DIR
+        PATH_VARS LIB_INSTALL_DIR INCLUDE_INSTALL_DIR CONFIG_PACKAGE_INSTALL_DIR
     )
     set(COMPATIBILITY_ARG SameMajorVersion)
     if(PARSE_COMPATIBILITY)
