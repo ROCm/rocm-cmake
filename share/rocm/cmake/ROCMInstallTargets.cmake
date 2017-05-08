@@ -137,7 +137,7 @@ function(rocm_export_targets)
         endforeach()
     endif()
 
-    configure_package_config_file(
+    rocm_configure_package_config_file(
         ${CONFIG_TEMPLATE}
         ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}.cmake
         INSTALL_DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR}

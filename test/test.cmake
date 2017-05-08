@@ -1,0 +1,54 @@
+
+include(CMakeParseArguments)
+
+string(RANDOM _TEST_RAND)
+set(TEST ${CMAKE_ARGV3})
+set(TEST_DIR ${CMAKE_CURRENT_LIST_DIR})
+set(TMP_DIR ${CMAKE_ARGV4}-${_TEST_RAND})
+file(MAKE_DIRECTORY ${TMP_DIR})
+set(PREFIX ${TMP_DIR}/usr)
+set(BUILDS_DIR ${TMP_DIR}/builds)
+
+macro(test_expect_eq X Y)
+    if(NOT ${X} EQUAL ${Y})
+        message(FATAL_ERROR "EXPECT FAILURE: ${X} != ${Y}")
+    endif()
+endmacro()
+
+function(test_exec)
+    execute_process(${ARGN} RESULT_VARIABLE RESULT)
+    if(NOT RESULT EQUAL 0)
+        message(FATAL_ERROR "Process failed: ${ARGN}")
+    endif()
+endfunction()
+
+function(install_dir DIR)
+    set(options)
+    set(oneValueArgs)
+    set(multiValueArgs CMAKE_ARGS)
+
+    cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    string(RANDOM BUILD_RAND)
+    set(BUILD_DIR ${BUILDS_DIR}/${BUILD_RAND})
+    if(NOT EXISTS ${BUILD_DIR})
+        file(MAKE_DIRECTORY ${BUILD_DIR})
+    endif()
+    test_exec(COMMAND ${CMAKE_COMMAND} 
+        -DCMAKE_PREFIX_PATH=${PREFIX} 
+        -DCMAKE_INSTALL_PREFIX=${PREFIX}
+        ${PARSE_CMAKE_ARGS}
+        ${DIR}
+        WORKING_DIRECTORY ${BUILD_DIR}
+    )
+    test_exec(COMMAND ${CMAKE_COMMAND} --build ${BUILD_DIR})
+    test_exec(COMMAND ${CMAKE_COMMAND} --build ${BUILD_DIR} --target install)
+
+    file(REMOVE_RECURSE ${BUILD_DIR})
+endfunction()
+
+install_dir(${TEST_DIR}/../)
+
+include(${TEST})
+
+file(REMOVE_RECURSE ${TMP_DIR})
