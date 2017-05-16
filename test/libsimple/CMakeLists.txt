@@ -8,6 +8,20 @@ include(ROCMInstallTargets)
 include(ROCMPackageConfigHelpers)
 include(ROCMSetupVersion)
 include(ROCMInstallSymlinks)
+include(ROCMCreatePackage)
+
+if(ROCM_PREFIX)
+rocm_create_package(
+    NAME simple 
+    PREFIX ${ROCM_PREFIX}
+    MAINTAINER "Amd amd@amd.com"
+    LDCONFIG)
+else()
+rocm_create_package(
+    NAME simple 
+    MAINTAINER "Amd amd@amd.com"
+    LDCONFIG)
+endif()
 
 rocm_setup_version(VERSION 1.0.0)
 

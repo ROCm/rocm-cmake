@@ -31,7 +31,7 @@ endfunction()
 function(install_dir DIR)
     set(options)
     set(oneValueArgs)
-    set(multiValueArgs CMAKE_ARGS)
+    set(multiValueArgs CMAKE_ARGS TARGETS)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -48,6 +48,9 @@ function(install_dir DIR)
         WORKING_DIRECTORY ${BUILD_DIR}
     )
     test_exec(COMMAND ${CMAKE_COMMAND} --build ${BUILD_DIR})
+    foreach(TARGET ${PARSE_TARGETS})
+        test_exec(COMMAND ${CMAKE_COMMAND} --build ${BUILD_DIR} --target ${TARGET})
+    endforeach()
     test_exec(COMMAND ${CMAKE_COMMAND} --build ${BUILD_DIR} --target install)
 
     file(REMOVE_RECURSE ${BUILD_DIR})

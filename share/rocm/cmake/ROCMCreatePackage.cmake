@@ -1,11 +1,12 @@
 
 include(CMakeParseArguments)
+include(GNUInstallDirs)
 
 find_program(MAKE_NSIS_EXE makensis)
 
 macro(rocm_create_package)
-    set(options)
-    set(oneValueArgs NAME DESCRIPTION LDCONFIG SECTION MAINTAINER)
+    set(options LDCONFIG)
+    set(oneValueArgs NAME DESCRIPTION SECTION MAINTAINER LDCONFIG_DIR PREFIX)
     set(multiValueArgs DEB_DEPENDS)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -29,8 +30,14 @@ macro(rocm_create_package)
     endif()
 
     if(PARSE_LDCONFIG)
+        set(LDCONFIG_DIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
+        if(PARSE_LDCONFIG_DIR)
+            set(LDCONFIG_DIR ${PARSE_LDCONFIG_DIR})
+        elseif(PARSE_PREFIX)
+            set(LDCONFIG_DIR ${CMAKE_INSTALL_PREFIX}/${PARSE_PREFIX}/${CMAKE_INSTALL_LIBDIR})
+        endif()
         file(WRITE ${PROJECT_BINARY_DIR}/debian/postinst "
-            echo \"${PARSE_LDCONFIG}\" > /etc/ld.so.conf.d/${PARSE_NAME}.conf
+            echo \"${LDCONFIG_DIR}\" > /etc/ld.so.conf.d/${PARSE_NAME}.conf
             ldconfig
         ")
 
