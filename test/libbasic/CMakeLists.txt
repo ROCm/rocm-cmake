@@ -7,11 +7,14 @@ find_package(simple)
 
 include(ROCMInstallTargets)
 include(ROCMPackageConfigHelpers)
-include(ROCMGetVersion)
 include(ROCMSetupVersion)
 
-rocm_get_version(VERSION 1.0.0)
-rocm_setup_version(VERSION ${TAGGED_VERSION})
+rocm_setup_version(VERSION VERSION 1.0.0)
+rocm_get_version(TAGGED_VERSION VERSION 1.0.0)
+
+if(NOT PROJECT_VERSION EQUAL TAGGED_VERSION)
+    message(SEND_ERROR "Version not the same")
+endif()
 
 add_library(basic main.cpp)
 target_link_libraries(basic simple)
