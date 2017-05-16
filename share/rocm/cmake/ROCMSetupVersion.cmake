@@ -25,7 +25,8 @@ function(rocm_get_version OUTPUT_VERSION)
                         WORKING_DIRECTORY ${DIRECTORY}
                         OUTPUT_VARIABLE GIT_TAG_VERSION
                         OUTPUT_STRIP_TRAILING_WHITESPACE
-                        RESULT_VARIABLE RESULT)
+                        RESULT_VARIABLE RESULT
+                        ERROR_QUIET)
         if(${RESULT} EQUAL 0)
             set(_version ${GIT_TAG_VERSION})
         endif()
