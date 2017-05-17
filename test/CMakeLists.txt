@@ -1,3 +1,7 @@
+################################################################################
+# Copyright (C) 2017 Advanced Micro Devices, Inc.
+################################################################################
+
 
 function(create_test NAME TEST)
     add_custom_target(${NAME} COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/test.cmake ${TEST} ${CMAKE_CURRENT_BINARY_DIR}/tmp/${NAME})

@@ -1,3 +1,7 @@
+################################################################################
+# Copyright (C) 2017 Advanced Micro Devices, Inc.
+################################################################################
+
 
 function(rocm_install_symlink_subdir SUBDIR)
     # TODO: Check if SUBDIR is relative path
