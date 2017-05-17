@@ -1,9 +1,5 @@
 
-include(WriteBasicConfigVersionFile)
-
-macro(write_basic_package_version_file)
-    write_basic_config_version_file(${ARGN})
-endmacro()
+include(CMakePackageConfigHelpers)
 
 function(rocm_configure_package_config_file INPUT_FILE OUTPUT_FILE)
     set(options)
