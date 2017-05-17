@@ -8,6 +8,7 @@ include(GNUInstallDirs)
 
 find_program(MAKE_NSIS_EXE makensis)
 find_program(RPMBUILD_EXE rpmbuild)
+find_program(DPKG_EXE dpkg)
 
 macro(rocm_create_package)
     set(options LDCONFIG)
@@ -29,13 +30,17 @@ macro(rocm_create_package)
 
     set(CPACK_RPM_PACKAGE_RELOCATABLE Off)
     
-    set(CPACK_GENERATOR "DEB")
+    set(CPACK_GENERATOR "TGZ;ZIP")
     if(EXISTS ${MAKE_NSIS_EXE})
         list(APPEND CPACK_GENERATOR "NSIS")
     endif()
 
     if(EXISTS ${RPMBUILD_EXE})
         list(APPEND CPACK_GENERATOR "RPM")
+    endif()
+
+    if(EXISTS ${DPKG_EXE})
+        list(APPEND CPACK_GENERATOR "DEB")
     endif()
 
     if(PARSE_DEB_DEPENDS)
