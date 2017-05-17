@@ -7,6 +7,7 @@ include(CMakeParseArguments)
 include(GNUInstallDirs)
 
 find_program(MAKE_NSIS_EXE makensis)
+find_program(RPMBUILD_EXE rpmbuild)
 
 macro(rocm_create_package)
     set(options LDCONFIG)
@@ -27,6 +28,10 @@ macro(rocm_create_package)
     set(CPACK_GENERATOR "DEB")
     if(EXISTS ${MAKE_NSIS_EXE})
         list(APPEND CPACK_GENERATOR "NSIS")
+    endif()
+
+    if(EXISTS ${RPMBUILD_EXE})
+        list(APPEND CPACK_GENERATOR "RPM")
     endif()
 
     if(PARSE_DEB_DEPENDS)
