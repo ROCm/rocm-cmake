@@ -2,95 +2,77 @@
 include(WriteBasicConfigVersionFile)
 
 macro(write_basic_package_version_file)
-  write_basic_config_version_file(${ARGN})
+    write_basic_config_version_file(${ARGN})
 endmacro()
 
-function(rocm_configure_package_config_file _inputFile _outputFile)
-  set(options NO_SET_AND_CHECK_MACRO NO_CHECK_REQUIRED_COMPONENTS_MACRO)
-  set(oneValueArgs INSTALL_DESTINATION INSTALL_PREFIX)
-  set(multiValueArgs PATH_VARS )
+function(rocm_configure_package_config_file INPUT_FILE OUTPUT_FILE)
+    set(options)
+    set(oneValueArgs INSTALL_DESTINATION INSTALL_PREFIX)
+    set(multiValueArgs PATH_VARS)
 
-  cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}"  ${ARGN})
+    cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}"  ${ARGN})
 
-  if(PARSE_UNPARSED_ARGUMENTS)
-    message(FATAL_ERROR "Unknown keywords given to rocm_configure_package_config_file(): \"${PARSE_UNPARSED_ARGUMENTS}\"")
-  endif()
-
-  if(NOT PARSE_INSTALL_DESTINATION)
-    message(FATAL_ERROR "No INSTALL_DESTINATION given to rocm_configure_package_config_file()")
-  endif()
-
-  if(DEFINED PARSE_INSTALL_PREFIX)
-    if(IS_ABSOLUTE "${PARSE_INSTALL_PREFIX}")
-      set(installPrefix "${PARSE_INSTALL_PREFIX}")
-    else()
-      message(FATAL_ERROR "INSTALL_PREFIX must be an absolute path")
+    if(PARSE_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR "Unknown keywords given to rocm_configure_package_config_file(): \"${PARSE_UNPARSED_ARGUMENTS}\"")
     endif()
-  elseif(IS_ABSOLUTE "${CMAKE_INSTALL_PREFIX}")
-    set(installPrefix "${CMAKE_INSTALL_PREFIX}")
-  else()
-    get_filename_component(installPrefix "${CMAKE_INSTALL_PREFIX}" ABSOLUTE)
-  endif()
 
-  if(IS_ABSOLUTE "${PARSE_INSTALL_DESTINATION}")
-    set(absInstallDir "${PARSE_INSTALL_DESTINATION}")
-  else()
-    set(absInstallDir "${installPrefix}/${PARSE_INSTALL_DESTINATION}")
-  endif()
-
-  file(RELATIVE_PATH PACKAGE_RELATIVE_PATH "${absInstallDir}" "${installPrefix}" )
-
-  foreach(var ${PARSE_PATH_VARS})
-    if(NOT DEFINED ${var})
-      message(FATAL_ERROR "Variable ${var} does not exist")
-    else()
-      if(IS_ABSOLUTE "${${var}}")
-        string(REPLACE "${installPrefix}" "\${PACKAGE_PREFIX_DIR}"
-                        PACKAGE_${var} "${${var}}")
-      else()
-        set(PACKAGE_${var} "\${PACKAGE_PREFIX_DIR}/${${var}}")
-      endif()
+    if(NOT PARSE_INSTALL_DESTINATION)
+        message(FATAL_ERROR "INSTALL_DESTINATION is required for rocm_configure_package_config_file()")
     endif()
-  endforeach()
 
-  get_filename_component(inputFileName "${_inputFile}" NAME)
+    if(DEFINED PARSE_INSTALL_PREFIX)
+        set(INSTALL_PREFIX "${PARSE_INSTALL_PREFIX}")
+    elseif(IS_ABSOLUTE "${CMAKE_INSTALL_PREFIX}")
+        set(INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
+    else()
+        get_filename_component(INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" ABSOLUTE)
+    endif()
 
-  set(PACKAGE_INIT "
-####### Expanded from @PACKAGE_INIT@ by rocm_configure_package_config_file() #######
-####### Any changes to this file will be overwritten by the next CMake run ####
-####### The input file was ${inputFileName}                            ########
+    if(NOT IS_ABSOLUTE "${INSTALL_PREFIX}")
+        message(FATAL_ERROR "INSTALL_PREFIX must be an absolute path")
+    endif()
 
-get_filename_component(_CMAKE_CURRENT_LIST_FILE_REAL \"\${CMAKE_CURRENT_LIST_FILE}\" REALPATH)
-get_filename_component(_CMAKE_CURRENT_LIST_DIR_REAL \"\${_CMAKE_CURRENT_LIST_FILE_REAL}\" DIRECTORY)
-get_filename_component(PACKAGE_PREFIX_DIR \"\${_CMAKE_CURRENT_LIST_DIR_REAL}/${PACKAGE_RELATIVE_PATH}\" ABSOLUTE)
-")
+    if(IS_ABSOLUTE "${PARSE_INSTALL_DESTINATION}")
+        set(ABSOLUTE_INSTALL_DIR "${PARSE_INSTALL_DESTINATION}")
+    else()
+        set(ABSOLUTE_INSTALL_DIR "${INSTALL_PREFIX}/${PARSE_INSTALL_DESTINATION}")
+    endif()
 
-  if("${absInstallDir}" MATCHES "^(/usr)?/lib(64)?/.+")
-    # Handle "/usr move" symlinks created by some Linux distros.
-    string(APPEND PACKAGE_INIT "
-# Use original install prefix when loaded through a \"/usr move\"
-# cross-prefix symbolic link such as /lib -> /usr/lib.
-get_filename_component(_realCurr \"\${CMAKE_CURRENT_LIST_DIR}\" REALPATH)
-get_filename_component(_realOrig \"${absInstallDir}\" REALPATH)
-if(_realCurr STREQUAL _realOrig)
-  set(PACKAGE_PREFIX_DIR \"${installPrefix}\")
-endif()
-unset(_realOrig)
-unset(_realCurr)
-")
-  endif()
+    file(RELATIVE_PATH PACKAGE_RELATIVE_PATH "${ABSOLUTE_INSTALL_DIR}" "${INSTALL_PREFIX}" )
 
-  if(NOT PARSE_NO_SET_AND_CHECK_MACRO)
-    string(APPEND PACKAGE_INIT "
+    foreach(_var ${PARSE_PATH_VARS})
+        if(NOT DEFINED ${_var})
+            message(FATAL_ERROR "Undefined path variable: ${_var}")
+        endif()
+        if(IS_ABSOLUTE "${${_var}}")
+            string(REPLACE "${INSTALL_PREFIX}" "\${PACKAGE_PREFIX_DIR}" PACKAGE_${_var} "${${_var}}")
+        else()
+            set(PACKAGE_${_var} "\${PACKAGE_PREFIX_DIR}/${${_var}}")
+        endif()
+    endforeach()
+
+    get_filename_component(INPUT_NAME "${INPUT_FILE}" NAME)
+
+    set(PACKAGE_INIT "
+####################################################################################
+# Auto generated @PACKAGE_INIT@ by rocm_configure_package_config_file() 
+# from ${INPUT_NAME}
+# Any changes to this file will be overwritten by the next CMake run
+####################################################################################
+
+get_filename_component(_ROCM_CMAKE_CURRENT_LIST_FILE_REAL \"\${CMAKE_CURRENT_LIST_FILE}\" REALPATH)
+get_filename_component(_ROCM_CMAKE_CURRENT_LIST_DIR_REAL \"\${_ROCM_CMAKE_CURRENT_LIST_FILE_REAL}\" DIRECTORY)
+get_filename_component(PACKAGE_PREFIX_DIR \"\${_ROCM_CMAKE_CURRENT_LIST_DIR_REAL}/${PACKAGE_RELATIVE_PATH}\" ABSOLUTE)
+
 macro(set_and_check _var _file)
-  set(\${_var} \"\${_file}\")
-  if(NOT EXISTS \"\${_file}\")
-    message(FATAL_ERROR \"File or directory \${_file} referenced by variable \${_var} does not exist !\")
-  endif()
+    set(\${_var} \"\${_file}\")
+    if(NOT EXISTS \"\${_file}\")
+        message(FATAL_ERROR \"File or directory \${_file} referenced by variable \${_var} does not exist !\")
+    endif()
 endmacro()
 
-include(CMakeFindDependencyMacro OPTIONAL RESULT_VARIABLE _CMakeFindDependencyMacro_FOUND)
-if (NOT _CMakeFindDependencyMacro_FOUND)
+include(CMakeFindDependencyMacro OPTIONAL RESULT_VARIABLE _ROCMCMakeFindDependencyMacro_FOUND)
+if (NOT _ROCMCMakeFindDependencyMacro_FOUND)
     macro(find_dependency dep)
         if (NOT \${dep}_FOUND)
             set(rocm_fd_version)
@@ -128,27 +110,20 @@ if (NOT _CMakeFindDependencyMacro_FOUND)
     endmacro()
 endif()
 
-")
-  endif()
-
-
-  if(NOT PARSE_NO_CHECK_REQUIRED_COMPONENTS_MACRO)
-    string(APPEND PACKAGE_INIT "
 macro(check_required_components _NAME)
-  foreach(comp \${\${_NAME}_FIND_COMPONENTS})
-    if(NOT \${_NAME}_\${comp}_FOUND)
-      if(\${_NAME}_FIND_REQUIRED_\${comp})
-        set(\${_NAME}_FOUND FALSE)
-      endif()
-    endif()
-  endforeach()
+    foreach(comp \${\${_NAME}_FIND_COMPONENTS})
+        if(NOT \${_NAME}_\${comp}_FOUND)
+            if(\${_NAME}_FIND_REQUIRED_\${comp})
+                set(\${_NAME}_FOUND FALSE)
+            endif()
+        endif()
+    endforeach()
 endmacro()
-")
-  endif()
 
-  string(APPEND PACKAGE_INIT "
-####################################################################################")
+####################################################################################
 
-  configure_file("${_inputFile}" "${_outputFile}" @ONLY)
+    ")
+
+    configure_file("${INPUT_FILE}" "${OUTPUT_FILE}" @ONLY)
 
 endfunction()
