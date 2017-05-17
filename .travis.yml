@@ -1,0 +1,42 @@
+sudo: required
+dist: trusty
+language: cpp
+script: cmake
+
+matrix:
+    include:
+        # OSX
+        - os: osx
+          compiler: clang
+
+        - os: linux
+          compiler: gcc
+          addons: &gcc
+            apt:
+              packages:
+                - util-linux
+                - g++-5
+              sources:
+                - ubuntu-toolchain-r-test
+
+install:
+    - export CHECKOUT_PATH=`pwd`
+    # Show compiler info
+    - $CXX --version
+    - which $CXX
+    - $CC --version
+    - which $CC
+    - which cmake
+    - cmake --version
+    
+script:
+    - export INSTALL_PREFIX_PATH="${TRAVIS_BUILD_DIR}/usr"
+    - mkdir -p "$INSTALL_PREFIX_PATH"
+    - cd $CHECKOUT_PATH
+    - mkdir build
+    - cd build
+    - cmake -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX_PATH ..
+    - make check
+    - make install
+    - rm -rf "$INSTALL_PREFIX_PATH"
+
