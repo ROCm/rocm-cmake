@@ -5,6 +5,12 @@
 
 function(rocm_install_symlink_subdir SUBDIR)
     # TODO: Check if SUBDIR is relative path
+    # Copy instead of symlink on windows
+    if(CMAKE_HOST_WIN32)
+        set(SYMLINK_CMD "file(COPY \${SRC_REL} DESTINATION \${DEST})")
+    else()
+        set(SYMLINK_CMD "execute_process(COMMAND ln -sf \${SRC_REL} \${DEST})")
+    endif()
     install(CODE "
         set(SUBDIR \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${SUBDIR})
         file(GLOB_RECURSE FILES RELATIVE \${SUBDIR} \${SUBDIR}/*)
@@ -15,7 +21,7 @@ function(rocm_install_symlink_subdir SUBDIR)
             file(MAKE_DIRECTORY \${DEST_DIR})
             file(RELATIVE_PATH SRC_REL \${DEST_DIR} \${SRC})
             message(STATUS \"symlink: \${SRC_REL} -> \${DEST}\")
-            execute_process(COMMAND ln -sf \${SRC_REL} \${DEST})
+            ${SYMLINK_CMD}
         endforeach()
     ")
 endfunction()
