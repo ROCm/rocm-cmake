@@ -7,7 +7,7 @@ function(rocm_install_symlink_subdir SUBDIR)
     # TODO: Check if SUBDIR is relative path
     # Copy instead of symlink on windows
     if(CMAKE_HOST_WIN32)
-        set(SYMLINK_CMD "file(COPY \${SRC_REL} DESTINATION \${DEST})")
+        set(SYMLINK_CMD "file(COPY \${SRC} DESTINATION \${DEST})")
     else()
         set(SYMLINK_CMD "execute_process(COMMAND ln -sf \${SRC_REL} \${DEST})")
     endif()
