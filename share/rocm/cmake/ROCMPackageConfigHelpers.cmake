@@ -7,7 +7,7 @@ include(CMakePackageConfigHelpers)
 
 function(rocm_configure_package_config_file INPUT_FILE OUTPUT_FILE)
     set(options)
-    set(oneValueArgs INSTALL_DESTINATION INSTALL_PREFIX)
+    set(oneValueArgs INSTALL_DESTINATION PREFIX)
     set(multiValueArgs PATH_VARS)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}"  ${ARGN})
@@ -20,17 +20,12 @@ function(rocm_configure_package_config_file INPUT_FILE OUTPUT_FILE)
         message(FATAL_ERROR "INSTALL_DESTINATION is required for rocm_configure_package_config_file()")
     endif()
 
-    if(DEFINED PARSE_INSTALL_PREFIX)
-        set(INSTALL_PREFIX "${PARSE_INSTALL_PREFIX}")
-    elseif(IS_ABSOLUTE "${CMAKE_INSTALL_PREFIX}")
+    if(IS_ABSOLUTE "${CMAKE_INSTALL_PREFIX}")
         set(INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
     else()
         get_filename_component(INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" ABSOLUTE)
     endif()
 
-    if(NOT IS_ABSOLUTE "${INSTALL_PREFIX}")
-        message(FATAL_ERROR "INSTALL_PREFIX must be an absolute path")
-    endif()
 
     if(IS_ABSOLUTE "${PARSE_INSTALL_DESTINATION}")
         set(ABSOLUTE_INSTALL_DIR "${PARSE_INSTALL_DESTINATION}")
@@ -38,7 +33,21 @@ function(rocm_configure_package_config_file INPUT_FILE OUTPUT_FILE)
         set(ABSOLUTE_INSTALL_DIR "${INSTALL_PREFIX}/${PARSE_INSTALL_DESTINATION}")
     endif()
 
-    file(RELATIVE_PATH PACKAGE_RELATIVE_PATH "${ABSOLUTE_INSTALL_DIR}" "${INSTALL_PREFIX}" )
+    file(RELATIVE_PATH PACKAGE_RELATIVE_PATH "${ABSOLUTE_INSTALL_DIR}" "${INSTALL_PREFIX}")
+    file(RELATIVE_PATH PACKAGE_INSTALL_RELATIVE_DIR "${INSTALL_PREFIX}" "${ABSOLUTE_INSTALL_DIR}")
+
+    set(CHECK_PREFIX)
+    if(PARSE_PREFIX)
+        # On windows there is no symlinks
+        if(WIN32)
+            set(CHECK_PREFIX "
+if(NOT \"\${PACKAGE_PREFIX_DIR}/${PACKAGE_INSTALL_RELATIVE_DIR}\" EQUAL \"\${CMAKE_CURRENT_LIST_DIR}\")
+    set(PACKAGE_PREFIX_DIR ${INSTALL_PREFIX})
+endif()
+")
+        endif()
+    endif()
+
 
     foreach(_var ${PARSE_PATH_VARS})
         if(NOT DEFINED ${_var})
@@ -63,6 +72,8 @@ function(rocm_configure_package_config_file INPUT_FILE OUTPUT_FILE)
 get_filename_component(_ROCM_CMAKE_CURRENT_LIST_FILE_REAL \"\${CMAKE_CURRENT_LIST_FILE}\" REALPATH)
 get_filename_component(_ROCM_CMAKE_CURRENT_LIST_DIR_REAL \"\${_ROCM_CMAKE_CURRENT_LIST_FILE_REAL}\" DIRECTORY)
 get_filename_component(PACKAGE_PREFIX_DIR \"\${_ROCM_CMAKE_CURRENT_LIST_DIR_REAL}/${PACKAGE_RELATIVE_PATH}\" ABSOLUTE)
+
+${CHECK_PREFIX}
 
 macro(set_and_check _var _file)
     set(\${_var} \"\${_file}\")
