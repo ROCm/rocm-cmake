@@ -70,7 +70,7 @@ rocm_configure_package_config_file
     rocm_configure_package_config_file(<input> <output>
         INSTALL_DESTINATION <path>
         [PATH_VARS <var>...]
-        [INSTALL_PREFIX <path>]
+        [PREFIX <path>]
     )
 
 Configure the the config file used found be `find_package`.
