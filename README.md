@@ -52,6 +52,7 @@ rocm_export_targets
     rocm_export_targets(
         [NAMESPACE <namespace>]
         [EXPORT <export>]
+        [INCLUDE <cmake-file>...]
         [NAME <name>]
         [COMPATIBILITY <compatibility>]
         [PREFIX <prefix>]
