@@ -46,12 +46,6 @@ function(rocm_setup_version)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-    string(TOUPPER ${PROJECT_NAME} PREFIX)
-
-    if(PARSE_PREFIX)
-        set(PREFIX ${PARSE_PREFIX})
-    endif()
-
     if(PARSE_VERSION)
         if(NO_GIT_TAG_VERSION)
             set(PACKAGE_VERSION ${PARSE_VERSION})
