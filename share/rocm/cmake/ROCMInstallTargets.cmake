@@ -10,7 +10,7 @@ include(ROCMPackageConfigHelpers)
 function(rocm_install_targets)
     set(options)
     set(oneValueArgs PREFIX EXPORT)
-    set(multiValueArgs TARGETS INCLUDE)
+    set(multiValueArgs TARGETS INCLUDE COMPONENT)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -31,6 +31,14 @@ function(rocm_install_targets)
         set(LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR})
         set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR})
     endif()
+
+    if(PARSE_COMPONENT)
+        set(DEV_COMPONENT ${PARSE_COMPONENT})
+        set(RUNTIME_COMPONENT ${PARSE_COMPONENT})
+    else()
+        set(DEV_COMPONENT "dev")
+        set(RUNTIME_COMPONENT "runtime")
+    endif()
     
     foreach(TARGET ${PARSE_TARGETS})
         foreach(INCLUDE ${PARSE_INCLUDE})
@@ -41,14 +49,16 @@ function(rocm_install_targets)
     endforeach()
 
     foreach(INCLUDE ${PARSE_INCLUDE})
-        install(DIRECTORY ${INCLUDE}/ DESTINATION ${INCLUDE_INSTALL_DIR})
+        install(DIRECTORY ${INCLUDE}/ DESTINATION ${INCLUDE_INSTALL_DIR} COMPONENT ${DEV_COMPONENT})
     endforeach()
 
     install(TARGETS ${PARSE_TARGETS} 
         EXPORT ${EXPORT_FILE}
         RUNTIME DESTINATION ${BIN_INSTALL_DIR}
         LIBRARY DESTINATION ${LIB_INSTALL_DIR}
-        ARCHIVE DESTINATION ${LIB_INSTALL_DIR})
+        ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
+        COMPONENT ${RUNTIME_COMPONENT}
+    )
 
 endfunction()
 
@@ -173,13 +183,16 @@ function(rocm_export_targets)
         DESTINATION
         ${CONFIG_PACKAGE_INSTALL_DIR}
         ${NAMESPACE_ARG}
+        COMPONENT dev
     )
 
     install( FILES
         ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}-version.cmake
         DESTINATION
-        ${CONFIG_PACKAGE_INSTALL_DIR})
+        ${CONFIG_PACKAGE_INSTALL_DIR}
+        COMPONENT dev
+    )
 
 endfunction()
 

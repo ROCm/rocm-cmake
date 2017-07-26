@@ -5,6 +5,7 @@
 
 include(CMakeParseArguments)
 include(GNUInstallDirs)
+include(CPackComponent)
 
 find_program(MAKE_NSIS_EXE makensis)
 find_program(RPMBUILD_EXE rpmbuild)
@@ -34,6 +35,15 @@ macro(rocm_create_package)
     set(CPACK_NSIS_PACKAGE_NAME ${PARSE_NAME})
 
     set(CPACK_RPM_PACKAGE_RELOCATABLE Off)
+
+    set(CPACK_RPM_COMPONENT_INSTALL ON)
+    set(CPACK_DEBIAN_COMPONENT_INSTALL ON)
+
+    # Add default components
+    cpack_add_component(runtime DISPLAY_NAME runtime REQUIRED INSTALL_TYPES all)
+    foreach(COMPONENT dev)
+        cpack_add_component(${COMPONENT} DISPLAY_NAME ${COMPONENT} REQUIRED INSTALL_TYPES all ARCHIVE_FILE "${CPACK_PACKAGE_NAME}-${COMPONENT}-${CPACK_PACKAGE_VERSION}-${CPACK_SYSTEM_NAME}")
+    endforeach()
     
     set(CPACK_GENERATOR "TGZ;ZIP")
     if(EXISTS ${MAKE_NSIS_EXE})
