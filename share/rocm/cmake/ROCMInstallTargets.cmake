@@ -41,7 +41,13 @@ function(rocm_install_targets)
     endforeach()
 
     foreach(INCLUDE ${PARSE_INCLUDE})
-        install(DIRECTORY ${INCLUDE}/ DESTINATION ${INCLUDE_INSTALL_DIR})
+        install(DIRECTORY ${INCLUDE}/ DESTINATION ${INCLUDE_INSTALL_DIR}
+            FILES_MATCHING 
+            PATTERN "*.h"
+            PATTERN "*.hpp"
+            PATTERN "*.hh"
+            PATTERN "*.hxx"
+        )
     endforeach()
 
     install(TARGETS ${PARSE_TARGETS} 
