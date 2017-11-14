@@ -25,7 +25,8 @@ function(rocm_get_version OUTPUT_VERSION)
     find_program(GIT NAMES git)
 
     if(GIT)
-        execute_process(COMMAND git describe --dirty --long --match [0-9]*
+        set(GIT_COMMAND ${GIT} describe --dirty --long --match [0-9]*)
+        execute_process(COMMAND ${GIT_COMMAND} 
                         WORKING_DIRECTORY ${DIRECTORY}
                         OUTPUT_VARIABLE GIT_TAG_VERSION
                         OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -33,6 +34,16 @@ function(rocm_get_version OUTPUT_VERSION)
                         ERROR_QUIET)
         if(${RESULT} EQUAL 0)
             set(_version ${GIT_TAG_VERSION})
+        else()
+            execute_process(COMMAND ${GIT_COMMAND} --always
+                        WORKING_DIRECTORY ${DIRECTORY}
+                        OUTPUT_VARIABLE GIT_TAG_VERSION
+                        OUTPUT_STRIP_TRAILING_WHITESPACE
+                        RESULT_VARIABLE RESULT
+                        ERROR_QUIET)
+            if(${RESULT} EQUAL 0)
+                set(_version ${_version}-${GIT_TAG_VERSION})
+            endif()
         endif()
     endif()
     rocm_set_parent(${OUTPUT_VERSION} ${_version})
@@ -47,7 +58,11 @@ function(rocm_setup_version)
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     if(PARSE_VERSION)
-        if(NO_GIT_TAG_VERSION)
+        # Compensate for missing patch version
+        if(PARSE_VERSION MATCHES "^[0-9]+\\.[0-9]+$")
+            set(PARSE_VERSION ${PARSE_VERSION}.0)
+        endif()
+        if(PARSE_NO_GIT_TAG_VERSION)
             set(PACKAGE_VERSION ${PARSE_VERSION})
         else()
             rocm_get_version(PACKAGE_VERSION VERSION ${PARSE_VERSION})
@@ -57,7 +72,8 @@ function(rocm_setup_version)
         string(REGEX REPLACE "^([0-9]+)\\.[0-9]+\\.[0-9]+.*" "\\1" _version_MAJOR "${PROJECT_VERSION}")
         string(REGEX REPLACE "^[0-9]+\\.([0-9]+)\\.[0-9]+.*" "\\1" _version_MINOR "${PROJECT_VERSION}")
         string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.([0-9]+).*" "\\1" _version_PATCH "${PROJECT_VERSION}")
-        foreach(level MAJOR MINOR PATCH)
+        string(REGEX REPLACE "^[0-9]+\\.[0-9]+\\.[0-9]+[.-](.*)" "\\1" _version_TWEAK "${PROJECT_VERSION}")
+        foreach(level MAJOR MINOR PATCH TWEAK)
             rocm_set_parent(${PROJECT_NAME}_VERSION_${level} ${_version_${level}})
             rocm_set_parent(PROJECT_VERSION_${level} ${_version_${level}})
         endforeach()
