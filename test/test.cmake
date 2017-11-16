@@ -15,7 +15,13 @@ set(BUILDS_DIR ${TMP_DIR}/builds)
 
 macro(test_expect_eq X Y)
     if(NOT ${X} EQUAL ${Y})
-        message(FATAL_ERROR "EXPECT FAILURE: ${X} != ${Y}")
+        message(FATAL_ERROR "EXPECT FAILURE: ${X} != ${Y} ${ARGN}")
+    endif()
+endmacro()
+
+macro(test_expect_matches X Y)
+    if(NOT ${X} MATCHES ${Y})
+        message(FATAL_ERROR "EXPECT FAILURE: ${X} != ${Y} ${ARGN}")
     endif()
 endmacro()
 
@@ -58,6 +64,10 @@ function(install_dir DIR)
     test_exec(COMMAND ${CMAKE_COMMAND} --build ${BUILD_DIR} --target install)
 
     file(REMOVE_RECURSE ${BUILD_DIR})
+endfunction()
+
+function(write_version_cmake DIR CONTENT)
+    configure_file(${TEST_DIR}/version/CMakeLists.txt ${DIR}/CMakeLists.txt @ONLY)
 endfunction()
 
 install_dir(${TEST_DIR}/../)
