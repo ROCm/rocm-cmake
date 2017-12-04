@@ -16,6 +16,8 @@ matrix:
               packages:
                 - util-linux
                 - g++-5
+                - cppcheck
+                - clang-tidy
               sources:
                 - ubuntu-toolchain-r-test
 
