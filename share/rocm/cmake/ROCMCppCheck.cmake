@@ -50,7 +50,7 @@ macro(rocm_enable_cppcheck)
         -q
         # --report-progress
         ${CPPCHECK_FORCE}
-        --platform=native
+        # --platform=native
         --template='{file}:{line}: {severity}[{id}]: {message}'
         --error-exitcode=1
         -j ${CPPCHECK_JOBS}
