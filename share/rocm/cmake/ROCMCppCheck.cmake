@@ -67,7 +67,9 @@ macro(rocm_enable_cppcheck)
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "cppcheck: Running cppcheck..."
     )
-    rocm_mark_as_analyzer(cppcheck)
+    if(CPPCHECK_EXE)
+        rocm_mark_as_analyzer(cppcheck)
+    endif()
 endmacro()
 
 
