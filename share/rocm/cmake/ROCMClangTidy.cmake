@@ -72,7 +72,7 @@ macro(rocm_enable_clang_tidy)
         set(CLANG_TIDY_ERRORS_ARG "-warnings-as-errors='${CLANG_TIDY_ERRORS}'")
     endif()
 
-    if (${CLANG_TIDY_VERSION} VERSION_LESS "4.0.0")
+    if (${CLANG_TIDY_VERSION} VERSION_LESS "4.0.0" AND WIN32)
         set(CLANG_TIDY_QUIET_ARG "")
     else()
         set(CLANG_TIDY_QUIET_ARG "-quiet")
