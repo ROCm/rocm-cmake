@@ -16,8 +16,12 @@ matrix:
               packages:
                 - util-linux
                 - g++-5
+                - cppcheck
+                - clang-4.0
+                - clang-tidy-4.0
               sources:
                 - ubuntu-toolchain-r-test
+                - llvm-toolchain-trusty-4.0
 
 install:
     - export CHECKOUT_PATH=`pwd`
