@@ -35,6 +35,7 @@ macro(rocm_create_package)
     set(CPACK_NSIS_PACKAGE_NAME ${PARSE_NAME})
 
     set(CPACK_RPM_PACKAGE_RELOCATABLE Off)
+    set( CPACK_RPM_PACKAGE_AUTOREQPROV Off CACHE BOOL "turns off rpm autoreqprov field; packages explicity list dependencies" )
 
     set(CPACK_GENERATOR "TGZ;ZIP")
     if(EXISTS ${MAKE_NSIS_EXE})
