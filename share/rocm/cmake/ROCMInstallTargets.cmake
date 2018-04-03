@@ -7,6 +7,8 @@ include(CMakeParseArguments)
 include(GNUInstallDirs)
 include(ROCMPackageConfigHelpers)
 
+set(ROCM_INSTALL_LIBDIR lib)
+
 function(rocm_install_targets)
     set(options)
     set(oneValueArgs PREFIX EXPORT)
@@ -24,11 +26,11 @@ function(rocm_install_targets)
     if(PARSE_PREFIX)
         set(PREFIX_DIR ${PARSE_PREFIX})
         set(BIN_INSTALL_DIR ${PARSE_PREFIX}/${CMAKE_INSTALL_BINDIR})
-        set(LIB_INSTALL_DIR ${PARSE_PREFIX}/${CMAKE_INSTALL_LIBDIR})
+        set(LIB_INSTALL_DIR ${PARSE_PREFIX}/${ROCM_INSTALL_LIBDIR})
         set(INCLUDE_INSTALL_DIR ${PARSE_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR})
     else()
         set(BIN_INSTALL_DIR ${CMAKE_INSTALL_BINDIR})
-        set(LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR})
+        set(LIB_INSTALL_DIR ${ROCM_INSTALL_LIBDIR})
         set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR})
     endif()
 
@@ -49,7 +51,13 @@ function(rocm_install_targets)
     endforeach()
 
     foreach(INCLUDE ${PARSE_INCLUDE})
-        install(DIRECTORY ${INCLUDE}/ DESTINATION ${INCLUDE_INSTALL_DIR} COMPONENT ${DEV_COMPONENT})
+        install(DIRECTORY ${INCLUDE}/ DESTINATION ${INCLUDE_INSTALL_DIR} COMPONENT ${DEV_COMPONENT}
+            FILES_MATCHING 
+            PATTERN "*.h"
+            PATTERN "*.hpp"
+            PATTERN "*.hh"
+            PATTERN "*.hxx"
+        )
     endforeach()
 
     install(TARGETS ${PARSE_TARGETS} 
@@ -115,11 +123,11 @@ function(rocm_export_targets)
         set(PREFIX_DIR ${PARSE_PREFIX})
         set(PREFIX_ARG PREFIX ${PREFIX_DIR})
         set(BIN_INSTALL_DIR ${PREFIX_DIR}/${CMAKE_INSTALL_BINDIR})
-        set(LIB_INSTALL_DIR ${PREFIX_DIR}/${CMAKE_INSTALL_LIBDIR})
+        set(LIB_INSTALL_DIR ${PREFIX_DIR}/${ROCM_INSTALL_LIBDIR})
         set(INCLUDE_INSTALL_DIR ${PREFIX_DIR}/${CMAKE_INSTALL_INCLUDEDIR})
     else()
         set(BIN_INSTALL_DIR ${CMAKE_INSTALL_BINDIR})
-        set(LIB_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR})
+        set(LIB_INSTALL_DIR ${ROCM_INSTALL_LIBDIR})
         set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR})
     endif()
     set(CONFIG_PACKAGE_INSTALL_DIR ${LIB_INSTALL_DIR}/cmake/${PACKAGE_NAME_LOWER})

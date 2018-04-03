@@ -21,11 +21,12 @@ macro(rocm_create_package)
     set(CPACK_PACKAGE_NAME ${PARSE_NAME})
     set(CPACK_PACKAGE_VENDOR "Advanced Micro Devices, Inc")
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${PARSE_DESCRIPTION})
+    set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
     set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
     set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
     set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
     if(NOT CMAKE_HOST_WIN32)
-        set(CPACK_SET_DESTDIR On)
+        set( CPACK_SET_DESTDIR ON CACHE BOOL "Boolean toggle to make CPack use DESTDIR mechanism when packaging" )
     endif()
 
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER ${PARSE_MAINTAINER})
@@ -35,7 +36,6 @@ macro(rocm_create_package)
     set(CPACK_NSIS_PACKAGE_NAME ${PARSE_NAME})
 
     set(CPACK_RPM_PACKAGE_RELOCATABLE Off)
-
 
     set(CPACK_RPM_COMPONENT_INSTALL ON)
     set(CPACK_DEBIAN_COMPONENT_INSTALL ON)
@@ -62,6 +62,8 @@ macro(rocm_create_package)
         endforeach()
     endforeach()
     
+    set( CPACK_RPM_PACKAGE_AUTOREQPROV Off CACHE BOOL "turns off rpm autoreqprov field; packages explicity list dependencies" )
+
     set(CPACK_GENERATOR "TGZ;ZIP")
     if(EXISTS ${MAKE_NSIS_EXE})
         list(APPEND CPACK_GENERATOR "NSIS")
