@@ -38,7 +38,8 @@ macro(rocm_create_package)
     set(CPACK_RPM_PACKAGE_RELOCATABLE Off)
 
     set(CPACK_RPM_COMPONENT_INSTALL ON)
-    set(CPACK_DEBIAN_COMPONENT_INSTALL ON)
+    # This variable is with CPACK_DEB_ prefix instead of CPACK_DEBIAN_ prefix
+    set(CPACK_DEB_COMPONENT_INSTALL ON)
 
     set(CPACK_DEBIAN_PACKAGE_COMPONENT On)
     set(CPACK_RPM_PACKAGE_COMPONENT On)

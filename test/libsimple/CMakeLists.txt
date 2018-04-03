@@ -39,3 +39,6 @@ else()
     rocm_install_targets(TARGETS simple INCLUDE include)
     rocm_export_targets(TARGETS simple INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/importtarget.cmake)
 endif()
+
+add_custom_target(check-package COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/check-package.cmake ${CMAKE_CURRENT_BINARY_DIR})
+add_custom_target(list-files COMMAND ls -l ${CMAKE_CURRENT_BINARY_DIR})
