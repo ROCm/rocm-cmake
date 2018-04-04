@@ -13,6 +13,27 @@ find_program(CPPCHECK_EXE
         /opt/rocm/bin
 )
 
+function(rocm_find_cppcheck_version VAR)
+    execute_process(COMMAND ${CPPCHECK_EXE} --version OUTPUT_VARIABLE VERSION_OUTPUT)
+    separate_arguments(VERSION_OUTPUT_LIST UNIX_COMMAND "${VERSION_OUTPUT}")
+    list(LENGTH VERSION_OUTPUT_LIST VERSION_OUTPUT_LIST_LEN)
+    if(VERSION_OUTPUT_LIST_LEN GREATER 1)
+        list(GET VERSION_OUTPUT_LIST 1 VERSION)
+        set(${VAR} ${VERSION} PARENT_SCOPE)
+    else()
+        set(${VAR} "0.0" PARENT_SCOPE)
+    endif()
+
+endfunction()
+
+if( NOT CPPCHECK_EXE )
+    message( STATUS "Cppcheck not found" )
+    set(CPPCHECK_VERSION "0.0")
+else()
+    rocm_find_cppcheck_version(CPPCHECK_VERSION)
+    message( STATUS "Cppcheck found: ${CPPCHECK_VERSION}")
+endif()
+
 ProcessorCount(CPPCHECK_JOBS)
 
 set(CPPCHECK_BUILD_DIR ${CMAKE_BINARY_DIR}/cppcheck-build)
@@ -49,6 +70,13 @@ macro(rocm_enable_cppcheck)
         set(CPPCHECK_FORCE --force)
     endif()
 
+    if (${CPPCHECK_VERSION} VERSION_LESS "1.80")
+        set(CPPCHECK_BUILD_DIR_FLAG)
+    else()
+        set(CPPCHECK_BUILD_DIR_FLAG "--cppcheck-build-dir=${CPPCHECK_BUILD_DIR}")
+    endif()
+
+
     set(SOURCES)
     set(GLOBS)
     foreach(SOURCE ${PARSE_SOURCES})
@@ -72,7 +100,7 @@ macro(rocm_enable_cppcheck)
             # -v
             # --report-progress
             ${CPPCHECK_FORCE}
-            --cppcheck-build-dir=${CPPCHECK_BUILD_DIR}
+            ${CPPCHECK_BUILD_DIR_FLAG}
             --platform=native
             \"--template={file}:{line}: {severity}: {message} [{id}]\"
             --error-exitcode=1
