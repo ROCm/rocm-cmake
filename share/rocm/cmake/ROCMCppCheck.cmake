@@ -76,6 +76,12 @@ macro(rocm_enable_cppcheck)
         set(CPPCHECK_BUILD_DIR_FLAG "--cppcheck-build-dir=${CPPCHECK_BUILD_DIR}")
     endif()
 
+    if (${CPPCHECK_VERSION} VERSION_LESS "1.80")
+        set(CPPCHECK_PLATFORM_FLAG)
+    else()
+        set(CPPCHECK_PLATFORM_FLAG "--platform=native")
+    endif()
+
 
     set(SOURCES)
     set(GLOBS)
@@ -101,8 +107,8 @@ macro(rocm_enable_cppcheck)
             # --report-progress
             ${CPPCHECK_FORCE}
             ${CPPCHECK_BUILD_DIR_FLAG}
-            --platform=native
-            \"--template={file}:{line}: {severity}: {message} [{id}]\"
+            ${CPPCHECK_PLATFORM_FLAG}
+            --template=daca2
             --error-exitcode=1
             -j ${CPPCHECK_JOBS}
             ${CPPCHECK_DEFINES}
