@@ -70,6 +70,26 @@ function(write_version_cmake DIR CONTENT)
     configure_file(${TEST_DIR}/version/CMakeLists.txt ${DIR}/CMakeLists.txt @ONLY)
 endfunction()
 
+function(test_check_package)
+    set(options)
+    set(oneValueArgs NAME HEADER TARGET)
+    set(multiValueArgs)
+
+    cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    set(HEADER_FLAG)
+    if(PARSE_HEADER)
+        set(HEADER_FLAG -DPKG_HEADER=${PARSE_HEADER})
+    endif()
+
+    set(TARGET ${PARSE_NAME})
+    if(PARSE_TARGET)
+        set(TARGET ${PARSE_TARGET})
+    endif()
+
+    install_dir(${TEST_DIR}/findpackagecheck CMAKE_ARGS -DPKG=${PARSE_NAME} -DPKG_TARGET=${TARGET} ${HEADER_FLAG})
+endfunction()
+
 install_dir(${TEST_DIR}/../)
 
 include(${TEST})
