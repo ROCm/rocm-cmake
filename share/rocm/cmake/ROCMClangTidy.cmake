@@ -7,6 +7,9 @@ include(ROCMAnalyzers)
 find_program(CLANG_TIDY_EXE 
     NAMES 
         clang-tidy
+        clang-tidy-8.0
+        clang-tidy-7.0
+        clang-tidy-6.0
         clang-tidy-5.0
         clang-tidy-4.0
         clang-tidy-3.9
@@ -69,13 +72,19 @@ macro(rocm_enable_clang_tidy)
     if (${CLANG_TIDY_VERSION} VERSION_LESS "3.9.0")
         set(CLANG_TIDY_ERRORS_ARG "")
     else()
-        set(CLANG_TIDY_ERRORS_ARG "-warnings-as-errors='${CLANG_TIDY_ERRORS}'")
+        set(CLANG_TIDY_ERRORS_ARG "-warnings-as-errors=${CLANG_TIDY_ERRORS}")
     endif()
 
     if (${CLANG_TIDY_VERSION} VERSION_LESS "4.0.0" OR WIN32)
         set(CLANG_TIDY_QUIET_ARG "")
     else()
         set(CLANG_TIDY_QUIET_ARG "-quiet")
+    endif()
+
+    if(EXISTS ${CMAKE_SOURCE_DIR}/.clang-tidy)
+        set(CLANG_TIDY_CONFIG_ARG "-config=")
+    else()
+        set(CLANG_TIDY_CONFIG_ARG)
     endif()
 
     if(PARSE_HEADER_FILTER)
@@ -86,14 +95,17 @@ macro(rocm_enable_clang_tidy)
 
     set(CLANG_TIDY_COMMAND 
         ${CLANG_TIDY_EXE}
+        ${CLANG_TIDY_CONFIG_ARG}
         ${CLANG_TIDY_QUIET_ARG} 
-        -p ${CMAKE_BINARY_DIR} 
-        -checks='${CLANG_TIDY_CHECKS}'
-        ${CLANG_TIDY_ERRORS_ARG}
-        -extra-arg='${CLANG_TIDY_EXTRA_ARGS}'
+        -p "${CMAKE_BINARY_DIR}"
+        "-checks=${CLANG_TIDY_CHECKS}"
+        "${CLANG_TIDY_ERRORS_ARG}"
+        "-extra-arg=${CLANG_TIDY_EXTRA_ARGS}"
         ${CLANG_TIDY_ANALYZE_TEMPORARY_DTORS}
-        -header-filter='${CLANG_TIDY_HEADER_FILTER}'
+        "-header-filter=${CLANG_TIDY_HEADER_FILTER}"
     )
+    execute_process(COMMAND ${CLANG_TIDY_COMMAND} -dump-config OUTPUT_VARIABLE CLANG_TIDY_CONFIG)
+    file(WRITE ${CMAKE_BINARY_DIR}/clang-tidy.yml ${CLANG_TIDY_CONFIG})
     add_custom_target(tidy)
     if(CLANG_TIDY_EXE)
         rocm_mark_as_analyzer(tidy)
@@ -112,8 +124,8 @@ function(rocm_clang_tidy_check TARGET)
     # COMMAND ${CLANG_TIDY_COMMAND} $<JOIN:$<TARGET_PROPERTY:${TARGET},SOURCES>, >
     foreach(SOURCE ${SOURCES})
         if(NOT "${SOURCE}" MATCHES "(h|hpp|hxx)$")
-            set(tidy_target tidy-target-${TARGET}-${tidy_file})
             string(MAKE_C_IDENTIFIER "${SOURCE}" tidy_file)        
+            set(tidy_target tidy-target-${TARGET}-${tidy_file})
             add_custom_target(${tidy_target}
                 COMMAND ${CLANG_TIDY_COMMAND} ${SOURCE} "-export-fixes=${CLANG_TIDY_FIXIT_DIR}/${TARGET}-${tidy_file}.yaml"
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
