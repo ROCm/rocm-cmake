@@ -42,7 +42,7 @@ set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CPPCHECK_BU
 
 macro(rocm_enable_cppcheck)
     set(options FORCE)
-    set(oneValueArgs)
+    set(oneValueArgs RULE_FILE)
     set(multiValueArgs CHECKS SUPPRESS DEFINE UNDEFINE INCLUDE SOURCES)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -82,6 +82,10 @@ macro(rocm_enable_cppcheck)
         set(CPPCHECK_PLATFORM_FLAG "--platform=native")
     endif()
 
+    set(CPPCHECK_RULE_FILE_ARG)
+    if(PARSE_RULE_FILE)
+        set(CPPCHECK_RULE_FILE_ARG "--rule-file=${PARSE_RULE_FILE}")
+    endif()
 
     set(SOURCES)
     set(GLOBS)
@@ -108,6 +112,7 @@ macro(rocm_enable_cppcheck)
             ${CPPCHECK_FORCE}
             ${CPPCHECK_BUILD_DIR_FLAG}
             ${CPPCHECK_PLATFORM_FLAG}
+            ${CPPCHECK_RULE_FILE_ARG}
             --inline-suppr
             --template=gcc
             --error-exitcode=1
