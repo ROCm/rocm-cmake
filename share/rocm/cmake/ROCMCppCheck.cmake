@@ -108,7 +108,7 @@ macro(rocm_enable_cppcheck)
             ${CPPCHECK_FORCE}
             ${CPPCHECK_BUILD_DIR_FLAG}
             ${CPPCHECK_PLATFORM_FLAG}
-            --template=daca2
+            --template=gcc
             --error-exitcode=1
             -j ${CPPCHECK_JOBS}
             ${CPPCHECK_DEFINES}
