@@ -41,7 +41,7 @@ file(MAKE_DIRECTORY ${CPPCHECK_BUILD_DIR})
 set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CPPCHECK_BUILD_DIR})
 
 macro(rocm_enable_cppcheck)
-    set(options FORCE)
+    set(options FORCE INCONCLUSIVE)
     set(oneValueArgs RULE_FILE)
     set(multiValueArgs CHECKS SUPPRESS DEFINE UNDEFINE INCLUDE SOURCES)
 
@@ -68,6 +68,11 @@ macro(rocm_enable_cppcheck)
     set(CPPCHECK_FORCE "--project=${CMAKE_BINARY_DIR}/compile_commands.json")
     if(PARSE_FORCE)
         set(CPPCHECK_FORCE --force)
+    endif()
+
+    set(CPPCHECK_INCONCLUSIVE "")
+    if(PARSE_INCONCLUSIVE)
+        set(CPPCHECK_INCONCLUSIVE --inconclusive)
     endif()
 
     if (${CPPCHECK_VERSION} VERSION_LESS "1.80")
@@ -110,6 +115,7 @@ macro(rocm_enable_cppcheck)
             # -v
             # --report-progress
             ${CPPCHECK_FORCE}
+            ${CPPCHECK_INCONCLUSIVE}
             ${CPPCHECK_BUILD_DIR_FLAG}
             ${CPPCHECK_PLATFORM_FLAG}
             ${CPPCHECK_RULE_FILE_ARG}

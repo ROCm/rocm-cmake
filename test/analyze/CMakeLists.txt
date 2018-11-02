@@ -28,6 +28,7 @@ rocm_enable_clang_tidy(
 )
 include(ROCMCppCheck)
 rocm_enable_cppcheck(
+    INCONCLUSIVE
     CHECKS 
         all
     FORCE
