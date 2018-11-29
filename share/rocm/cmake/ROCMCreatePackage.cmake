@@ -13,7 +13,7 @@ find_program(DPKG_EXE dpkg)
 macro(rocm_create_package)
     set(options LDCONFIG)
     set(oneValueArgs NAME DESCRIPTION SECTION MAINTAINER LDCONFIG_DIR PREFIX)
-    set(multiValueArgs DEB_DEPENDS)
+    set(multiValueArgs DEPENDS)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -50,8 +50,10 @@ macro(rocm_create_package)
         list(APPEND CPACK_GENERATOR "DEB")
     endif()
 
-    if(PARSE_DEB_DEPENDS)
-        set(CPACK_DEBIAN_PACKAGE_DEPENDS ${PARSE_DEB_DEPENDS})
+    if(PARSE_DEPENDS)
+        string(REPLACE ";" ", " DEPENDS "${PARSE_DEPENDS}")
+        set(CPACK_DEBIAN_PACKAGE_DEPENDS "${DEPENDS}")
+        set(CPACK_RPM_PACKAGE_REQUIRES "${DEPENDS}")
     endif()
 
     if(PARSE_LDCONFIG)
