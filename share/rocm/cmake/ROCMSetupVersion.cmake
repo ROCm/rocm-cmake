@@ -19,10 +19,9 @@ function(rocm_git_remote_refs REFS REMOTE DIRECTORY)
         ERROR_QUIET)
     string(REPLACE "\n" ";" LINES ${OUTPUT})
     foreach(LINE ${LINES})
-        string(REPLACE "\n" ";" LINES ${OUTPUT})
-        separate_arguments(FIELDS "${LINE}")
+        separate_arguments(FIELDS UNIX_COMMAND "${LINE}")
         list(GET FIELDS 1 REF)
-        if(NOT REF EQUAL "HEAD")
+        if(NOT "${REF}" STREQUAL "HEAD")
             list(APPEND _refs ${REF})
         endif()
     endforeach()
@@ -39,9 +38,9 @@ function(rocm_git_commit_hash COMMIT DIRECTORY)
     rocm_set_parent(${COMMIT} ${OUTPUT})
 endfunction()
 
-function(rocm_git_validate_version OUTPUT COMMIT DIRECTORY)
+function(rocm_git_validate_version OUTPUT DIRECTORY)
     foreach(URL ${ARGN})
-        execute_process(COMMAND ${GIT} fetch ${URL} ${COMMIT}
+        execute_process(COMMAND ${GIT} fetch ${URL}
                     WORKING_DIRECTORY ${DIRECTORY}
                     RESULT_VARIABLE RESULT
                     ERROR_QUIET)
@@ -50,12 +49,13 @@ function(rocm_git_validate_version OUTPUT COMMIT DIRECTORY)
         foreach(REF ${REFS})
             execute_process(COMMAND ${GIT} for-each-ref ${REF} --contains=${COMMIT}
                 WORKING_DIRECTORY ${DIRECTORY}
-                OUTPUT_VARIABLE OUTPUT
+                OUTPUT_VARIABLE EACH_REF
                 OUTPUT_STRIP_TRAILING_WHITESPACE
                 RESULT_VARIABLE RESULT
                 ERROR_QUIET)
-            if(OUTPUT)
+            if(NOT EACH_REF)
                 rocm_set_parent(${OUTPUT} 1)
+                return()
             endif()
         endforeach()
     endforeach()
@@ -96,7 +96,7 @@ function(rocm_get_version OUTPUT_VERSION)
             if(${RESULT} EQUAL 0)
                 set(_version ${_version}-${GIT_TAG_VERSION})
                 if(PARSE_URL)
-                    rocm_git_validate_version(VALID_VERSION ${GIT_TAG_VERSION} ${PARSE_URL})
+                    rocm_git_validate_version(VALID_VERSION ${DIRECTORY} ${PARSE_URL})
                     if(VALID_VERSION)
                         set(_version ${_version}-unofficial)
                     endif()
