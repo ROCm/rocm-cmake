@@ -14,7 +14,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/share/rocm/cmake)
 include(ROCMCreatePackage)
 include(ROCMSetupVersion)
 
-rocm_setup_version(VERSION 0.2)
+rocm_setup_version(VERSION 0.2 URL https://github.com/RadeonOpenCompute/rocm-cmake.git)
 
 rocm_create_package(
     NAME rocm-cmake

@@ -42,5 +42,6 @@ script:
     - cmake -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX_PATH ..
     - make check
     - make install
+    - make package
     - rm -rf "$INSTALL_PREFIX_PATH"
 
