@@ -2,22 +2,62 @@
 # Copyright (C) 2017 Advanced Micro Devices, Inc.
 ################################################################################
 
+find_program(GIT NAMES git)
 
 macro(rocm_set_parent VAR)
     set(${VAR} ${ARGN} PARENT_SCOPE)
     set(${VAR} ${ARGN})
 endmacro()
 
-function(rocm_validate_version OUTPUT GIT COMMIT DIRECTORY)
+function(rocm_git_remote_refs REFS REMOTE DIRECTORY)
+    set(_refs)
+    execute_process(COMMAND ${GIT} ls-remote ${REMOTE}
+        WORKING_DIRECTORY ${DIRECTORY}
+        OUTPUT_VARIABLE OUTPUT
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        RESULT_VARIABLE RESULT
+        ERROR_QUIET)
+    string(REPLACE "\n" ";" LINES ${OUTPUT})
+    foreach(LINE ${LINES})
+        string(REPLACE "\n" ";" LINES ${OUTPUT})
+        separate_arguments(FIELDS "${LINE}")
+        list(GET FIELDS 1 REF)
+        if(NOT REF EQUAL "HEAD")
+            list(APPEND _refs ${REF})
+        endif()
+    endforeach()
+    rocm_set_parent(${REFS} ${_refs})
+endfunction()
+
+function(rocm_git_commit_hash COMMIT DIRECTORY)
+    execute_process(COMMAND ${GIT} rev-parse HEAD
+        WORKING_DIRECTORY ${DIRECTORY}
+        OUTPUT_VARIABLE OUTPUT
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        RESULT_VARIABLE RESULT
+        ERROR_QUIET)
+    rocm_set_parent(${COMMIT} ${OUTPUT})
+endfunction()
+
+function(rocm_git_validate_version OUTPUT COMMIT DIRECTORY)
     foreach(URL ${ARGN})
         execute_process(COMMAND ${GIT} fetch ${URL} ${COMMIT}
                     WORKING_DIRECTORY ${DIRECTORY}
                     RESULT_VARIABLE RESULT
                     ERROR_QUIET)
-        if(${RESULT} EQUAL 0)
-            rocm_set_parent(${OUTPUT} 1)
-            return()
-        endif()
+        rocm_git_remote_refs(REFS ${URL} ${DIRECTORY})
+        rocm_git_commit_hash(COMMIT ${DIRECTORY})
+        foreach(REF ${REFS})
+            execute_process(COMMAND ${GIT} for-each-ref ${REF} --contains=${COMMIT}
+                WORKING_DIRECTORY ${DIRECTORY}
+                OUTPUT_VARIABLE OUTPUT
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+                RESULT_VARIABLE RESULT
+                ERROR_QUIET)
+            if(OUTPUT)
+                rocm_set_parent(${OUTPUT} 1)
+            endif()
+        endforeach()
     endforeach()
     rocm_set_parent(${OUTPUT} 0)
 endfunction()
@@ -35,8 +75,6 @@ function(rocm_get_version OUTPUT_VERSION)
     if(PARSE_DIRECTORY)
         set(DIRECTORY ${PARSE_DIRECTORY})
     endif()
-
-    find_program(GIT NAMES git)
 
     if(GIT)
         set(GIT_COMMAND ${GIT} describe --dirty --long --match [0-9]*)
@@ -58,7 +96,7 @@ function(rocm_get_version OUTPUT_VERSION)
             if(${RESULT} EQUAL 0)
                 set(_version ${_version}-${GIT_TAG_VERSION})
                 if(PARSE_URL)
-                    rocm_validate_version(VALID_VERSION ${GIT} ${GIT_TAG_VERSION} ${PARSE_URL})
+                    rocm_git_validate_version(VALID_VERSION ${GIT_TAG_VERSION} ${PARSE_URL})
                     if(VALID_VERSION)
                         set(_version ${_version}-unofficial)
                     endif()
