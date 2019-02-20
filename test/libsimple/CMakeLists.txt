@@ -19,11 +19,13 @@ rocm_create_package(
     NAME simple 
     PREFIX ${ROCM_PREFIX}
     MAINTAINER "Amd amd@amd.com"
+    PTH
     LDCONFIG)
 else()
 rocm_create_package(
     NAME simple 
     MAINTAINER "Amd amd@amd.com"
+    PTH
     LDCONFIG)
 endif()
 
