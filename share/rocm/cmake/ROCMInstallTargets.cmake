@@ -49,7 +49,7 @@ function(rocm_install_targets)
             PATTERN "*.hpp"
             PATTERN "*.hh"
             PATTERN "*.hxx"
-	    PATTERN "*.inl"
+            PATTERN "*.inl"
         )
     endforeach()
 
