@@ -93,7 +93,7 @@ ${NAME}(${ARGS})
 endfunction()
 
 function(rocm_export_targets)
-    set(options)
+    set(options HEADER_ONLY)
     set(oneValueArgs NAMESPACE EXPORT NAME COMPATIBILITY PREFIX)
     set(multiValueArgs TARGETS DEPENDS INCLUDE)
 
@@ -155,10 +155,12 @@ function(rocm_export_targets)
 
     if(PARSE_TARGETS)
         rocm_write_package_template_function(${CONFIG_TEMPLATE} include "\${${PACKAGE_NAME}_TARGET_FILE}")
-        foreach(NAME ${PACKAGE_NAME} ${PACKAGE_NAME_UPPER} ${PACKAGE_NAME_LOWER})
-            rocm_write_package_template_function(${CONFIG_TEMPLATE} set ${NAME}_LIBRARIES ${PARSE_TARGETS})
-            rocm_write_package_template_function(${CONFIG_TEMPLATE} set ${NAME}_LIBRARY ${PARSE_TARGETS})
-        endforeach()
+        if(not PARSE_HEADER_ONLY)
+            foreach(NAME ${PACKAGE_NAME} ${PACKAGE_NAME_UPPER} ${PACKAGE_NAME_LOWER})
+               rocm_write_package_template_function(${CONFIG_TEMPLATE} set ${NAME}_LIBRARIES ${PARSE_TARGETS})
+               rocm_write_package_template_function(${CONFIG_TEMPLATE} set ${NAME}_LIBRARY ${PARSE_TARGETS})
+            endforeach()
+	endif()
     endif()
 
     rocm_configure_package_config_file(
