@@ -9,8 +9,8 @@ find_package(ROCM)
 
 include(ROCMSetupVersion)
 
-rocm_setup_version(VERSION 1.0)
-
+rocm_setup_version(VERSION @VERSION@)
+message("VERSION: @VERSION@")
 message("PROJECT_VERSION: ${PROJECT_VERSION}")
 
 install(CODE "message(\"No install\")")

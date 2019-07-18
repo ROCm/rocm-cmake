@@ -66,7 +66,7 @@ function(install_dir DIR)
     file(REMOVE_RECURSE ${BUILD_DIR})
 endfunction()
 
-function(write_version_cmake DIR CONTENT)
+function(write_version_cmake DIR VERSION CONTENT)
     configure_file(${TEST_DIR}/version/CMakeLists.txt ${DIR}/CMakeLists.txt @ONLY)
 endfunction()
 
