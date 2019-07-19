@@ -102,6 +102,7 @@ rocm_setup_version
     rocm_setup_version(
         VERSION <version>
         [NO_GIT_TAG_VERSION]
+        [PARENT <commit>]
     )
 
-Setup the version for the project. This will try to use git tag to set the version if possible unless `NO_GIT_TAG_VERSION` is passed.
+Setup the version for the project. This will try to use git tag to set the version if possible unless `NO_GIT_TAG_VERSION` is passed. The `PARENT` argument can be used to set the commit to start the count of number of commits to the current revision.
