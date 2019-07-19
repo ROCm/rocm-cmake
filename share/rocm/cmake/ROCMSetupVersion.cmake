@@ -12,8 +12,8 @@ find_program(GIT NAMES git)
 
 function(rocm_get_rev_count OUTPUT_COUNT)
     set(options)
-    set(oneValueArgs REV DIRECTORY)
-    set(multiValueArgs)
+    set(oneValueArgs DIRECTORY)
+    set(multiValueArgs REV)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -53,9 +53,8 @@ function(rocm_get_commit_count OUTPUT_COUNT)
     set(_count ${ALL_COUNT})
 
     if(PARSE_PARENT)
-        rocm_get_rev_count(PARENT_COUNT DIRECTORY ${DIRECTORY} REV ${PARSE_PARENT})
-        math(EXPR DIFF_COUNT "${ALL_COUNT} - ${PARENT_COUNT}")
-        set(_count ${DIFF_COUNT})
+        rocm_get_rev_count(PARENT_COUNT DIRECTORY ${DIRECTORY} REV HEAD ^${PARSE_PARENT})
+        set(_count ${PARENT_COUNT})
     endif()
     rocm_set_parent(${OUTPUT_COUNT} ${_count})
 endfunction()
