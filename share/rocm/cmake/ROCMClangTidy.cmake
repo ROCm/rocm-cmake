@@ -54,22 +54,34 @@ file(MAKE_DIRECTORY ${CLANG_TIDY_FIXIT_DIR})
 set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CLANG_TIDY_FIXIT_DIR})
 
 macro(rocm_enable_clang_tidy)
-    set(options ANALYZE_TEMPORARY_DTORS)
+    set(options ANALYZE_TEMPORARY_DTORS ENABLE_ALPHA_CHECKS)
     set(oneValueArgs HEADER_FILTER)
-    set(multiValueArgs CHECKS ERRORS EXTRA_ARGS)
+    set(multiValueArgs CHECKS ERRORS EXTRA_ARGS CLANG_ARGS)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
     string(REPLACE ";" "," CLANG_TIDY_CHECKS "${PARSE_CHECKS}")
     string(REPLACE ";" "," CLANG_TIDY_ERRORS "${PARSE_ERRORS}")
+    
+    message(STATUS "Clang tidy checks: ${CLANG_TIDY_CHECKS}")
+    
     set(CLANG_TIDY_EXTRA_ARGS)
     foreach(ARG ${PARSE_EXTRA_ARGS})
         list(APPEND CLANG_TIDY_EXTRA_ARGS "-extra-arg=${ARG}")
     endforeach()
-    
-    message(STATUS "Clang tidy checks: ${CLANG_TIDY_CHECKS}")
 
-    if (${PARSE_ANALYZE_TEMPORARY_DTORS})
-        set(CLANG_TIDY_ANALYZE_TEMPORARY_DTORS "-analyze-temporary-dtors")
+    set(CLANG_TIDY_CLANG_ARGS)
+    foreach(ARG ${PARSE_CLANG_ARGS})
+        list(APPEND CLANG_TIDY_CLANG_ARGS -Xclang ${ARG})
+    endforeach()
+
+    set(CLANG_TIDY_ARGS)
+    if(CLANG_TIDY_CLANG_ARGS)
+        set(CLANG_TIDY_ARGS -- ${CLANG_TIDY_CLANG_ARGS})
+    endif()
+
+    set(CLANG_TIDY_ENABLE_ALPHA_CHECKS_ARGS)
+    if(PARSE_ENABLE_ALPHA_CHECKS)
+        set(CLANG_TIDY_ENABLE_ALPHA_CHECKS_ARGS --allow-enabling-analyzer-alpha-checkers)
     endif()
 
     if (${CLANG_TIDY_VERSION} VERSION_LESS "3.9.0")
@@ -100,12 +112,13 @@ macro(rocm_enable_clang_tidy)
         ${CLANG_TIDY_EXE}
         ${CLANG_TIDY_CONFIG_ARG}
         ${CLANG_TIDY_QUIET_ARG} 
+        ${CLANG_TIDY_ENABLE_ALPHA_CHECKS_ARGS}
         -p "${CMAKE_BINARY_DIR}"
         "-checks=${CLANG_TIDY_CHECKS}"
         "${CLANG_TIDY_ERRORS_ARG}"
         ${CLANG_TIDY_EXTRA_ARGS}
-        ${CLANG_TIDY_ANALYZE_TEMPORARY_DTORS}
         "-header-filter=${CLANG_TIDY_HEADER_FILTER}"
+        ${CLANG_TIDY_ARGS}
     )
     execute_process(COMMAND ${CLANG_TIDY_COMMAND} -dump-config OUTPUT_VARIABLE CLANG_TIDY_CONFIG)
     file(WRITE ${CMAKE_BINARY_DIR}/clang-tidy.yml ${CLANG_TIDY_CONFIG})
