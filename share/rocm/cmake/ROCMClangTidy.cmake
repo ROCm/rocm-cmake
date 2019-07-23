@@ -69,15 +69,9 @@ macro(rocm_enable_clang_tidy)
         list(APPEND CLANG_TIDY_EXTRA_ARGS "-extra-arg=${ARG}")
     endforeach()
 
-    set(CLANG_TIDY_CLANG_ARGS)
     foreach(ARG ${PARSE_CLANG_ARGS})
-        list(APPEND CLANG_TIDY_CLANG_ARGS -Xclang ${ARG})
+        list(APPEND CLANG_TIDY_EXTRA_ARGS -extra-arg=-Xclang "-extra-arg=${ARG}")
     endforeach()
-
-    set(CLANG_TIDY_ARGS)
-    if(CLANG_TIDY_CLANG_ARGS)
-        set(CLANG_TIDY_ARGS -- ${CLANG_TIDY_CLANG_ARGS})
-    endif()
 
     set(CLANG_TIDY_ENABLE_ALPHA_CHECKS_ARGS)
     if(PARSE_ENABLE_ALPHA_CHECKS)
@@ -118,7 +112,6 @@ macro(rocm_enable_clang_tidy)
         "${CLANG_TIDY_ERRORS_ARG}"
         ${CLANG_TIDY_EXTRA_ARGS}
         "-header-filter=${CLANG_TIDY_HEADER_FILTER}"
-        ${CLANG_TIDY_ARGS}
     )
     execute_process(COMMAND ${CLANG_TIDY_COMMAND} -dump-config OUTPUT_VARIABLE CLANG_TIDY_CONFIG)
     file(WRITE ${CMAKE_BINARY_DIR}/clang-tidy.yml ${CLANG_TIDY_CONFIG})
