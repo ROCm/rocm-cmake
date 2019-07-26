@@ -37,7 +37,11 @@ function(rocm_install_targets)
     foreach(TARGET ${PARSE_TARGETS})
         foreach(INCLUDE ${PARSE_INCLUDE})
             get_filename_component(INCLUDE_PATH ${INCLUDE} ABSOLUTE)
-            target_include_directories(${TARGET} PUBLIC $<BUILD_INTERFACE:${INCLUDE_PATH}>)
+            target_include_directories(${TARGET} INTERFACE $<BUILD_INTERFACE:${INCLUDE_PATH}>)
+            get_target_property(TARGET_TYPE ${TARGET} TYPE)
+            if(NOT "${TARGET_TYPE}" STREQUAL "INTERFACE_LIBRARY")
+                target_include_directories(${TARGET} PRIVATE ${INCLUDE_PATH})
+            endif()
         endforeach()
         target_include_directories(${TARGET} INTERFACE $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>)
     endforeach()
@@ -49,6 +53,7 @@ function(rocm_install_targets)
             PATTERN "*.hpp"
             PATTERN "*.hh"
             PATTERN "*.hxx"
+            PATTERN "*.inl"
         )
     endforeach()
 
