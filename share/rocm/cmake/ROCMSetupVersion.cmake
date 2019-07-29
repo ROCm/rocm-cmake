@@ -61,10 +61,10 @@ endfunction()
 
 function(rocm_get_build_info OUTPUT DELIM)
     set(_info)
-    if(DEFINED $ENV{JOB_NAME})
+    if(DEFINED ENV{JOB_NAME})
         set(_info ${_info}${DELIM}$ENV{JOB_NAME})
     endif()
-    if(DEFINED $ENV{BUILD_ID})
+    if(DEFINED ENV{BUILD_ID})
         set(_info ${_info}${DELIM}$ENV{BUILD_ID})
     endif()
     rocm_set_parent(${OUTPUT} ${_info})
@@ -87,7 +87,7 @@ function(rocm_get_version OUTPUT_VERSION)
     rocm_get_build_info(BUILD_INFO -)
 
     if(GIT)
-        set(GIT_COMMAND ${GIT} describe --dirty --long --match [0-9]*)
+        set(GIT_COMMAND ${GIT} describe --long --match [0-9]*)
         execute_process(COMMAND ${GIT_COMMAND} 
                         WORKING_DIRECTORY ${DIRECTORY}
                         OUTPUT_VARIABLE GIT_TAG_VERSION
