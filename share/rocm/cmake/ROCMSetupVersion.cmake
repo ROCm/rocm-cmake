@@ -154,3 +154,10 @@ function(rocm_setup_version)
     endif()
 
 endfunction()
+
+function(rocm_set_soversion)
+    set(oneValueArgs TARGET SOVERSION)
+
+    rocm_version_regex_parse("^([0-9]+).*" SOVERSION_MAJOR "${SOVERSION}")
+    set_target_properties(${TARGET} PROPERTIES VERSION ${SOVERSION_MAJOR} SOVERSION ${SOVERSION})
+endfunction()
