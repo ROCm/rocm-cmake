@@ -161,5 +161,5 @@ function(rocm_setup_version)
             rocm_set_parent(${PROJECT_NAME}_VERSION_${level} ${_version_${level}})
             rocm_set_parent(PROJECT_SOVERSION_${level} ${_version_${level}})
         endforeach()
-
+    endif()  
 endfunction()
