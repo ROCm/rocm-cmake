@@ -156,10 +156,10 @@ function(rocm_setup_version)
 endfunction()
 
 function(rocm_set_soversion)
-    set(oneValueArgs TARGET SOVERSION)
+    set(oneValueArgs LIBRARY_TARGET SOVERSION)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     rocm_version_regex_parse("^([0-9]+).*" SOVERSION_MAJOR "${PARSE_SOVERSION}")
-    set_target_properties(${PARSE_TARGET} PROPERTIES VERSION ${SOVERSION_MAJOR} SOVERSION ${PARSE_SOVERSION})
+    set_target_properties(${PARSE_LIBRARY_TARGET} PROPERTIES VERSION ${SOVERSION_MAJOR} SOVERSION ${PARSE_SOVERSION})
 endfunction()
