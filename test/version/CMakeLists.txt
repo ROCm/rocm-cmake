@@ -16,7 +16,7 @@ message("PROJECT_VERSION: ${PROJECT_VERSION}")
 install(CODE "message(\"No install\")")
 
 macro(test_expect_eq X Y)
-    if(${X} EQUAL ${Y} OR ${X} STREQUAL ${Y})
+    if("${X}" STREQUAL "${Y}")
     else()
         message(FATAL_ERROR "EXPECT FAILURE: ${X} != ${Y} ${ARGN}")
     endif()
