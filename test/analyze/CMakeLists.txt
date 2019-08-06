@@ -30,17 +30,10 @@ include(ROCMCppCheck)
 rocm_enable_cppcheck(
     INCONCLUSIVE
     CHECKS 
-        all
+        warning
     FORCE
     SUPPRESS 
-        # ConfigurationNotChecked
-        # unmatchedSuppression
-        # constStatement
-        # noExplicitConstructor
-        # passedByValue
-        # # preprocessorErrorDirective
-        # unusedStructMember
-        # *:*.cl
+        unmatchedSuppression
     SOURCES
         simple.cpp
     INCLUDE
