@@ -10,8 +10,7 @@ execute_process(COMMAND ${GIT} describe --dirty --long --always WORKING_DIRECTOR
 if(NOT ${RESULT} EQUAL 0)
     set(GIT_TAG 0)
 endif()
-set(ENV{JOB_NAME} "job")
-set(ENV{BUILD_ID} "7")
+set(ENV{ROCM_BUILD_ID} "rocm-rel-x.y-72")
 execute_process(COMMAND ${GIT} rev-list --count HEAD WORKING_DIRECTORY ${TMP_DIR}/repo OUTPUT_VARIABLE REVS RESULT_VARIABLE RESULT)
 string(STRIP "${REVS}" REVS)
 write_version_cmake(${TMP_DIR}/repo 1.0 "
