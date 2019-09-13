@@ -191,4 +191,4 @@ function (read_key KEYVALUE OUTPUT)
   #remove trailing quote
   string (REGEX REPLACE "\"$" "" _output "${_output}")
   set(${OUTPUT} ${_output} PARENT_SCOPE)
-endfunction ()
+endfunction()
