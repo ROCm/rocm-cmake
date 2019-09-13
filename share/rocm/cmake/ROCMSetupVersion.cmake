@@ -170,7 +170,7 @@ function (rocm_set_system_name)
         STRING(CONCANT _os_id _version_id ".amd64")
     endif()
     rocm_set_parent(CMAKE_SYSTEM_NAME ${_system_name})
-
+endfunction()
 
 function (rocm_set_os_id OS_ID)
   set(_os_id "unknown")
