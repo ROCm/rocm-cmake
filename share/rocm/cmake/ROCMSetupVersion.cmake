@@ -160,7 +160,7 @@ function(rocm_set_soversion LIBRARY_TARGET SOVERSION)
 endfunction()
 
 function (rocm_set_system_name)
-    set(_system_name "unknown"
+    set(_system_name "unknown")
     rocm_set_os_id("ID" _os_id)
     read_key("VERSION_ID" _version_id)
 
