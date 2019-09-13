@@ -158,3 +158,37 @@ function(rocm_set_soversion LIBRARY_TARGET SOVERSION)
         set_target_properties(${LIBRARY_TARGET} PROPERTIES VERSION ${SOVERSION} SOVERSION ${SOVERSION_MAJOR})
     endif()
 endfunction()
+
+function (rocm_set_system_name)
+    set(_system_name "unknown"
+    rocm_set_os_id("ID" _os_id)
+    read_key("VERSION_ID" _version_id)
+
+    if (_os_id_centos OR _os_is_rhel)
+        STRING(CONCANT _system_name "el" _version_id ".x86_64")
+    else()
+        STRING(CONCANT _os_id _version_id ".amd64")
+    endif()
+    rocm_set_parent(CMAKE_SYSTEM_NAME ${_system_name})
+
+
+function (rocm_set_os_id OS_ID)
+  set(_os_id "unknown")
+  if (EXISTS "/etc/os-release")
+    read_key("ID" _os_id)
+  endif()
+  rocm_set_parent(${OS_ID} ${_os_id})
+  rocm_set_parent(${OS_ID}_${_os_id} TRUE)
+endfunction()
+
+function (read_key KEYVALUE OUTPUT)
+  #finds the line with the keyvalue
+  file (STRINGS /etc/os-release _keyvalue_line REGEX "^${KEYVALUE}=")
+
+  #remove keyvalue=
+  string (REGEX REPLACE "^${KEYVALUE}=\"?(.*)" "\\1" _output "${_keyvalue_line}")
+
+  #remove trailing quote
+  string (REGEX REPLACE "\"$" "" _output "${_output}")
+  set(${OUTPUT} ${_output} PARENT_SCOPE)
+endfunction ()
