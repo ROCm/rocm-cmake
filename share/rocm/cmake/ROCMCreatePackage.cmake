@@ -39,7 +39,7 @@ macro(rocm_create_package)
         STRING(CONCAT _SYSTEM_NAME ${_os_id} "-"${_version_id} "_amd64")
     elseif(_os_is_sles)
         STRING(CONCAT _SYSTEM_NAME ${_os_id} "-"${_version_id} ".amd64")
-    else
+    else()
         set(_SYSTEM_NAME ${CPACK_SYSTEM_NAME})
     endif()
 
