@@ -44,6 +44,7 @@ macro(rocm_create_package)
     else()
         set(_SYSTEM_NAME ${CPACK_SYSTEM_NAME})
     endif()
+
     set(CPACK_SYSTEM_NAME ${_SYSTEM_NAME} CACHE STRING "CPACK_SYSTEM_NAME for packaging")
     
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER ${PARSE_MAINTAINER})
