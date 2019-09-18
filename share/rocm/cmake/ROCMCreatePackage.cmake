@@ -30,13 +30,21 @@ macro(rocm_create_package)
 
     rocm_set_os_id(_os_id)
     rocm_read_os_release("VERSION_ID" _version_id)
-    
-    #only set CPACK_SYSTEM_NAME for AMD supported OSes
-    if (_os_id_centos OR _os_is_rhel)
-        STRING(CONCAT CPACK_SYSTEM_NAME "el" ${_version_id} ".x86_64")
-    elseif(_os_id_ubuntu OR _os_is_sles)
-        STRING(CONCAT CPACK_SYSTEM_NAME ${_os_id} "-"${_version_id} ".amd64")
+
+    if (NOT _os_id STREQUAL "unknown")
+        #only set CPACK_SYSTEM_NAME for AMD supported OSes
+        if (_os_id_centos OR _os_is_rhel)
+            STRING(CONCAT _SYSTEM_NAME "el" ${_version_id} ".x86_64")
+        #Debs use underscrore between OS and architecture
+        elseif(_os_id_ubuntu)
+            STRING(CONCAT _SYSTEM_NAME ${_os_id} "-"${_version_id} "_amd64")
+        elseif(_os_is_sles)
+            STRING(CONCAT _SYSTEM_NAME ${_os_id} "-"${_version_id} ".amd64")
+        endif()
+    else()
+        set(_SYSTEM_NAME ${CPACK_SYSTEM_NAME})
     endif()
+    set(CPACK_SYSTEM_NAME ${_SYSTEM_NAME} CACHE STRING "CPACK_SYSTEM_NAME for packaging")
     
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER ${PARSE_MAINTAINER})
     set(CPACK_DEBIAN_PACKAGE_SECTION "devel")
