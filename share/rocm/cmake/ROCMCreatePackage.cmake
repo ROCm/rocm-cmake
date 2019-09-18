@@ -30,7 +30,7 @@ macro(rocm_create_package)
 
     rocm_set_os_id(_os_id)
     rocm_read_os_release("VERSION_ID" _version_id)
-    
+
     #only set CPACK_SYSTEM_NAME for AMD supported OSes
     if (_os_id_centos OR _os_is_rhel)
         STRING(CONCAT _SYSTEM_NAME "el" ${_version_id} ".x86_64")
