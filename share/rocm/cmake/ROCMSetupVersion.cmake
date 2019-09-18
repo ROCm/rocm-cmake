@@ -158,5 +158,3 @@ function(rocm_set_soversion LIBRARY_TARGET SOVERSION)
         set_target_properties(${LIBRARY_TARGET} PROPERTIES VERSION ${SOVERSION} SOVERSION ${SOVERSION_MAJOR})
     endif()
 endfunction()
-
-
