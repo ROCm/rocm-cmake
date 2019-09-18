@@ -109,32 +109,20 @@ macro(rocm_create_package)
     include(CPack)
 endmacro()
 
-
-function (rocm_set_system_name)
-    set(_system_name "unknown")
-    rocm_set_os_id(_os_id)
-    read_key("VERSION_ID" _version_id)
-
-    if (_os_id_centos OR _os_is_rhel)
-        STRING(CONCAT _system_name "el" ${_version_id} ".x86_64")
-    else()
-        STRING(CONCAT _system_name ${_os_id} "-"$ {_version_id} ".amd64")
-    endif()
-    rocm_set_parent(CMAKE_SYSTEM_NAME ${_system_name})
-endfunction()
-
 function (rocm_set_os_id OS_ID)
     set(_os_id "unknown")
     if (EXISTS "/etc/os-release")
         rocm_read_os_release("ID" _os_id)
-        endif()
+    endif()
     set(${OS_ID} ${_os_id} PARENT_SCOPE)
     set(${OS_ID}_${_os_id} TRUE PARENT_SCOPE)
 endfunction()
 
-function (rocm_read_os_release KEYVALUE OUTPUT)
+function (rocm_read_os_release OUTPUT KEYVALUE)
     #finds the line with the keyvalue
-    file (STRINGS /etc/os-release _keyvalue_line REGEX "^${KEYVALUE}=")
+    if (EXISTS "/etc/os-release")
+        file (STRINGS /etc/os-release _keyvalue_line REGEX "^${KEYVALUE}=")
+    endif()
 
     #remove keyvalue=
     string (REGEX REPLACE "^${KEYVALUE}=\"?(.*)" "\\1" _output "${_keyvalue_line}")
