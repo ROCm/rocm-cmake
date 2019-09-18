@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (C) 2017 Advanced Micro Devices, Inc.
+# Copyright (C) 2017-2019 Advanced Micro Devices, Inc.
 ################################################################################
 
 
@@ -28,6 +28,15 @@ macro(rocm_create_package)
         set( CPACK_SET_DESTDIR ON CACHE BOOL "Boolean toggle to make CPack use DESTDIR mechanism when packaging" )
     endif()
 
+    rocm_set_os_id(_os_id)
+    read_key("VERSION_ID" _version_id)
+
+    if (_os_id_centos OR _os_is_rhel)
+        STRING(CONCAT CPACK_SYSTEM_NAME "el" ${_version_id} ".x86_64")
+    else()
+        STRING(CONCAT CPACK_SYSTEM_NAME ${_os_id} "-"$ {_version_id} ".amd64")
+    endif()
+    
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER ${PARSE_MAINTAINER})
     set(CPACK_DEBIAN_PACKAGE_SECTION "devel")
 
@@ -98,3 +107,38 @@ macro(rocm_create_package)
     endif()
     include(CPack)
 endmacro()
+
+
+function (rocm_set_system_name)
+    set(_system_name "unknown")
+    rocm_set_os_id(_os_id)
+    read_key("VERSION_ID" _version_id)
+
+    if (_os_id_centos OR _os_is_rhel)
+        STRING(CONCAT _system_name "el" ${_version_id} ".x86_64")
+    else()
+        STRING(CONCAT _system_name ${_os_id} "-"$ {_version_id} ".amd64")
+    endif()
+    rocm_set_parent(CMAKE_SYSTEM_NAME ${_system_name})
+endfunction()
+
+function (rocm_set_os_id OS_ID)
+    set(_os_id "unknown")
+    if (EXISTS "/etc/os-release")
+        rocm_read_os_release("ID" _os_id)
+        endif()
+    set(${OS_ID} ${_os_id} PARENT_SCOPE)
+    set(${OS_ID}_${_os_id} TRUE PARENT_SCOPE)
+endfunction()
+
+function (rocm_read_os_release KEYVALUE OUTPUT)
+    #finds the line with the keyvalue
+    file (STRINGS /etc/os-release _keyvalue_line REGEX "^${KEYVALUE}=")
+
+    #remove keyvalue=
+    string (REGEX REPLACE "^${KEYVALUE}=\"?(.*)" "\\1" _output "${_keyvalue_line}")
+
+    #remove trailing quote
+    string (REGEX REPLACE "\"$" "" _output "${_output}")
+    set(${OUTPUT} ${_output} PARENT_SCOPE)
+endfunction()
