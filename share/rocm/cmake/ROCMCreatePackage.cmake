@@ -29,7 +29,7 @@ macro(rocm_create_package)
     endif()
 
     rocm_set_os_id(_os_id)
-    rocm_read_os_release("VERSION_ID" _version_id)
+    rocm_read_os_release(_version_id "VERSION_ID")
 
     #only set CPACK_SYSTEM_NAME for AMD supported OSes
     if (_os_id_centos OR _os_is_rhel)
@@ -119,7 +119,7 @@ endmacro()
 function (rocm_set_os_id OS_ID)
     set(_os_id "unknown")
     if (EXISTS "/etc/os-release")
-        rocm_read_os_release("ID" _os_id)
+        rocm_read_os_release(_os_id "ID")
     endif()
     set(${OS_ID} ${_os_id} PARENT_SCOPE)
     set(${OS_ID}_${_os_id} TRUE PARENT_SCOPE)
