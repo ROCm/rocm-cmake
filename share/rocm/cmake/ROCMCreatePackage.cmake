@@ -40,7 +40,8 @@ macro(rocm_create_package)
     elseif(_os_id_sles)
         STRING(CONCAT _SYSTEM_NAME ${_os_id} "-" ${_version_id} ".amd64")
     else()
-        set(_SYSTEM_NAME ${CPACK_SYSTEM_NAME})
+    #Default behaviour for unsupported OSes
+        STRING(CONCAT _SYSTEM_NAME ${_os_id} "-" ${_version_id} ".amd64")
     endif()
 
     set(CPACK_SYSTEM_NAME ${_SYSTEM_NAME} CACHE STRING "CPACK_SYSTEM_NAME for packaging")
