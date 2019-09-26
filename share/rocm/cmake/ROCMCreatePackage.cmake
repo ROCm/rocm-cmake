@@ -37,7 +37,7 @@ macro(rocm_create_package)
     #Debs use underscrore between OS and architecture
     elseif(_os_id_ubuntu)
         STRING(CONCAT _SYSTEM_NAME ${_os_id} "-" ${_version_id} "_amd64")
-    elseif(_os_is_sles)
+    elseif(_os_id_sles)
         STRING(CONCAT _SYSTEM_NAME ${_os_id} "-" ${_version_id} ".amd64")
     else()
         set(_SYSTEM_NAME ${CPACK_SYSTEM_NAME})
