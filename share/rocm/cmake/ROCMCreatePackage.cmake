@@ -28,22 +28,24 @@ macro(rocm_create_package)
         set( CPACK_SET_DESTDIR ON CACHE BOOL "Boolean toggle to make CPack use DESTDIR mechanism when packaging" )
     endif()
 
-    rocm_set_os_id(_os_id)
-    rocm_read_os_release(_version_id "VERSION_ID")
+    if (EXISTS "/etc/os-release")
+        rocm_set_os_id(_os_id)
+        rocm_read_os_release(_version_id "VERSION_ID")
 
-    #only set CPACK_SYSTEM_NAME for AMD supported OSes
-    if (_os_id_centos OR _os_is_rhel)
-        STRING(CONCAT _SYSTEM_NAME "el" ${_version_id} ".x86_64")
-    #Debs use underscrore between OS and architecture
-    elseif(_os_id_ubuntu)
-        STRING(CONCAT _SYSTEM_NAME ${_os_id} "-" ${_version_id} "_amd64")
-    else()
-    #For SLES and unsupported OSes
-        STRING(CONCAT _SYSTEM_NAME ${_os_id} "-" ${_version_id} ".amd64")
+        #only set CPACK_SYSTEM_NAME for AMD supported OSes
+        if (_os_id_centos OR _os_is_rhel)
+            STRING(CONCAT _SYSTEM_NAME "el" ${_version_id} ".x86_64")
+        #Debs use underscrore between OS and architecture
+        elseif(_os_id_ubuntu)
+            STRING(CONCAT _SYSTEM_NAME ${_os_id} "-" ${_version_id} "_amd64")
+        else()
+        #For SLES and unsupported OSes
+            STRING(CONCAT _SYSTEM_NAME ${_os_id} "-" ${_version_id} ".amd64")
+        endif()
+
+        set(CPACK_SYSTEM_NAME ${_SYSTEM_NAME} CACHE STRING "CPACK_SYSTEM_NAME for packaging")
     endif()
 
-    set(CPACK_SYSTEM_NAME ${_SYSTEM_NAME} CACHE STRING "CPACK_SYSTEM_NAME for packaging")
-    
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER ${PARSE_MAINTAINER})
     set(CPACK_DEBIAN_PACKAGE_SECTION "devel")
 
