@@ -84,7 +84,7 @@ function(rocm_get_version OUTPUT_VERSION)
     rocm_get_build_info(BUILD_INFO -)
 
     if(GIT)
-        set(GIT_COMMAND ${GIT} describe --dirty --long --match [0-9]*)
+        set(GIT_COMMAND ${GIT} describe --long --match [0-9]*)
         execute_process(COMMAND ${GIT_COMMAND} 
                         WORKING_DIRECTORY ${DIRECTORY}
                         OUTPUT_VARIABLE GIT_TAG_VERSION
