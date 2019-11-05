@@ -19,6 +19,7 @@ matrix:
                 - cppcheck
                 - clang-4.0
                 - clang-tidy-4.0
+                - realpath
               sources:
                 - ubuntu-toolchain-r-test
                 - llvm-toolchain-trusty-4.0
