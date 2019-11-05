@@ -7,6 +7,7 @@ include(ROCMAnalyzers)
 find_program(CLANG_TIDY_EXE 
     NAMES 
         clang-tidy
+        clang-tidy-9.0
         clang-tidy-8.0
         clang-tidy-7.0
         clang-tidy-6.0
