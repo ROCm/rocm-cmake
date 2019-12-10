@@ -44,7 +44,7 @@ macro(test_exec)
     endif()
 endmacro()
 
-function(install_dir DIR)
+function(configure_dir DIR)
     set(options)
     set(oneValueArgs)
     set(multiValueArgs CMAKE_ARGS TARGETS)
@@ -59,17 +59,31 @@ function(install_dir DIR)
     test_exec(COMMAND ${CMAKE_COMMAND} 
         -DCMAKE_PREFIX_PATH=${PREFIX} 
         -DCMAKE_INSTALL_PREFIX=${PREFIX}
+        -DROCM_ERROR_TOOLCHAIN_VAR=On
         ${PARSE_CMAKE_ARGS}
         ${DIR}
         WORKING_DIRECTORY ${BUILD_DIR}
     )
-    test_exec(COMMAND ${CMAKE_COMMAND} --build ${BUILD_DIR})
     foreach(TARGET ${PARSE_TARGETS})
-        test_exec(COMMAND ${CMAKE_COMMAND} --build ${BUILD_DIR} --target ${TARGET})
+        if("${TARGET}" STREQUAL all)
+            test_exec(COMMAND ${CMAKE_COMMAND} --build ${BUILD_DIR})
+        else()
+            test_exec(COMMAND ${CMAKE_COMMAND} --build ${BUILD_DIR} --target ${TARGET})
+        endif()
     endforeach()
-    test_exec(COMMAND ${CMAKE_COMMAND} --build ${BUILD_DIR} --target install)
 
     file(REMOVE_RECURSE ${BUILD_DIR})
+endfunction()
+
+
+function(install_dir DIR)
+    set(options)
+    set(oneValueArgs)
+    set(multiValueArgs CMAKE_ARGS TARGETS)
+
+    cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    configure_dir(${DIR} TARGETS all ${PARSE_TARGETS} install CMAKE_ARGS ${PARSE_CMAKE_ARGS})
 endfunction()
 
 function(write_version_cmake DIR VERSION CONTENT)
