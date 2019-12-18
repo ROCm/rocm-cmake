@@ -2,6 +2,7 @@
 # Copyright (C) 2017-2019 Advanced Micro Devices, Inc.
 ################################################################################
 
+set(ROCM_DISABLE_LDCONFIG OFF CACHE BOOL "")
 
 include(CMakeParseArguments)
 include(GNUInstallDirs)
@@ -84,7 +85,7 @@ macro(rocm_create_package)
     set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${PROJECT_BINARY_DIR}/debian/postinst")
     set(CPACK_RPM_PRE_UNINSTALL_SCRIPT_FILE "${PROJECT_BINARY_DIR}/debian/prerm")
 
-    if(PARSE_LDCONFIG)
+    if(PARSE_LDCONFIG AND NOT ${ROCM_DISABLE_LDCONFIG})
         set(LDCONFIG_DIR ${LIB_DIR})
         if(PARSE_LDCONFIG_DIR)
             set(LDCONFIG_DIR ${PARSE_LDCONFIG_DIR})
