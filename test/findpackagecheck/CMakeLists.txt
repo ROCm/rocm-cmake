@@ -4,8 +4,13 @@ project(findpackagecheck)
 
 message(STATUS "PKG: ${PKG}")
 message(STATUS "PKG_TARGET: ${PKG_TARGET}")
+message(STATUS "CHECK_TARGET: ${CHECK_TARGET}")
 
 find_package(${PKG})
+
+if(NOT TARGET ${CHECK_TARGET})
+    message(FATAL_ERROR "Target ${CHECK_TARGET} is missing.")
+endif()
 
 configure_file(main.cpp.in main.cpp @ONLY)
 
