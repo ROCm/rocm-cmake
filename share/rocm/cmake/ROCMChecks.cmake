@@ -16,7 +16,7 @@ function(rocm_check_toolchain_var var access value)
     if(access STREQUAL "MODIFIED_ACCESS")
         message("
 *******************************************************************************
-*----------------------------------- ERROR -----------------------------------*
+*---------------------------------- WARNING ----------------------------------*
 * The variable '${var}' should only be set by the cmake toolchain,
 * either by calling 'cmake -D${var}=\"${value}\"' or
 * set in a toolchain file and added with 
