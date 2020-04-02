@@ -5,7 +5,7 @@
 set(ROCM_WARN_TOOLCHAIN_VAR ON CACHE BOOL "")
 set(ROCM_ERROR_TOOLCHAIN_VAR OFF CACHE BOOL "")
 
-function(rocm_check_toolchain_var var access value)
+function(rocm_check_toolchain_var var access value list_file)
     set(message_type STATUS)
     if(ROCM_WARN_TOOLCHAIN_VAR)
         set(message_type WARNING)
@@ -14,7 +14,17 @@ function(rocm_check_toolchain_var var access value)
         set(message_type SEND_ERROR)
     endif()
     if(access STREQUAL "MODIFIED_ACCESS")
-        message("
+        set(cmake_module Off)
+        get_filename_component(base "${list_file}" DIRECTORY)
+        # Skip warning in cmake's built-in modules
+        if("${base}" STREQUAL "${CMAKE_ROOT}/Modules")
+            set(cmake_module On)
+        endif()
+        if("${base}" STREQUAL "${PROJECT_BINARY_DIR}/CMakeFiles/${CMAKE_VERSION}")
+            set(cmake_module On)
+        endif()
+        if (NOT cmake_module)
+            message("
 *******************************************************************************
 *----------------------------------- ERROR -----------------------------------*
 * The variable '${var}' should only be set by the cmake toolchain,
@@ -24,7 +34,8 @@ function(rocm_check_toolchain_var var access value)
 *-----------------------------------------------------------------------------*
 *******************************************************************************
 ")
-        message(${message_type} "The toolchain variable '${var}' is modified in the CMakeLists.txt.")
+            message(${message_type} "The toolchain variable '${var}' is modified in the CMakeLists.txt.")
+        endif()
     endif()
 endfunction()
 foreach(LANG C CXX Fortran)
