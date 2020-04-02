@@ -24,5 +24,5 @@ add_library(basic main.cpp)
 target_link_libraries(basic PRIVATE simple)
 
 rocm_install_targets(TARGETS basic INCLUDE include)
-rocm_export_targets(TARGETS basic STATIC_DEPENDS simple)
+rocm_export_targets(TARGETS basic STATIC_DEPENDS PACKAGE simple)
 
