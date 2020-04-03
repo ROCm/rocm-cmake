@@ -92,10 +92,18 @@ ${NAME}(${ARGS})
 ")
 endfunction()
 
+function(rocm_write_package_deps CONFIG_TEMPLATE)
+    set(DEPENDS ${ARGN})
+    rocm_list_split(DEPENDS PACKAGE DEPENDS_LIST)
+    foreach(DEPEND ${DEPENDS_LIST})
+        rocm_write_package_template_function(${CONFIG_TEMPLATE} find_dependency ${${DEPEND}})
+    endforeach()
+endfunction()
+
 function(rocm_export_targets)
     set(options)
     set(oneValueArgs NAMESPACE EXPORT NAME COMPATIBILITY PREFIX)
-    set(multiValueArgs TARGETS DEPENDS INCLUDE)
+    set(multiValueArgs TARGETS DEPENDS INCLUDE STATIC_DEPENDS)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}"  ${ARGN})
 
@@ -140,11 +148,13 @@ function(rocm_export_targets)
     endforeach()
     rocm_write_package_template_function(${CONFIG_TEMPLATE} set_and_check ${PACKAGE_NAME}_TARGET_FILE "@PACKAGE_CONFIG_PACKAGE_INSTALL_DIR@/${TARGET_FILE}.cmake")
 
+
     if(PARSE_DEPENDS)
-        rocm_list_split(PARSE_DEPENDS PACKAGE DEPENDS_LIST)
-        foreach(DEPEND ${DEPENDS_LIST})
-            rocm_write_package_template_function(${CONFIG_TEMPLATE} find_dependency ${${DEPEND}})
-        endforeach()
+        rocm_write_package_deps(${CONFIG_TEMPLATE} ${PARSE_DEPENDS})
+    endif()
+
+    if(PARSE_STATIC_DEPENDS AND NOT BUILD_SHARED_LIBS)
+        rocm_write_package_deps(${CONFIG_TEMPLATE} ${PARSE_STATIC_DEPENDS})
     endif()
 
     foreach(INCLUDE ${PARSE_INCLUDE})

@@ -21,8 +21,8 @@ if(NOT PROJECT_VERSION EQUAL TAGGED_VERSION)
 endif()
 
 add_library(basic main.cpp)
-target_link_libraries(basic simple)
+target_link_libraries(basic PRIVATE simple)
 
-rocm_install_targets(TARGETS basic)
-rocm_export_targets(TARGETS basic)
+rocm_install_targets(TARGETS basic INCLUDE include)
+rocm_export_targets(TARGETS basic STATIC_DEPENDS simple)
 

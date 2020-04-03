@@ -65,6 +65,7 @@ rocm_export_targets
         [PREFIX <prefix>]
         [TARGETS <targets>...]
         [DEPENDS [PACKAGE <package-name>]...]
+        [STATIC_DEPENDS [PACKAGE <package-name>]...]
     )
 
 Export the installed targets so they can be consumed with `find_package`.
