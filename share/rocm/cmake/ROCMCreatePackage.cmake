@@ -18,7 +18,8 @@ macro(rocm_create_package)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-    set(CPACK_PACKAGE_NAME ${PARSE_NAME})
+    string(TOLOWER ${PARSE_NAME} _rocm_cpack_package_name)
+    set(CPACK_PACKAGE_NAME ${_rocm_cpack_package_name})
     set(CPACK_PACKAGE_VENDOR "Advanced Micro Devices, Inc")
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${PARSE_DESCRIPTION})
     set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
