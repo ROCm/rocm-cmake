@@ -4,6 +4,8 @@
 include(CMakeParseArguments)
 include(ROCMAnalyzers)
 
+get_filename_component(CLANG_TIDY_EXE_HINT "${CMAKE_CXX_COMPILER}" PATH)
+
 find_program(CLANG_TIDY_EXE 
     NAMES 
         clang-tidy
@@ -18,10 +20,13 @@ find_program(CLANG_TIDY_EXE
         clang-tidy-3.7
         clang-tidy-3.6
         clang-tidy-3.5
+    HINTS
+        ${CLANG_TIDY_EXE_HINT}
     PATH_SUFFIXES
         compiler/bin
         bin
     PATHS
+        /opt/rocm/llvm/bin
         /opt/rocm/hcc
         /usr/local/opt/llvm/bin
 )
@@ -137,6 +142,7 @@ function(rocm_clang_tidy_check TARGET)
     # TODO: Use generator expressions instead
     # COMMAND ${CLANG_TIDY_COMMAND} $<TARGET_PROPERTY:${TARGET},SOURCES>
     # COMMAND ${CLANG_TIDY_COMMAND} $<JOIN:$<TARGET_PROPERTY:${TARGET},SOURCES>, >
+    add_custom_target(tidy-target-${TARGET})
     foreach(SOURCE ${SOURCES})
         if(NOT "${SOURCE}" MATCHES "(h|hpp|hxx)$")
             string(MAKE_C_IDENTIFIER "${SOURCE}" tidy_file)        
@@ -148,6 +154,7 @@ function(rocm_clang_tidy_check TARGET)
             )
             add_dependencies(${tidy_target} ${TARGET})
             add_dependencies(${tidy_target} tidy-base)
+            add_dependencies(tidy-target-${TARGET} ${tidy_target})
             add_dependencies(tidy ${tidy_target})
         endif()
     endforeach()
