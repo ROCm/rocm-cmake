@@ -131,6 +131,8 @@ function(rocm_setup_version)
         # Compensate for missing patch version
         if(PARSE_VERSION MATCHES "^[0-9]+\\.[0-9]+$")
             set(PARSE_VERSION ${PARSE_VERSION}.0)
+            #SWDEV-234857 : new nomanclature:Version=Major.minor.patch.<libpatch>
+            set(PARSE_VERSION ${PARSE_VERSION}.$ENV{ROCM_LIBPATCH_VERSION})
         endif()
         if(PARSE_NO_GIT_TAG_VERSION)
             set(PACKAGE_VERSION ${PARSE_VERSION})
