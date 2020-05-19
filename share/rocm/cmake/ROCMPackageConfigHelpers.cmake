@@ -73,6 +73,16 @@ get_filename_component(_ROCM_CMAKE_CURRENT_LIST_FILE_REAL \"\${CMAKE_CURRENT_LIS
 get_filename_component(_ROCM_CMAKE_CURRENT_LIST_DIR_REAL \"\${_ROCM_CMAKE_CURRENT_LIST_FILE_REAL}\" DIRECTORY)
 get_filename_component(PACKAGE_PREFIX_DIR \"\${_ROCM_CMAKE_CURRENT_LIST_DIR_REAL}/${PACKAGE_RELATIVE_PATH}\" ABSOLUTE)
 
+if(COMMAND include_guard)
+    include_guard(DIRECTORY)
+else()
+    string(MAKE_C_IDENTIFIER \"\${CMAKE_CURRENT_LIST_FILE}\" _PACKAGE_ID)
+    if(DEFINED \${_GUARD_FILE_\${_PACKAGE_ID}})
+        return()
+    endif()
+    set(\${_GUARD_FILE_\${_PACKAGE_ID}} On)
+endif()
+
 ${CHECK_PREFIX}
 
 macro(set_and_check _var _file)

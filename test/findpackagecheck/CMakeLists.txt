@@ -12,6 +12,8 @@ if(NOT TARGET ${CHECK_TARGET})
     message(FATAL_ERROR "Target ${CHECK_TARGET} is missing.")
 endif()
 
+# Check multiple inclusions work
+find_package(${PKG})
 configure_file(main.cpp.in main.cpp @ONLY)
 
 add_executable(main ${CMAKE_CURRENT_BINARY_DIR}/main.cpp)
