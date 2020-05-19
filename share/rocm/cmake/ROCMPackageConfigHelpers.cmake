@@ -70,6 +70,7 @@ endif()
 ####################################################################################
 
 get_filename_component(_ROCM_CMAKE_CURRENT_LIST_FILE_REAL \"\${CMAKE_CURRENT_LIST_FILE}\" REALPATH)
+get_filename_component(_ROCM_CMAKE_CURRENT_LIST_FILE_REAL \"\${_ROCM_CMAKE_CURRENT_LIST_FILE_REAL}\" REALPATH)
 get_filename_component(_ROCM_CMAKE_CURRENT_LIST_DIR_REAL \"\${_ROCM_CMAKE_CURRENT_LIST_FILE_REAL}\" DIRECTORY)
 get_filename_component(PACKAGE_PREFIX_DIR \"\${_ROCM_CMAKE_CURRENT_LIST_DIR_REAL}/${PACKAGE_RELATIVE_PATH}\" ABSOLUTE)
 
