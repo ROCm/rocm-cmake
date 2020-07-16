@@ -57,6 +57,9 @@ macro(rocm_create_package)
     set(CPACK_RPM_PACKAGE_RELOCATABLE Off)
     set( CPACK_RPM_PACKAGE_AUTOREQPROV Off CACHE BOOL "turns off rpm autoreqprov field; packages explicity list dependencies" )
 
+    #debian requires underscore between file name and version fields
+    set(CPACK_PROJECT_CONFIG_FILE "${CMAKE_CURRENT_SOURCE_DIR}/share/rocm/cmake/cpack_project_config.cmake")
+
     set(CPACK_GENERATOR "TGZ;ZIP")
     if(EXISTS ${MAKE_NSIS_EXE})
         list(APPEND CPACK_GENERATOR "NSIS")
