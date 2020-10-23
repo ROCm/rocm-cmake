@@ -1,10 +1,11 @@
-################################################################################
+# ######################################################################################################################
 # Copyright (C) 2017 Advanced Micro Devices, Inc.
-################################################################################
-
+# ######################################################################################################################
 
 macro(rocm_set_parent VAR)
-    set(${VAR} ${ARGN} PARENT_SCOPE)
+    set(${VAR}
+        ${ARGN}
+        PARENT_SCOPE)
     set(${VAR} ${ARGN})
 endmacro()
 
@@ -24,12 +25,13 @@ function(rocm_get_rev_count OUTPUT_COUNT)
 
     set(_count 0)
     if(GIT)
-        execute_process(COMMAND git rev-list --count ${PARSE_REV}
-                        WORKING_DIRECTORY ${DIRECTORY}
-                        OUTPUT_VARIABLE REV_COUNT
-                        OUTPUT_STRIP_TRAILING_WHITESPACE
-                        RESULT_VARIABLE RESULT
-                        ERROR_QUIET)
+        execute_process(
+            COMMAND git rev-list --count ${PARSE_REV}
+            WORKING_DIRECTORY ${DIRECTORY}
+            OUTPUT_VARIABLE REV_COUNT
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            RESULT_VARIABLE RESULT
+            ERROR_QUIET)
         if(${RESULT} EQUAL 0)
             set(_count ${REV_COUNT})
         endif()
@@ -49,11 +51,17 @@ function(rocm_get_commit_count OUTPUT_COUNT)
         set(DIRECTORY ${PARSE_DIRECTORY})
     endif()
 
-    rocm_get_rev_count(ALL_COUNT DIRECTORY ${DIRECTORY} REV HEAD)
+    rocm_get_rev_count(
+        ALL_COUNT
+        DIRECTORY ${DIRECTORY}
+        REV HEAD)
     set(_count ${ALL_COUNT})
 
     if(PARSE_PARENT)
-        rocm_get_rev_count(PARENT_COUNT DIRECTORY ${DIRECTORY} REV HEAD ^${PARSE_PARENT})
+        rocm_get_rev_count(
+            PARENT_COUNT
+            DIRECTORY ${DIRECTORY}
+            REV HEAD ^${PARSE_PARENT})
         set(_count ${PARENT_COUNT})
     endif()
     rocm_set_parent(${OUTPUT_COUNT} ${_count})
@@ -85,21 +93,23 @@ function(rocm_get_version OUTPUT_VERSION)
 
     if(GIT)
         set(GIT_COMMAND ${GIT} describe --dirty --long --match [0-9]*)
-        execute_process(COMMAND ${GIT_COMMAND} 
-                        WORKING_DIRECTORY ${DIRECTORY}
-                        OUTPUT_VARIABLE GIT_TAG_VERSION
-                        OUTPUT_STRIP_TRAILING_WHITESPACE
-                        RESULT_VARIABLE RESULT
-                        ERROR_QUIET)
+        execute_process(
+            COMMAND ${GIT_COMMAND}
+            WORKING_DIRECTORY ${DIRECTORY}
+            OUTPUT_VARIABLE GIT_TAG_VERSION
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            RESULT_VARIABLE RESULT
+            ERROR_QUIET)
         if(${RESULT} EQUAL 0)
             set(_version ${GIT_TAG_VERSION}${BUILD_INFO})
         else()
-            execute_process(COMMAND ${GIT_COMMAND} --always
-                        WORKING_DIRECTORY ${DIRECTORY}
-                        OUTPUT_VARIABLE GIT_TAG_VERSION
-                        OUTPUT_STRIP_TRAILING_WHITESPACE
-                        RESULT_VARIABLE RESULT
-                        ERROR_QUIET)
+            execute_process(
+                COMMAND ${GIT_COMMAND} --always
+                WORKING_DIRECTORY ${DIRECTORY}
+                OUTPUT_VARIABLE GIT_TAG_VERSION
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+                RESULT_VARIABLE RESULT
+                ERROR_QUIET)
             if(${RESULT} EQUAL 0)
                 set(_version ${_version}${BUILD_INFO}-${GIT_TAG_VERSION})
             endif()
@@ -165,13 +175,13 @@ function(rocm_set_soversion LIBRARY_TARGET SOVERSION)
         rocm_version_regex_parse("^([0-9]+).*" LIB_VERSION_MAJOR "${SOVERSION}")
         rocm_version_regex_parse("^[0-9]+\\.(.*)" LIB_VERSION_MINOR "${SOVERSION}")
 
-        set (LIB_VERSION_STRING "${LIB_VERSION_MAJOR}.${LIB_VERSION_MINOR}")
+        set(LIB_VERSION_STRING "${LIB_VERSION_MAJOR}.${LIB_VERSION_MINOR}")
         rocm_get_so_patch(LIB_VERSION_PATCH)
-        if( NOT ${LIB_VERSION_PATCH} EQUAL "")
-            set (LIB_VERSION_STRING "${LIB_VERSION_STRING}.${LIB_VERSION_PATCH}")
+        if(NOT ${LIB_VERSION_PATCH} EQUAL "")
+            set(LIB_VERSION_STRING "${LIB_VERSION_STRING}.${LIB_VERSION_PATCH}")
         endif()
 
-        set_target_properties(${LIBRARY_TARGET} PROPERTIES SOVERSION ${LIB_VERSION_MAJOR} )
-        set_target_properties(${LIBRARY_TARGET} PROPERTIES VERSION ${LIB_VERSION_STRING} )
+        set_target_properties(${LIBRARY_TARGET} PROPERTIES SOVERSION ${LIB_VERSION_MAJOR})
+        set_target_properties(${LIBRARY_TARGET} PROPERTIES VERSION ${LIB_VERSION_STRING})
     endif()
 endfunction()

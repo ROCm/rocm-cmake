@@ -1,7 +1,6 @@
-################################################################################
+# ######################################################################################################################
 # Copyright (C) 2017 Advanced Micro Devices, Inc.
-################################################################################
-
+# ######################################################################################################################
 
 include(CMakeParseArguments)
 include(GNUInstallDirs)
@@ -22,7 +21,6 @@ function(rocm_install_targets)
         set(EXPORT_FILE ${PARSE_EXPORT})
     endif()
 
-
     if(PARSE_PREFIX)
         set(PREFIX_DIR ${PARSE_PREFIX})
         set(BIN_INSTALL_DIR ${PARSE_PREFIX}/${CMAKE_INSTALL_BINDIR})
@@ -33,7 +31,7 @@ function(rocm_install_targets)
         set(LIB_INSTALL_DIR ${ROCM_INSTALL_LIBDIR})
         set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR})
     endif()
-    
+
     foreach(TARGET ${PARSE_TARGETS})
         foreach(INCLUDE ${PARSE_INCLUDE})
             get_filename_component(INCLUDE_PATH ${INCLUDE} ABSOLUTE)
@@ -47,17 +45,19 @@ function(rocm_install_targets)
     endforeach()
 
     foreach(INCLUDE ${PARSE_INCLUDE})
-        install(DIRECTORY ${INCLUDE}/ DESTINATION ${INCLUDE_INSTALL_DIR}
-            FILES_MATCHING 
+        install(
+            DIRECTORY ${INCLUDE}/
+            DESTINATION ${INCLUDE_INSTALL_DIR}
+            FILES_MATCHING
             PATTERN "*.h"
             PATTERN "*.hpp"
             PATTERN "*.hh"
             PATTERN "*.hxx"
-            PATTERN "*.inl"
-        )
+            PATTERN "*.inl")
     endforeach()
 
-    install(TARGETS ${PARSE_TARGETS} 
+    install(
+        TARGETS ${PARSE_TARGETS}
         EXPORT ${EXPORT_FILE}
         RUNTIME DESTINATION ${BIN_INSTALL_DIR}
         LIBRARY DESTINATION ${LIB_INSTALL_DIR}
@@ -79,16 +79,21 @@ function(rocm_list_split LIST ELEMENT OUTPUT_LIST)
         string(REPLACE ${_rocm_tmp_list_marker} ";" TMPSUBLIST "${SUBLIST}")
         math(EXPR count "${count}+1")
         set(list_var ${LIST_PREFIX}_${count})
-        set(${list_var} "${TMPSUBLIST}" PARENT_SCOPE)
+        set(${list_var}
+            "${TMPSUBLIST}"
+            PARENT_SCOPE)
         list(APPEND result ${LIST_PREFIX}_${count})
     endforeach()
-    set(${OUTPUT_LIST} "${result}" PARENT_SCOPE)
+    set(${OUTPUT_LIST}
+        "${result}"
+        PARENT_SCOPE)
 endfunction()
 
 function(rocm_write_package_template_function FILENAME NAME)
     string(REPLACE ";" " " ARGS "${ARGN}")
-    file(APPEND ${FILENAME}
-"
+    file(
+        APPEND ${FILENAME}
+        "
 ${NAME}(${ARGS})
 ")
 endfunction()
@@ -106,7 +111,7 @@ function(rocm_export_targets)
     set(oneValueArgs NAMESPACE EXPORT NAME COMPATIBILITY PREFIX)
     set(multiValueArgs TARGETS DEPENDS INCLUDE STATIC_DEPENDS)
 
-    cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}"  ${ARGN})
+    cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     set(PACKAGE_NAME ${PROJECT_NAME})
     if(PARSE_NAME)
@@ -136,19 +141,22 @@ function(rocm_export_targets)
     endif()
     set(CONFIG_PACKAGE_INSTALL_DIR ${LIB_INSTALL_DIR}/cmake/${PACKAGE_NAME_LOWER})
 
-
     set(CONFIG_TEMPLATE "${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_NAME_LOWER}-config.cmake.in")
 
-    file(WRITE ${CONFIG_TEMPLATE} "
+    file(
+        WRITE ${CONFIG_TEMPLATE}
+        "
 @PACKAGE_INIT@
     ")
 
     foreach(NAME ${PACKAGE_NAME} ${PACKAGE_NAME_UPPER} ${PACKAGE_NAME_LOWER})
-        rocm_write_package_template_function(${CONFIG_TEMPLATE} set_and_check ${NAME}_INCLUDE_DIR "@PACKAGE_INCLUDE_INSTALL_DIR@")
-        rocm_write_package_template_function(${CONFIG_TEMPLATE} set_and_check ${NAME}_INCLUDE_DIRS "@PACKAGE_INCLUDE_INSTALL_DIR@")
+        rocm_write_package_template_function(${CONFIG_TEMPLATE} set_and_check ${NAME}_INCLUDE_DIR
+                                             "@PACKAGE_INCLUDE_INSTALL_DIR@")
+        rocm_write_package_template_function(${CONFIG_TEMPLATE} set_and_check ${NAME}_INCLUDE_DIRS
+                                             "@PACKAGE_INCLUDE_INSTALL_DIR@")
     endforeach()
-    rocm_write_package_template_function(${CONFIG_TEMPLATE} set_and_check ${PACKAGE_NAME}_TARGET_FILE "@PACKAGE_CONFIG_PACKAGE_INSTALL_DIR@/${TARGET_FILE}.cmake")
-
+    rocm_write_package_template_function(${CONFIG_TEMPLATE} set_and_check ${PACKAGE_NAME}_TARGET_FILE
+                                         "@PACKAGE_CONFIG_PACKAGE_INSTALL_DIR@/${TARGET_FILE}.cmake")
 
     if(PARSE_DEPENDS)
         rocm_write_package_deps(${CONFIG_TEMPLATE} ${PARSE_DEPENDS})
@@ -173,12 +181,9 @@ function(rocm_export_targets)
     endif()
 
     rocm_configure_package_config_file(
-        ${CONFIG_TEMPLATE}
-        ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}.cmake
-        INSTALL_DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR}
-        ${PREFIX_ARG}
-        PATH_VARS LIB_INSTALL_DIR INCLUDE_INSTALL_DIR CONFIG_PACKAGE_INSTALL_DIR
-    )
+        ${CONFIG_TEMPLATE} ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}.cmake
+        INSTALL_DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR} ${PREFIX_ARG}
+        PATH_VARS LIB_INSTALL_DIR INCLUDE_INSTALL_DIR CONFIG_PACKAGE_INSTALL_DIR)
     set(COMPATIBILITY_ARG SameMajorVersion)
     if(PARSE_COMPATIBILITY)
         set(COMPATIBILITY_ARG ${PARSE_COMPATIBILITY})
@@ -186,25 +191,18 @@ function(rocm_export_targets)
     write_basic_package_version_file(
         ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}-version.cmake
         VERSION ${TARGET_VERSION}
-        COMPATIBILITY ${COMPATIBILITY_ARG}
-    )
+        COMPATIBILITY ${COMPATIBILITY_ARG})
 
     set(NAMESPACE_ARG)
     if(PARSE_NAMESPACE)
         set(NAMESPACE_ARG "NAMESPACE;${PARSE_NAMESPACE}")
     endif()
-    install( EXPORT ${TARGET_FILE}
-        DESTINATION
-        ${CONFIG_PACKAGE_INSTALL_DIR}
-        ${NAMESPACE_ARG}
-    )
+    install(
+        EXPORT ${TARGET_FILE}
+        DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR}
+        ${NAMESPACE_ARG})
 
-    install( FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}.cmake
-        ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}-version.cmake
-        DESTINATION
-        ${CONFIG_PACKAGE_INSTALL_DIR})
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}.cmake
+                  ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}-version.cmake DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR})
 
 endfunction()
-
-

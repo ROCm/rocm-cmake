@@ -1,17 +1,16 @@
-################################################################################
+# ######################################################################################################################
 # Copyright (C) 2017 Advanced Micro Devices, Inc.
-################################################################################
-
+# ######################################################################################################################
 
 function(rocm_install_symlink_subdir SUBDIR)
-    # TODO: Check if SUBDIR is relative path
-    # Copy instead of symlink on windows
+    # TODO: Check if SUBDIR is relative path Copy instead of symlink on windows
     if(CMAKE_HOST_WIN32)
         set(SYMLINK_CMD "file(COPY \${SRC} DESTINATION \${DEST_DIR})")
     else()
         set(SYMLINK_CMD "execute_process(COMMAND ln -sf \${SRC_REL} \${DEST})")
     endif()
-    install(CODE "
+    install(
+        CODE "
         set(SUBDIR \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${SUBDIR})
         file(GLOB_RECURSE FILES RELATIVE \${SUBDIR} \${SUBDIR}/*)
         foreach(FILE \${FILES})
@@ -25,4 +24,3 @@ function(rocm_install_symlink_subdir SUBDIR)
         endforeach()
     ")
 endfunction()
-

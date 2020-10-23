@@ -1,9 +1,13 @@
-################################################################################
+# ######################################################################################################################
 # Copyright (C) 2019 Advanced Micro Devices, Inc.
-################################################################################
+# ######################################################################################################################
 
-set(ROCM_WARN_TOOLCHAIN_VAR ON CACHE BOOL "")
-set(ROCM_ERROR_TOOLCHAIN_VAR OFF CACHE BOOL "")
+set(ROCM_WARN_TOOLCHAIN_VAR
+    ON
+    CACHE BOOL "")
+set(ROCM_ERROR_TOOLCHAIN_VAR
+    OFF
+    CACHE BOOL "")
 
 function(rocm_check_toolchain_var var access value list_file)
     set(message_type STATUS)
@@ -23,13 +27,14 @@ function(rocm_check_toolchain_var var access value list_file)
         if("${base}" STREQUAL "${PROJECT_BINARY_DIR}/CMakeFiles/${CMAKE_VERSION}")
             set(cmake_module On)
         endif()
-        if (NOT cmake_module)
-            message("
+        if(NOT cmake_module)
+            message(
+                "
 *******************************************************************************
 *----------------------------------- ERROR -----------------------------------*
 * The variable '${var}' should only be set by the cmake toolchain,
 * either by calling 'cmake -D${var}=\"${value}\"' or
-* set in a toolchain file and added with 
+* set in a toolchain file and added with
 * 'cmake -DCMAKE_TOOLCHAIN_FILE=<toolchain-file>'.
 *-----------------------------------------------------------------------------*
 *******************************************************************************
@@ -50,5 +55,3 @@ variable_watch(CMAKE_EXE_LINKER_FLAGS rocm_check_toolchain_var)
 variable_watch(CMAKE_MODULE_LINKER_FLAGS rocm_check_toolchain_var)
 variable_watch(CMAKE_SHARED_LINKER_FLAGS rocm_check_toolchain_var)
 variable_watch(CMAKE_STATIC_LINKER_FLAGS rocm_check_toolchain_var)
-
-

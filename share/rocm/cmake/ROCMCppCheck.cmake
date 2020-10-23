@@ -1,17 +1,15 @@
-################################################################################
+# ######################################################################################################################
 # Copyright (C) 2017 Advanced Micro Devices, Inc.
-################################################################################
+# ######################################################################################################################
 
 include(CMakeParseArguments)
 include(ProcessorCount)
 include(ROCMAnalyzers)
 
-find_program(CPPCHECK_EXE 
-    NAMES 
-        cppcheck
-    PATHS
-        /opt/rocm/bin
-)
+find_program(
+    CPPCHECK_EXE
+    NAMES cppcheck
+    PATHS /opt/rocm/bin)
 
 function(rocm_find_cppcheck_version VAR)
     execute_process(COMMAND ${CPPCHECK_EXE} --version OUTPUT_VARIABLE VERSION_OUTPUT)
@@ -19,26 +17,33 @@ function(rocm_find_cppcheck_version VAR)
     list(LENGTH VERSION_OUTPUT_LIST VERSION_OUTPUT_LIST_LEN)
     if(VERSION_OUTPUT_LIST_LEN GREATER 1)
         list(GET VERSION_OUTPUT_LIST 1 VERSION)
-        set(${VAR} ${VERSION} PARENT_SCOPE)
+        set(${VAR}
+            ${VERSION}
+            PARENT_SCOPE)
     else()
-        set(${VAR} "0.0" PARENT_SCOPE)
+        set(${VAR}
+            "0.0"
+            PARENT_SCOPE)
     endif()
 
 endfunction()
 
-if( NOT CPPCHECK_EXE )
-    message( STATUS "Cppcheck not found" )
+if(NOT CPPCHECK_EXE)
+    message(STATUS "Cppcheck not found")
     set(CPPCHECK_VERSION "0.0")
 else()
     rocm_find_cppcheck_version(CPPCHECK_VERSION)
-    message( STATUS "Cppcheck found: ${CPPCHECK_VERSION}")
+    message(STATUS "Cppcheck found: ${CPPCHECK_VERSION}")
 endif()
 
-ProcessorCount(CPPCHECK_JOBS)
+processorcount(CPPCHECK_JOBS)
 
 set(CPPCHECK_BUILD_DIR ${CMAKE_BINARY_DIR}/cppcheck-build)
 file(MAKE_DIRECTORY ${CPPCHECK_BUILD_DIR})
-set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CPPCHECK_BUILD_DIR})
+set_property(
+    DIRECTORY
+    APPEND
+    PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CPPCHECK_BUILD_DIR})
 
 macro(rocm_enable_cppcheck)
     set(options FORCE INCONCLUSIVE)
@@ -75,13 +80,13 @@ macro(rocm_enable_cppcheck)
         set(CPPCHECK_INCONCLUSIVE --inconclusive)
     endif()
 
-    if (${CPPCHECK_VERSION} VERSION_LESS "1.80")
+    if(${CPPCHECK_VERSION} VERSION_LESS "1.80")
         set(CPPCHECK_BUILD_DIR_FLAG)
     else()
         set(CPPCHECK_BUILD_DIR_FLAG "--cppcheck-build-dir=${CPPCHECK_BUILD_DIR}")
     endif()
 
-    if (${CPPCHECK_VERSION} VERSION_LESS "1.80")
+    if(${CPPCHECK_VERSION} VERSION_LESS "1.80")
         set(CPPCHECK_PLATFORM_FLAG)
     else()
         set(CPPCHECK_PLATFORM_FLAG "--platform=native")
@@ -98,7 +103,9 @@ macro(rocm_enable_cppcheck)
         get_filename_component(ABS_SOURCE ${SOURCE} ABSOLUTE)
         if(EXISTS ${ABS_SOURCE})
             if(IS_DIRECTORY ${ABS_SOURCE})
-                set(GLOBS "${GLOBS} ${ABS_SOURCE}/*.cpp ${ABS_SOURCE}/*.hpp ${ABS_SOURCE}/*.cxx ${ABS_SOURCE}/*.c ${ABS_SOURCE}/*.h")
+                set(GLOBS
+                    "${GLOBS} ${ABS_SOURCE}/*.cpp ${ABS_SOURCE}/*.hpp ${ABS_SOURCE}/*.cxx ${ABS_SOURCE}/*.c ${ABS_SOURCE}/*.h"
+                )
             else()
                 set(SOURCES "${SOURCES} ${ABS_SOURCE}")
             endif()
@@ -107,7 +114,9 @@ macro(rocm_enable_cppcheck)
         endif()
     endforeach()
 
-    file(WRITE ${CMAKE_BINARY_DIR}/cppcheck.cmake "
+    file(
+        WRITE ${CMAKE_BINARY_DIR}/cppcheck.cmake
+        "
         file(GLOB_RECURSE GSRCS ${GLOBS})
         set(CPPCHECK_COMMAND
             ${CPPCHECK_EXE}
@@ -142,11 +151,11 @@ macro(rocm_enable_cppcheck)
         endif()
 ")
 
-    add_custom_target(cppcheck
+    add_custom_target(
+        cppcheck
         COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/cppcheck.cmake
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMENT "cppcheck: Running cppcheck..."
-    )
+        COMMENT "cppcheck: Running cppcheck...")
     if(CPPCHECK_EXE)
         rocm_mark_as_analyzer(cppcheck)
     endif()
