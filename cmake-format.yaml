@@ -165,7 +165,7 @@ parse:
         nargs: '*'
     test_exec:
       pargs:
-        nargs: 0
+        nargs: '*'
       flags:
         - OUTPUT_QUIET
         - ERROR_QUIET
