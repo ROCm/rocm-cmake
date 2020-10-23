@@ -166,7 +166,7 @@ parse:
     test_exec:
       pargs:
         nargs: '*'
-      flags:
+        flags:
         - OUTPUT_QUIET
         - ERROR_QUIET
         - OUTPUT_STRIP_TRAILING_WHITESPACE
