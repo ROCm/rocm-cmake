@@ -162,10 +162,30 @@ parse:
         nargs: 2
     test_expect_file:
       pargs:
-        nargs: 1
+        nargs: '*'
     test_exec:
       pargs:
         nargs: 0
+      flags:
+        - OUTPUT_QUIET
+        - ERROR_QUIET
+        - OUTPUT_STRIP_TRAILING_WHITESPACE
+        - ERROR_STRIP_TRAILING_WHITESPACE
+        - ECHO_OUTPUT_VARIABLE
+        - ECHO_ERROR_VARIABLE
+      kwargs:
+        COMMAND: '*'
+        WORKING_DIRECTORY: 1
+        TIMEOUT: 1
+        RESULT_VARIABLE: 1
+        RESULTS_VARIABLE: 1
+        OUTPUT_VARIABLE: 1
+        ERROR_VARIABLE: 1
+        INPUT_FILE: 1
+        OUTPUT_FILE: 1
+        ERROR_FILE: 1
+        COMMAND_ECHO: 1
+        ENCODING: 1
     configure_dir:
       pargs:
         nargs: 1+
