@@ -31,6 +31,7 @@ write_version_cmake(
     test_expect_eq(\${PROJECT_VERSION_MINOR} 0)
     test_expect_eq(\${PROJECT_VERSION_PATCH} 0)
     test_expect_eq(\${PROJECT_VERSION_TWEAK} 50-${GIT_TAG})
-    test_expect_eq(\${PROJECT_VERSION} \${PROJECT_VERSION_MAJOR}.\${PROJECT_VERSION_MINOR}.\${PROJECT_VERSION_PATCH}.\${PROJECT_VERSION_TWEAK})
+    test_expect_eq(\${PROJECT_VERSION}
+        \${PROJECT_VERSION_MAJOR}.\${PROJECT_VERSION_MINOR}.\${PROJECT_VERSION_PATCH}.\${PROJECT_VERSION_TWEAK})
 ")
 install_dir(${TMP_DIR}/repo)

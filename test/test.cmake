@@ -12,6 +12,7 @@ file(MAKE_DIRECTORY ${TMP_DIR})
 set(PREFIX ${TMP_DIR}/usr)
 set(BUILDS_DIR ${TMP_DIR}/builds)
 
+# cmake-lint: disable=C0103
 macro(test_expect_eq X Y)
     if(NOT "${X}" STREQUAL "${Y}")
         message(FATAL_ERROR "EXPECT FAILURE: ${X} != ${Y} ${ARGN}")

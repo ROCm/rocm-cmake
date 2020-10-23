@@ -103,6 +103,7 @@ macro(rocm_enable_cppcheck)
         get_filename_component(ABS_SOURCE ${SOURCE} ABSOLUTE)
         if(EXISTS ${ABS_SOURCE})
             if(IS_DIRECTORY ${ABS_SOURCE})
+                # cmake-lint: disable=C0301
                 set(GLOBS
                     "${GLOBS} ${ABS_SOURCE}/*.cpp ${ABS_SOURCE}/*.hpp ${ABS_SOURCE}/*.cxx ${ABS_SOURCE}/*.c ${ABS_SOURCE}/*.h"
                 )
