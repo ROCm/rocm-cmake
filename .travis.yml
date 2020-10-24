@@ -34,7 +34,7 @@ install:
     - which $CC
     - which cmake
     - cmake --version
-    - pip3 install 'cmakelang[YAML]'
+    - pip3 install --user 'cmakelang[YAML]'
     
 script:
     - export INSTALL_PREFIX_PATH="${TRAVIS_BUILD_DIR}/usr"
