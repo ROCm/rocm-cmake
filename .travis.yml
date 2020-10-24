@@ -34,12 +34,12 @@ install:
     - which $CC
     - which cmake
     - cmake --version
-    - python --version
+    - python3 --version
     - pip3 install --user 'cmakelang[YAML]'
     
 script:
     - export INSTALL_PREFIX_PATH="${TRAVIS_BUILD_DIR}/usr"
-    - export PATH="/Users/travis/Library/Python/3.4/bin:$PATH"
+    - export PATH="/Users/travis/Library/Python/3.7/bin:$PATH"
     - mkdir -p "$INSTALL_PREFIX_PATH"
     - cd $CHECKOUT_PATH
     - cmake-lint $(find ./test -type f | grep .cmake$) $(find ./share -type f | grep .cmake$)
