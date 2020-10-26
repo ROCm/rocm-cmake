@@ -1,7 +1,6 @@
-################################################################################
+# ######################################################################################################################
 # Copyright (C) 2017 Advanced Micro Devices, Inc.
-################################################################################
-
+# ######################################################################################################################
 
 include(CMakePackageConfigHelpers)
 
@@ -10,10 +9,12 @@ function(rocm_configure_package_config_file INPUT_FILE OUTPUT_FILE)
     set(oneValueArgs INSTALL_DESTINATION PREFIX)
     set(multiValueArgs PATH_VARS)
 
-    cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}"  ${ARGN})
+    cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     if(PARSE_UNPARSED_ARGUMENTS)
-        message(FATAL_ERROR "Unknown keywords given to rocm_configure_package_config_file(): \"${PARSE_UNPARSED_ARGUMENTS}\"")
+        message(
+            FATAL_ERROR
+                "Unknown keywords given to rocm_configure_package_config_file(): \"${PARSE_UNPARSED_ARGUMENTS}\"")
     endif()
 
     if(NOT PARSE_INSTALL_DESTINATION)
@@ -25,7 +26,6 @@ function(rocm_configure_package_config_file INPUT_FILE OUTPUT_FILE)
     else()
         get_filename_component(INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" ABSOLUTE)
     endif()
-
 
     if(IS_ABSOLUTE "${PARSE_INSTALL_DESTINATION}")
         set(ABSOLUTE_INSTALL_DIR "${PARSE_INSTALL_DESTINATION}")
@@ -40,14 +40,14 @@ function(rocm_configure_package_config_file INPUT_FILE OUTPUT_FILE)
     if(PARSE_PREFIX)
         # On windows there is no symlinks
         if(WIN32)
-            set(CHECK_PREFIX "
+            set(CHECK_PREFIX
+                "
 if(NOT \"\${PACKAGE_PREFIX_DIR}/${PACKAGE_INSTALL_RELATIVE_DIR}\" EQUAL \"\${CMAKE_CURRENT_LIST_DIR}\")
     set(PACKAGE_PREFIX_DIR ${INSTALL_PREFIX})
 endif()
 ")
         endif()
     endif()
-
 
     foreach(_var ${PARSE_PATH_VARS})
         if(NOT DEFINED ${_var})
@@ -62,9 +62,10 @@ endif()
 
     get_filename_component(INPUT_NAME "${INPUT_FILE}" NAME)
 
-    set(PACKAGE_INIT "
+    set(PACKAGE_INIT
+        "
 ####################################################################################
-# Auto generated @PACKAGE_INIT@ by rocm_configure_package_config_file() 
+# Auto generated @PACKAGE_INIT@ by rocm_configure_package_config_file()
 # from ${INPUT_NAME}
 # Any changes to this file will be overwritten by the next CMake run
 ####################################################################################
@@ -109,7 +110,8 @@ if (NOT _ROCMCMakeFindDependencyMacro_FOUND)
             )
             string(TOUPPER \${dep} cmake_dep_upper)
             if (NOT \${dep}_FOUND AND NOT \${cmake_dep_upper}_FOUND)
-                set(\${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE \"\${CMAKE_FIND_PACKAGE_NAME} could not be found because dependency \${dep} could not be found.\")
+                set(\${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE
+                    \"\${CMAKE_FIND_PACKAGE_NAME} could not be found because dependency \${dep} could not be found.\")
                 set(\${CMAKE_FIND_PACKAGE_NAME}_FOUND False)
                 return()
             endif()

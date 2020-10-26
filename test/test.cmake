@@ -1,7 +1,6 @@
-################################################################################
+# ######################################################################################################################
 # Copyright (C) 2017 Advanced Micro Devices, Inc.
-################################################################################
-
+# ######################################################################################################################
 
 include(CMakeParseArguments)
 
@@ -13,6 +12,7 @@ file(MAKE_DIRECTORY ${TMP_DIR})
 set(PREFIX ${TMP_DIR}/usr)
 set(BUILDS_DIR ${TMP_DIR}/builds)
 
+# cmake-lint: disable=C0103
 macro(test_expect_eq X Y)
     if(NOT "${X}" STREQUAL "${Y}")
         message(FATAL_ERROR "EXPECT FAILURE: ${X} != ${Y} ${ARGN}")
@@ -58,14 +58,8 @@ function(configure_dir DIR)
     if(NOT EXISTS ${BUILD_DIR})
         file(MAKE_DIRECTORY ${BUILD_DIR})
     endif()
-    test_exec(COMMAND ${CMAKE_COMMAND} 
-        -DCMAKE_PREFIX_PATH=${PREFIX} 
-        -DCMAKE_INSTALL_PREFIX=${PREFIX}
-        -DROCM_ERROR_TOOLCHAIN_VAR=On
-        ${PARSE_CMAKE_ARGS}
-        ${DIR}
-        WORKING_DIRECTORY ${BUILD_DIR}
-    )
+    test_exec(COMMAND ${CMAKE_COMMAND} -DCMAKE_PREFIX_PATH=${PREFIX} -DCMAKE_INSTALL_PREFIX=${PREFIX}
+                      -DROCM_ERROR_TOOLCHAIN_VAR=On ${PARSE_CMAKE_ARGS} ${DIR} WORKING_DIRECTORY ${BUILD_DIR})
     foreach(TARGET ${PARSE_TARGETS})
         if("${TARGET}" STREQUAL all)
             test_exec(COMMAND ${CMAKE_COMMAND} --build ${BUILD_DIR})
@@ -77,7 +71,6 @@ function(configure_dir DIR)
     file(REMOVE_RECURSE ${BUILD_DIR})
 endfunction()
 
-
 function(install_dir DIR)
     set(options)
     set(oneValueArgs)
@@ -85,7 +78,10 @@ function(install_dir DIR)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-    configure_dir(${DIR} TARGETS all ${PARSE_TARGETS} install CMAKE_ARGS ${PARSE_CMAKE_ARGS})
+    configure_dir(
+        ${DIR}
+        TARGETS all ${PARSE_TARGETS} install
+        CMAKE_ARGS ${PARSE_CMAKE_ARGS})
 endfunction()
 
 function(write_version_cmake DIR VERSION CONTENT)
@@ -113,7 +109,8 @@ function(test_check_package)
         set(CHECK_TARGET ${PARSE_CHECK_TARGET})
     endif()
 
-    install_dir(${TEST_DIR}/findpackagecheck CMAKE_ARGS -DPKG=${PARSE_NAME} -DPKG_TARGET=${TARGET} -DCHECK_TARGET=${CHECK_TARGET} ${HEADER_FLAG})
+    install_dir(${TEST_DIR}/findpackagecheck CMAKE_ARGS -DPKG=${PARSE_NAME} -DPKG_TARGET=${TARGET}
+                                                        -DCHECK_TARGET=${CHECK_TARGET} ${HEADER_FLAG})
 endfunction()
 
 install_dir(${TEST_DIR}/../)

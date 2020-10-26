@@ -1,35 +1,28 @@
-################################################################################
+# ######################################################################################################################
 # Copyright (C) 2017 Advanced Micro Devices, Inc.
-################################################################################
+# ######################################################################################################################
 include(CMakeParseArguments)
 include(ROCMAnalyzers)
 
 get_filename_component(CLANG_TIDY_EXE_HINT "${CMAKE_CXX_COMPILER}" PATH)
 
-find_program(CLANG_TIDY_EXE 
-    NAMES 
-        clang-tidy
-        clang-tidy-9.0
-        clang-tidy-8.0
-        clang-tidy-7.0
-        clang-tidy-6.0
-        clang-tidy-5.0
-        clang-tidy-4.0
-        clang-tidy-3.9
-        clang-tidy-3.8
-        clang-tidy-3.7
-        clang-tidy-3.6
-        clang-tidy-3.5
-    HINTS
-        ${CLANG_TIDY_EXE_HINT}
-    PATH_SUFFIXES
-        compiler/bin
-        bin
-    PATHS
-        /opt/rocm/llvm/bin
-        /opt/rocm/hcc
-        /usr/local/opt/llvm/bin
-)
+find_program(
+    CLANG_TIDY_EXE
+    NAMES clang-tidy
+          clang-tidy-9.0
+          clang-tidy-8.0
+          clang-tidy-7.0
+          clang-tidy-6.0
+          clang-tidy-5.0
+          clang-tidy-4.0
+          clang-tidy-3.9
+          clang-tidy-3.8
+          clang-tidy-3.7
+          clang-tidy-3.6
+          clang-tidy-3.5
+    HINTS ${CLANG_TIDY_EXE_HINT}
+    PATH_SUFFIXES compiler/bin bin
+    PATHS /opt/rocm/llvm/bin /opt/rocm/hcc /usr/local/opt/llvm/bin)
 
 function(rocm_find_clang_tidy_version VAR)
     execute_process(COMMAND ${CLANG_TIDY_EXE} -version OUTPUT_VARIABLE VERSION_OUTPUT)
@@ -38,26 +31,33 @@ function(rocm_find_clang_tidy_version VAR)
     if(VERSION_INDEX GREATER 0)
         math(EXPR VERSION_INDEX "${VERSION_INDEX} + 1")
         list(GET VERSION_OUTPUT_LIST ${VERSION_INDEX} VERSION)
-        set(${VAR} ${VERSION} PARENT_SCOPE)
+        set(${VAR}
+            ${VERSION}
+            PARENT_SCOPE)
     else()
-        set(${VAR} "0.0" PARENT_SCOPE)
+        set(${VAR}
+            "0.0"
+            PARENT_SCOPE)
     endif()
 
 endfunction()
 
-if( NOT CLANG_TIDY_EXE )
-    message( STATUS "Clang tidy not found" )
+if(NOT CLANG_TIDY_EXE)
+    message(STATUS "Clang tidy not found")
     set(CLANG_TIDY_VERSION "0.0")
 else()
     rocm_find_clang_tidy_version(CLANG_TIDY_VERSION)
-    message( STATUS "Clang tidy found: ${CLANG_TIDY_VERSION}")
+    message(STATUS "Clang tidy found: ${CLANG_TIDY_VERSION}")
 endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CLANG_TIDY_FIXIT_DIR ${CMAKE_BINARY_DIR}/fixits)
 file(MAKE_DIRECTORY ${CLANG_TIDY_FIXIT_DIR})
-set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CLANG_TIDY_FIXIT_DIR})
+set_property(
+    DIRECTORY
+    APPEND
+    PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CLANG_TIDY_FIXIT_DIR})
 
 macro(rocm_enable_clang_tidy)
     set(options ALL ANALYZE_TEMPORARY_DTORS ENABLE_ALPHA_CHECKS)
@@ -67,14 +67,14 @@ macro(rocm_enable_clang_tidy)
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
     string(REPLACE ";" "," CLANG_TIDY_CHECKS "${PARSE_CHECKS}")
     string(REPLACE ";" "," CLANG_TIDY_ERRORS "${PARSE_ERRORS}")
-    
+
     message(STATUS "Clang tidy checks: ${CLANG_TIDY_CHECKS}")
 
     set(CLANG_TIDY_ALL)
     if(PARSE_ALL)
         set(CLANG_TIDY_ALL ALL)
     endif()
-    
+
     set(CLANG_TIDY_EXTRA_ARGS)
     foreach(ARG ${PARSE_EXTRA_ARGS})
         list(APPEND CLANG_TIDY_EXTRA_ARGS "-extra-arg=${ARG}")
@@ -89,13 +89,13 @@ macro(rocm_enable_clang_tidy)
         set(CLANG_TIDY_ENABLE_ALPHA_CHECKS_ARGS --allow-enabling-analyzer-alpha-checkers)
     endif()
 
-    if (${CLANG_TIDY_VERSION} VERSION_LESS "3.9.0")
+    if(${CLANG_TIDY_VERSION} VERSION_LESS "3.9.0")
         set(CLANG_TIDY_ERRORS_ARG "")
     else()
         set(CLANG_TIDY_ERRORS_ARG "-warnings-as-errors=${CLANG_TIDY_ERRORS}")
     endif()
 
-    if (${CLANG_TIDY_VERSION} VERSION_LESS "4.0.0" OR WIN32)
+    if(${CLANG_TIDY_VERSION} VERSION_LESS "4.0.0" OR WIN32)
         set(CLANG_TIDY_QUIET_ARG "")
     else()
         set(CLANG_TIDY_QUIET_ARG "-quiet")
@@ -113,17 +113,10 @@ macro(rocm_enable_clang_tidy)
         set(CLANG_TIDY_HEADER_FILTER ".*")
     endif()
 
-    set(CLANG_TIDY_COMMAND 
-        ${CLANG_TIDY_EXE}
-        ${CLANG_TIDY_CONFIG_ARG}
-        ${CLANG_TIDY_QUIET_ARG} 
-        ${CLANG_TIDY_ENABLE_ALPHA_CHECKS_ARGS}
-        -p "${CMAKE_BINARY_DIR}"
-        "-checks=${CLANG_TIDY_CHECKS}"
-        "${CLANG_TIDY_ERRORS_ARG}"
-        ${CLANG_TIDY_EXTRA_ARGS}
-        "-header-filter=${CLANG_TIDY_HEADER_FILTER}"
-    )
+    set(CLANG_TIDY_COMMAND
+        ${CLANG_TIDY_EXE} ${CLANG_TIDY_CONFIG_ARG} ${CLANG_TIDY_QUIET_ARG} ${CLANG_TIDY_ENABLE_ALPHA_CHECKS_ARGS} -p
+        "${CMAKE_BINARY_DIR}" "-checks=${CLANG_TIDY_CHECKS}" "${CLANG_TIDY_ERRORS_ARG}" ${CLANG_TIDY_EXTRA_ARGS}
+        "-header-filter=${CLANG_TIDY_HEADER_FILTER}")
     execute_process(COMMAND ${CLANG_TIDY_COMMAND} -dump-config OUTPUT_VARIABLE CLANG_TIDY_CONFIG)
     file(WRITE ${CMAKE_BINARY_DIR}/clang-tidy.yml ${CLANG_TIDY_CONFIG})
     add_custom_target(tidy ${CLANG_TIDY_ALL})
@@ -139,19 +132,19 @@ endmacro()
 
 function(rocm_clang_tidy_check TARGET)
     get_target_property(SOURCES ${TARGET} SOURCES)
-    # TODO: Use generator expressions instead
-    # COMMAND ${CLANG_TIDY_COMMAND} $<TARGET_PROPERTY:${TARGET},SOURCES>
-    # COMMAND ${CLANG_TIDY_COMMAND} $<JOIN:$<TARGET_PROPERTY:${TARGET},SOURCES>, >
+    # TODO: Use generator expressions instead COMMAND ${CLANG_TIDY_COMMAND} $<TARGET_PROPERTY:${TARGET},SOURCES> COMMAND
+    # ${CLANG_TIDY_COMMAND} $<JOIN:$<TARGET_PROPERTY:${TARGET},SOURCES>, >
     add_custom_target(tidy-target-${TARGET})
     foreach(SOURCE ${SOURCES})
         if(NOT "${SOURCE}" MATCHES "(h|hpp|hxx)$")
-            string(MAKE_C_IDENTIFIER "${SOURCE}" tidy_file)        
+            string(MAKE_C_IDENTIFIER "${SOURCE}" tidy_file)
             set(tidy_target tidy-target-${TARGET}-${tidy_file})
-            add_custom_target(${tidy_target}
-                COMMAND ${CLANG_TIDY_COMMAND} ${SOURCE} "-export-fixes=${CLANG_TIDY_FIXIT_DIR}/${TARGET}-${tidy_file}.yaml"
+            add_custom_target(
+                ${tidy_target}
+                COMMAND ${CLANG_TIDY_COMMAND} ${SOURCE}
+                        "-export-fixes=${CLANG_TIDY_FIXIT_DIR}/${TARGET}-${tidy_file}.yaml"
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                COMMENT "clang-tidy: Running clang-tidy on target ${SOURCE}..."
-            )
+                COMMENT "clang-tidy: Running clang-tidy on target ${SOURCE}...")
             add_dependencies(${tidy_target} ${TARGET})
             add_dependencies(${tidy_target} tidy-base)
             add_dependencies(tidy-target-${TARGET} ${tidy_target})
@@ -159,4 +152,3 @@ function(rocm_clang_tidy_check TARGET)
         endif()
     endforeach()
 endfunction()
-

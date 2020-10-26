@@ -20,6 +20,7 @@ matrix:
                 - clang-4.0
                 - clang-tidy-4.0
                 - realpath
+                - python3-pip
               sources:
                 - ubuntu-toolchain-r-test
                 - llvm-toolchain-trusty-4.0
@@ -33,11 +34,15 @@ install:
     - which $CC
     - which cmake
     - cmake --version
+    - python3 --version
+    - pip3 install --user 'cmakelang[YAML]'
     
 script:
     - export INSTALL_PREFIX_PATH="${TRAVIS_BUILD_DIR}/usr"
+    - export PATH="/Users/travis/Library/Python/3.7/bin:$PATH"
     - mkdir -p "$INSTALL_PREFIX_PATH"
     - cd $CHECKOUT_PATH
+    - cmake-lint $(find ./test -type f | grep .cmake$) $(find ./share -type f | grep .cmake$)
     - mkdir build
     - cd build
     - cmake -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX_PATH ..
