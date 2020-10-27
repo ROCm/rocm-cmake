@@ -10,7 +10,7 @@ write_version_cmake(
     ${TMP_DIR}/repo
     1.0
     "
-    test_expect_eq(\${PROJECT_VERSION_MAJOR} 3)
+    test_expect_eq(\${PROJECT_VERSION_MAJOR} 1)
     test_expect_eq(\${PROJECT_VERSION_MINOR} 0)
     test_expect_eq(\${PROJECT_VERSION_PATCH} 0)
 ")
