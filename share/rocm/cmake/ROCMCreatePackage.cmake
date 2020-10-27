@@ -67,7 +67,7 @@ macro(rocm_create_package)
                     OUTPUT_VARIABLE EVAL_RESULT
                     OUTPUT_STRIP_TRAILING_WHITESPACE)
     if (PROC_RESULT EQUAL "0" AND NOT EVAL_RESULT STREQUAL "")
-           string (APPEND RPM_RELEASE "%{?dist}")
+        string (APPEND RPM_RELEASE "%{?dist}")
     endif()
     set(CPACK_DEBIAN_PACKAGE_RELEASE ${DEBIAN_VERSION})
     set(CPACK_RPM_PACKAGE_RELEASE ${RPM_RELEASE})
