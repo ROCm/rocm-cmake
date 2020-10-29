@@ -14,9 +14,8 @@ include(ROCMPackageConfigHelpers)
 include(ROCMSetupVersion)
 
 rocm_setup_version(VERSION VERSION 1.0.0)
-rocm_get_version(TAGGED_VERSION VERSION 1.0.0)
 
-if(NOT PROJECT_VERSION EQUAL TAGGED_VERSION)
+if(NOT PROJECT_VERSION STREQUAL "1.0.0")
     message(SEND_ERROR "Version not the same")
 endif()
 

@@ -8,6 +8,7 @@ set(ROCM_DISABLE_LDCONFIG
 
 include(CMakeParseArguments)
 include(GNUInstallDirs)
+include(ROCMSetupVersion)
 
 find_program(MAKE_NSIS_EXE makensis)
 find_program(RPMBUILD_EXE rpmbuild)
@@ -24,7 +25,7 @@ macro(rocm_create_package)
     set(CPACK_PACKAGE_NAME ${_rocm_cpack_package_name})
     set(CPACK_PACKAGE_VENDOR "Advanced Micro Devices, Inc")
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${PARSE_DESCRIPTION})
-    set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+    set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
     set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
     set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
     set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
@@ -34,28 +35,14 @@ macro(rocm_create_package)
             CACHE BOOL "Boolean toggle to make CPack use DESTDIR mechanism when packaging")
     endif()
 
-    if(EXISTS "/etc/os-release")
-        rocm_set_os_id(_os_id)
-        rocm_read_os_release(_version_id "VERSION_ID")
-
-        # only set CPACK_SYSTEM_NAME for AMD supported OSes
-        if(_os_id_centos OR _os_is_rhel)
-            string(CONCAT _SYSTEM_NAME "el" ${_version_id} ".x86_64")
-            # Debs use underscrore between OS and architecture
-        elseif(_os_id_ubuntu)
-            string(CONCAT _SYSTEM_NAME ${_os_id} "-" ${_version_id} "_amd64")
-        else()
-            # For SLES and unsupported OSes
-            string(CONCAT _SYSTEM_NAME ${_os_id} "-" ${_version_id} ".amd64")
-        endif()
-
-        set(CPACK_SYSTEM_NAME
-            ${_SYSTEM_NAME}
-            CACHE STRING "CPACK_SYSTEM_NAME for packaging")
+    rocm_get_patch_version(ROCM_VERSION_NUM)
+    if(ROCM_VERSION_NUM)
+        set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}.${ROCM_VERSION_NUM}")
     endif()
 
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER ${PARSE_MAINTAINER})
     set(CPACK_DEBIAN_PACKAGE_SECTION "devel")
+    set(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
 
     set(CPACK_NSIS_MODIFY_PATH On)
     set(CPACK_NSIS_PACKAGE_NAME ${PARSE_NAME})
@@ -64,6 +51,28 @@ macro(rocm_create_package)
     set(CPACK_RPM_PACKAGE_AUTOREQPROV
         Off
         CACHE BOOL "turns off rpm autoreqprov field; packages explicity list dependencies")
+    set(CPACK_RPM_FILE_NAME "RPM-DEFAULT")
+
+    set(DEBIAN_VERSION ${PROJECT_VERSION_TWEAK})
+    if(DEFINED ENV{CPACK_DEBIAN_PACKAGE_RELEASE})
+        set(DEBIAN_VERSION $ENV{CPACK_DEBIAN_PACKAGE_RELEASE})
+    endif()
+
+    set(RPM_RELEASE ${PROJECT_VERSION_TWEAK})
+    if(DEFINED ENV{CPACK_RPM_PACKAGE_RELEASE})
+        set(RPM_RELEASE $ENV{CPACK_RPM_PACKAGE_RELEASE})
+    endif()
+
+    # '%{?dist}' breaks manual builds on debian systems due to empty Provides
+    execute_process(COMMAND rpm --eval %{?dist}
+                    RESULT_VARIABLE PROC_RESULT
+                    OUTPUT_VARIABLE EVAL_RESULT
+                    OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (PROC_RESULT EQUAL "0" AND NOT EVAL_RESULT STREQUAL "")
+        string (APPEND RPM_RELEASE "%{?dist}")
+    endif()
+    set(CPACK_DEBIAN_PACKAGE_RELEASE ${DEBIAN_VERSION})
+    set(CPACK_RPM_PACKAGE_RELEASE ${RPM_RELEASE})
 
     set(CPACK_GENERATOR "TGZ;ZIP")
     if(EXISTS ${MAKE_NSIS_EXE})

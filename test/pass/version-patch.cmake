@@ -4,34 +4,19 @@
 
 find_program(GIT NAMES git)
 
-# Try to test without git
 file(MAKE_DIRECTORY ${TMP_DIR}/repo)
-execute_process(
-    COMMAND ${GIT} describe --dirty --long --always
-    WORKING_DIRECTORY ${TMP_DIR}/repo
-    OUTPUT_VARIABLE GIT_TAG
-    RESULT_VARIABLE RESULT)
-if(NOT ${RESULT} EQUAL 0)
-    set(GIT_TAG 0)
-endif()
-execute_process(
-    COMMAND ${GIT} rev-list HEAD
-    WORKING_DIRECTORY ${TMP_DIR}/repo
-    OUTPUT_VARIABLE REVS
-    RESULT_VARIABLE RESULT)
-separate_arguments(REVS UNIX_COMMAND "${REVS}")
-list(GET REVS 10 PARENT)
-string(STRIP "${REVS}" REVS)
-message("PARENT: ${PARENT}")
+test_exec(COMMAND ${GIT} init WORKING_DIRECTORY ${TMP_DIR}/repo)
 write_version_cmake(
     ${TMP_DIR}/repo
-    "1.0 PARENT ${PARENT}"
+    1.0.5
     "
     test_expect_eq(\${PROJECT_VERSION_MAJOR} 1)
     test_expect_eq(\${PROJECT_VERSION_MINOR} 0)
-    test_expect_eq(\${PROJECT_VERSION_PATCH} 0)
-    test_expect_eq(\${PROJECT_VERSION_TWEAK} ${GIT_TAG})
+    test_expect_eq(\${PROJECT_VERSION_PATCH} 5)
     test_expect_eq(\${PROJECT_VERSION}
         \${PROJECT_VERSION_MAJOR}.\${PROJECT_VERSION_MINOR}.\${PROJECT_VERSION_PATCH})
+    test_expect_matches(\${PROJECT_VERSION_TWEAK} ^[0-9a-f]+\$)
 ")
+test_exec(COMMAND ${GIT} add . WORKING_DIRECTORY ${TMP_DIR}/repo)
+test_exec(COMMAND ${GIT} commit -am "Init" WORKING_DIRECTORY ${TMP_DIR}/repo)
 install_dir(${TMP_DIR}/repo)
