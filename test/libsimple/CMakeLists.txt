@@ -14,6 +14,8 @@ include(ROCMSetupVersion)
 include(ROCMInstallSymlinks)
 include(ROCMCreatePackage)
 
+rocm_setup_version(VERSION 1.0.0)
+
 if(ROCM_PREFIX)
 rocm_create_package(
     NAME simple 
@@ -28,8 +30,6 @@ rocm_create_package(
     PTH
     LDCONFIG)
 endif()
-
-rocm_setup_version(VERSION 1.0.0)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)

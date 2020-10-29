@@ -16,6 +16,8 @@ include(ROCMCreatePackage)
 
 find_package(simple)
 
+rocm_setup_version(VERSION 1.0.0)
+
 if(ROCM_PREFIX)
 rocm_create_package(
     NAME simple2 
@@ -28,8 +30,6 @@ rocm_create_package(
     MAINTAINER "Amd amd@amd.com"
     LDCONFIG)
 endif()
-
-rocm_setup_version(VERSION 1.0.0)
 
 add_library(simple2 simple2.cpp)
 target_link_libraries(simple2 simple)

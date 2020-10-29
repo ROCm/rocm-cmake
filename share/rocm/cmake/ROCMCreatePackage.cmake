@@ -8,6 +8,7 @@ set(ROCM_DISABLE_LDCONFIG
 
 include(CMakeParseArguments)
 include(GNUInstallDirs)
+include(ROCMSetupVersion)
 
 find_program(MAKE_NSIS_EXE makensis)
 find_program(RPMBUILD_EXE rpmbuild)
@@ -24,7 +25,7 @@ macro(rocm_create_package)
     set(CPACK_PACKAGE_NAME ${_rocm_cpack_package_name})
     set(CPACK_PACKAGE_VENDOR "Advanced Micro Devices, Inc")
     set(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${PARSE_DESCRIPTION})
-    set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+    set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
     set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
     set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
     set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
@@ -52,13 +53,14 @@ macro(rocm_create_package)
         CACHE BOOL "turns off rpm autoreqprov field; packages explicity list dependencies")
     set(CPACK_RPM_FILE_NAME "RPM-DEFAULT")
 
-    rocm_get_debian_version_info(DEBIAN_VERSION)
-    if(DEBIAN_VERSION STREQUAL "unknown")
-        set(DEBIAN_VERSION  ${PROJECT_VERSION_TWEAK})
+    set(DEBIAN_VERSION ${PROJECT_VERSION_TWEAK})
+    if(DEFINED ENV{CPACK_DEBIAN_PACKAGE_RELEASE})
+        set(DEBIAN_VERSION $ENV{CPACK_DEBIAN_PACKAGE_RELEASE})
     endif()
-    rocm_get_rpm_release_info(RPM_RELEASE)
-    if(RPM_RELEASE STREQUAL "unknown")
-        set(RPM_RELEASE  ${PROJECT_VERSION_TWEAK})
+
+    set(RPM_RELEASE ${PROJECT_VERSION_TWEAK})
+    if(DEFINED ENV{CPACK_RPM_PACKAGE_RELEASE})
+        set(RPM_RELEASE $ENV{CPACK_RPM_PACKAGE_RELEASE})
     endif()
 
     # '%{?dist}' breaks manual builds on debian systems due to empty Provides
@@ -143,36 +145,6 @@ macro(rocm_create_package)
     endif()
     include(CPack)
 endmacro()
-
-function(rocm_get_patch_version OUTPUT)
-    set(_patch "")
-    if(DEFINED ENV{ROCM_LIBPATCH_VERSION})
-        set(_patch $ENV{ROCM_LIBPATCH_VERSION})
-    endif()
-    set(${OUTPUT}
-        ${_patch}
-        PARENT_SCOPE)
-endfunction()
-
-function(rocm_get_debian_version_info OUTPUT)
-    set(_patch "unknown")
-    if(DEFINED ENV{CPACK_DEBIAN_PACKAGE_RELEASE})
-        set(_patch $ENV{CPACK_DEBIAN_PACKAGE_RELEASE})
-    endif()
-    set(${OUTPUT}
-        ${_patch}
-        PARENT_SCOPE)
-endfunction()
-
-function(rocm_get_rpm_release_info OUTPUT)
-    set(_patch "unknown")
-    if(DEFINED ENV{CPACK_RPM_PACKAGE_RELEASE})
-        set(_patch $ENV{CPACK_RPM_PACKAGE_RELEASE})
-    endif()
-    set(${OUTPUT}
-        ${_patch}
-        PARENT_SCOPE)
-endfunction()
 
 function(rocm_set_os_id OS_ID)
     set(_os_id "unknown")
