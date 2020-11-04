@@ -59,6 +59,8 @@ set_property(
     APPEND
     PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CLANG_TIDY_FIXIT_DIR})
 
+set(CLANG_TIDY_DEPEND_ON_TARGET On CACHE BOOL "")
+
 macro(rocm_enable_clang_tidy)
     set(options ALL ANALYZE_TEMPORARY_DTORS ENABLE_ALPHA_CHECKS)
     set(oneValueArgs HEADER_FILTER)
@@ -145,7 +147,9 @@ function(rocm_clang_tidy_check TARGET)
                         "-export-fixes=${CLANG_TIDY_FIXIT_DIR}/${TARGET}-${tidy_file}.yaml"
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                 COMMENT "clang-tidy: Running clang-tidy on target ${SOURCE}...")
-            add_dependencies(${tidy_target} ${TARGET})
+            if(CLANG_TIDY_DEPEND_ON_TARGET)
+                add_dependencies(${tidy_target} ${TARGET})
+            endif()
             add_dependencies(${tidy_target} tidy-base)
             add_dependencies(tidy-target-${TARGET} ${tidy_target})
             add_dependencies(tidy ${tidy_target})
