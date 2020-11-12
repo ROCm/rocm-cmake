@@ -4,6 +4,8 @@
 
 find_program(GIT NAMES git)
 
+set(ENV{ROCM_LIBPATCH_VERSION} "21001")
+
 # Try to test without git
 file(MAKE_DIRECTORY ${TMP_DIR}/repo)
 execute_process(
@@ -14,24 +16,27 @@ execute_process(
 if(NOT ${RESULT} EQUAL 0)
     set(GIT_TAG 0)
 endif()
-execute_process(
-    COMMAND ${GIT} rev-list HEAD
-    WORKING_DIRECTORY ${TMP_DIR}/repo
-    OUTPUT_VARIABLE REVS
-    RESULT_VARIABLE RESULT)
-separate_arguments(REVS UNIX_COMMAND "${REVS}")
-list(GET REVS 10 PARENT)
-string(STRIP "${REVS}" REVS)
-message("PARENT: ${PARENT}")
+
 write_version_cmake(
     ${TMP_DIR}/repo
-    "1.0 PARENT ${PARENT}"
+    "4.5.6"
     "
-    test_expect_eq(\${PROJECT_VERSION_MAJOR} 1)
-    test_expect_eq(\${PROJECT_VERSION_MINOR} 0)
-    test_expect_eq(\${PROJECT_VERSION_PATCH} 0)
-    test_expect_eq(\${PROJECT_VERSION_TWEAK} ${GIT_TAG})
+    test_expect_eq(\${PROJECT_VERSION_MAJOR} 4)
+    test_expect_eq(\${PROJECT_VERSION_MINOR} 5)
+    test_expect_eq(\${PROJECT_VERSION_PATCH} 6)
     test_expect_eq(\${PROJECT_VERSION}
         \${PROJECT_VERSION_MAJOR}.\${PROJECT_VERSION_MINOR}.\${PROJECT_VERSION_PATCH})
+    test_expect_eq(\${CPACK_PACKAGE_VERSION} \${PROJECT_VERSION}.\$ENV{ROCM_LIBPATCH_VERSION})
 ")
-install_dir(${TMP_DIR}/repo)
+
+install_dir(${TEST_DIR}/libsimple TARGETS package)
+test_check_package(
+    NAME simple
+    HEADER simple.h
+    TARGET simple)
+install_dir(${TEST_DIR}/libbasic)
+install_dir(${TEST_DIR}/libsimple2 TARGETS package)
+test_check_package(
+    NAME simple2
+    HEADER simple2.h
+    TARGET simple2)
