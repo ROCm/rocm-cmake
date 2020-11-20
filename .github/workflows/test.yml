@@ -3,7 +3,7 @@ name: test
 on: [push]
 
 jobs:
-  build:
+  test:
     runs-on: ${{ matrix.platform }}
     strategy:
       max-parallel: 4
