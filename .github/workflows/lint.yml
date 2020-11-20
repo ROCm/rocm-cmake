@@ -15,6 +15,6 @@ jobs:
       run: |
         python -m pip install --upgrade setuptools pip wheel
         python -m pip install cmakelang[YAML]
-    - name: Run tests
+    - name: Run linter
       run: |
         cmake-lint $(find ./test -type f | grep .cmake$) $(find ./share -type f | grep .cmake$)
