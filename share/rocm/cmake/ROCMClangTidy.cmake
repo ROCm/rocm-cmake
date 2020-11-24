@@ -52,6 +52,11 @@ endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+if(CMAKE_GENERATOR MATCHES "Make")
+set(CLANG_TIDY_CACHE "${CMAKE_BINARY_DIR}/tidy-cache" CACHE STRING "")
+else()
+set(CLANG_TIDY_CACHE "" CACHE STRING "")
+endif()
 set(CLANG_TIDY_FIXIT_DIR ${CMAKE_BINARY_DIR}/fixits)
 file(MAKE_DIRECTORY ${CLANG_TIDY_FIXIT_DIR})
 set_property(
@@ -130,6 +135,10 @@ macro(rocm_enable_clang_tidy)
     add_custom_target(tidy-rm-fixit-dir COMMAND ${CMAKE_COMMAND} -E remove_directory ${CLANG_TIDY_FIXIT_DIR})
     add_dependencies(tidy-make-fixit-dir tidy-rm-fixit-dir)
     add_dependencies(tidy-base tidy-make-fixit-dir)
+    if(CLANG_TIDY_CACHE)
+        add_custom_target(tidy-create-cache-dir COMMAND ${CMAKE_COMMAND} -E make_directory ${CLANG_TIDY_CACHE})
+        add_dependencies(tidy-base tidy-create-cache-dir)
+    endif()
 endmacro()
 
 function(rocm_clang_tidy_check TARGET)
@@ -141,12 +150,43 @@ function(rocm_clang_tidy_check TARGET)
         if(NOT "${SOURCE}" MATCHES "(h|hpp|hxx)$")
             string(MAKE_C_IDENTIFIER "${SOURCE}" tidy_file)
             set(tidy_target tidy-target-${TARGET}-${tidy_file})
-            add_custom_target(
-                ${tidy_target}
-                COMMAND ${CLANG_TIDY_COMMAND} ${SOURCE}
-                        "-export-fixes=${CLANG_TIDY_FIXIT_DIR}/${TARGET}-${tidy_file}.yaml"
-                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                COMMENT "clang-tidy: Running clang-tidy on target ${SOURCE}...")
+            if(CLANG_TIDY_CACHE)
+                get_filename_component(BASE_SOURCE ${SOURCE} NAME_WE)
+                file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${tidy_target}.cmake "
+                    execute_process(COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR} --target ${BASE_SOURCE}.i OUTPUT_VARIABLE PP_OUT)
+                    string(REPLACE \"Preprocessing CXX source to \" \"\" PP_FILE \${PP_OUT})
+                    string(STRIP \"\${PP_FILE}\" PP_FILE)
+                    file(MD5 \${PP_FILE} PP_HASH)
+                    execute_process(COMMAND ${CLANG_TIDY_COMMAND} ${SOURCE} --dump-config OUTPUT_VARIABLE TIDY_CONFIG)
+                    string(MD5 CONFIG_HASH \"\${TIDY_CONFIG}\")
+                    set(HASH \${PP_HASH}-\${CONFIG_HASH})
+                    set(HASH_FILE ${CLANG_TIDY_CACHE}/${TARGET}-${tidy_file})
+                    set(RUN_TIDY On)
+                    if(EXISTS \${HASH_FILE})
+                        file(READ \${HASH_FILE} CACHED_HASH)
+                        if(\"\${CACHED_HASH}\" STREQUALS \"\${HASH}\")
+                            set(RUN_TIDY Off)
+                        endif()
+                    endif()
+                    if(RUN_TIDY)
+                        execute_process(
+                            COMMAND ${CLANG_TIDY_COMMAND} ${SOURCE} \"-export-fixes=${CLANG_TIDY_FIXIT_DIR}/${TARGET}-${tidy_file}.yaml\"
+                            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+                        file(WRITE \${HASH_FILE} \${HASH})
+                    endif()
+                ")
+                add_custom_target(
+                    ${tidy_target}
+                    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/${tidy_target}.cmake
+                    COMMENT "clang-tidy: Running clang-tidy on target ${SOURCE}...")
+            else()
+                add_custom_target(
+                    ${tidy_target}
+                    COMMAND ${CLANG_TIDY_COMMAND} ${SOURCE}
+                            "-export-fixes=${CLANG_TIDY_FIXIT_DIR}/${TARGET}-${tidy_file}.yaml"
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                    COMMENT "clang-tidy: Running clang-tidy on target ${SOURCE}...")
+            endif()
             if(CLANG_TIDY_DEPEND_ON_TARGET)
                 add_dependencies(${tidy_target} ${TARGET})
             endif()
