@@ -5,8 +5,9 @@
 include(CMakeParseArguments)
 
 set(SCRIPT_CMAKE_ARGS)
-foreach(i RANGE ${CMAKE_ARGC})
-    list(APPEND SCRIPT_CMAKE_ARGS ${CMAKE_ARGV${i}})
+# cmake-lint: disable=E1120
+foreach(IDX RANGE ${CMAKE_ARGC})
+    list(APPEND SCRIPT_CMAKE_ARGS ${CMAKE_ARGV${IDX}})
 endforeach()
 
 cmake_parse_arguments(SCRIPT_ARGS "" "" "-P" ${SCRIPT_CMAKE_ARGS})

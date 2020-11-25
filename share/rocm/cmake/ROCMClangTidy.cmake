@@ -180,11 +180,18 @@ function(rocm_clang_tidy_check TARGET)
                     WRITE ${CMAKE_CURRENT_BINARY_DIR}/${tidy_target}.cmake
                     "
                     set(CLANG_TIDY_COMMAND_LIST \"${CLANG_TIDY_COMMAND}\")
-                    execute_process(COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR} --target ${BASE_SOURCE}.i ERROR_QUIET OUTPUT_VARIABLE PP_OUT RESULT_VARIABLE RESULT1)
+                    execute_process(
+                        COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR} --target ${BASE_SOURCE}.i
+                        ERROR_QUIET
+                        OUTPUT_VARIABLE PP_OUT
+                        RESULT_VARIABLE RESULT1)
                     if(NOT RESULT1 EQUAL 0)
                         message(WARNING \"Could not preprocess ${SOURCE} -> ${BASE_SOURCE}.i\")
                         execute_process(
-                            COMMAND \${CLANG_TIDY_COMMAND_LIST} ${SOURCE} \"-export-fixes=${CLANG_TIDY_FIXIT_DIR}/${TARGET}-${tidy_file}.yaml\"
+                            COMMAND
+                                \${CLANG_TIDY_COMMAND_LIST}
+                                ${SOURCE}
+                                \"-export-fixes=${CLANG_TIDY_FIXIT_DIR}/${TARGET}-${tidy_file}.yaml\"
                             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                             RESULT_VARIABLE RESULT2)
                         if(NOT RESULT2 EQUAL 0)
@@ -195,7 +202,9 @@ function(rocm_clang_tidy_check TARGET)
                     string(REPLACE \"Preprocessing CXX source to \" \"\" PP_FILE \"\${PP_OUT}\")
                     string(STRIP \"\${PP_FILE}\" PP_FILE)
                     file(MD5 ${CMAKE_CURRENT_BINARY_DIR}/\${PP_FILE} PP_HASH)
-                    execute_process(COMMAND \${CLANG_TIDY_COMMAND_LIST} ${SOURCE} --dump-config OUTPUT_VARIABLE TIDY_CONFIG)
+                    execute_process(
+                        COMMAND \${CLANG_TIDY_COMMAND_LIST} ${SOURCE} --dump-config
+                        OUTPUT_VARIABLE TIDY_CONFIG)
                     string(MD5 CONFIG_HASH \"\${TIDY_CONFIG}\")
                     set(HASH \${PP_HASH}-\${CONFIG_HASH})
                     set(HASHES \${HASH})
@@ -217,7 +226,9 @@ function(rocm_clang_tidy_check TARGET)
                     endif()
                     if(RUN_TIDY)
                         execute_process(
-                            COMMAND \${CLANG_TIDY_COMMAND_LIST} ${SOURCE} \"-export-fixes=${CLANG_TIDY_FIXIT_DIR}/${TARGET}-${tidy_file}.yaml\"
+                            COMMAND
+                                \${CLANG_TIDY_COMMAND_LIST} ${SOURCE}
+                                \"-export-fixes=${CLANG_TIDY_FIXIT_DIR}/${TARGET}-${tidy_file}.yaml\"
                             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                             RESULT_VARIABLE RESULT3)
                         if(RESULT3 EQUAL 0)
