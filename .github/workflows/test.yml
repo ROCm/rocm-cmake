@@ -21,10 +21,10 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade setuptools pip wheel
-        python -m pip install cmakelang[YAML]
+        python -m pip install cget cmakelang[YAML]
     - name: Run linter
       run: |
-        cmake-lint $(find ./test -type f | grep .cmake$) $(find ./share -type f | grep .cmake$)
+        cget build -T analyze
   test:
     runs-on: ${{ matrix.platform }}
     strategy:
@@ -44,10 +44,11 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade setuptools pip wheel
-        python -m pip install cget
+        python -m pip install cget ninja
     - name: Run tests
       run: |
         git config --global user.email "you@example.com"
         git config --global user.name "Your Name"
         cget build --test
+        cget build -Cy --test -DROCM_CMAKE_GENERATOR=Ninja
 

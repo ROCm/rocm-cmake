@@ -4,10 +4,21 @@
 
 include(CMakeParseArguments)
 
+set(SCRIPT_CMAKE_ARGS)
+# cmake-lint: disable=E1120
+foreach(IDX RANGE ${CMAKE_ARGC})
+    list(APPEND SCRIPT_CMAKE_ARGS ${CMAKE_ARGV${IDX}})
+endforeach()
+
+cmake_parse_arguments(SCRIPT_ARGS "" "" "-P" ${SCRIPT_CMAKE_ARGS})
+set(ARGS ${SCRIPT_ARGS_-P})
+list(LENGTH ARGS ARGC)
+
 string(RANDOM _TEST_RAND)
-set(TEST ${CMAKE_ARGV3})
+list(GET ARGS 1 TEST)
 set(TEST_DIR ${CMAKE_CURRENT_LIST_DIR})
-set(TMP_DIR ${CMAKE_ARGV4}-${_TEST_RAND})
+list(GET ARGS 2 TMP_DIR_ROOT)
+set(TMP_DIR ${TMP_DIR_ROOT}-${_TEST_RAND})
 file(MAKE_DIRECTORY ${TMP_DIR})
 set(PREFIX ${TMP_DIR}/usr)
 set(BUILDS_DIR ${TMP_DIR}/builds)
@@ -37,6 +48,12 @@ macro(test_expect_file FILE)
     endif()
 endmacro()
 
+macro(test_expect_no_file FILE)
+    if(EXISTS ${FILE})
+        message(FATAL_ERROR "EXPECT NO FILE: ${FILE}")
+    endif()
+endmacro()
+
 macro(test_exec)
     string(REPLACE ";" " " EXEC_COMMAND "${ARGN}")
     message("${EXEC_COMMAND}")
@@ -58,7 +75,12 @@ function(configure_dir DIR)
     if(NOT EXISTS ${BUILD_DIR})
         file(MAKE_DIRECTORY ${BUILD_DIR})
     endif()
-    test_exec(COMMAND ${CMAKE_COMMAND} -DCMAKE_PREFIX_PATH=${PREFIX} -DCMAKE_INSTALL_PREFIX=${PREFIX}
+    if(ROCM_CMAKE_GENERATOR)
+        set(GENERATOR_FLAG -G "${ROCM_CMAKE_GENERATOR}")
+    else()
+        set(GENERATOR_FLAG)
+    endif()
+    test_exec(COMMAND ${CMAKE_COMMAND} ${GENERATOR_FLAG} -DCMAKE_PREFIX_PATH=${PREFIX} -DCMAKE_INSTALL_PREFIX=${PREFIX}
                       -DROCM_ERROR_TOOLCHAIN_VAR=On ${PARSE_CMAKE_ARGS} ${DIR} WORKING_DIRECTORY ${BUILD_DIR})
     foreach(TARGET ${PARSE_TARGETS})
         if("${TARGET}" STREQUAL all)

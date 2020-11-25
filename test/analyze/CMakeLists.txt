@@ -14,7 +14,9 @@ include(ROCMSetupVersion)
 
 rocm_setup_version(VERSION 1.0.0)
 
-add_library(simple simple.cpp)
+configure_file(simple2.cpp.in simple2.cpp)
+
+add_library(simple simple.cpp ${CMAKE_CURRENT_BINARY_DIR}/simple2.cpp)
 rocm_install_targets(TARGETS simple INCLUDE include)
 
 include(ROCMClangTidy)
