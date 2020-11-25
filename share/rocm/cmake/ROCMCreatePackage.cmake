@@ -64,12 +64,13 @@ macro(rocm_create_package)
     endif()
 
     # '%{?dist}' breaks manual builds on debian systems due to empty Provides
-    execute_process(COMMAND rpm --eval %{?dist}
-                    RESULT_VARIABLE PROC_RESULT
-                    OUTPUT_VARIABLE EVAL_RESULT
-                    OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if (PROC_RESULT EQUAL "0" AND NOT EVAL_RESULT STREQUAL "")
-        string (APPEND RPM_RELEASE "%{?dist}")
+    execute_process(
+        COMMAND rpm --eval %{?dist}
+        RESULT_VARIABLE PROC_RESULT
+        OUTPUT_VARIABLE EVAL_RESULT
+        OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if(PROC_RESULT EQUAL "0" AND NOT EVAL_RESULT STREQUAL "")
+        string(APPEND RPM_RELEASE "%{?dist}")
     endif()
     set(CPACK_DEBIAN_PACKAGE_RELEASE ${DEBIAN_VERSION})
     set(CPACK_RPM_PACKAGE_RELEASE ${RPM_RELEASE})

@@ -52,12 +52,18 @@ endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(CLANG_TIDY_CACHE "${CMAKE_BINARY_DIR}/tidy-cache" CACHE STRING "")
+set(CLANG_TIDY_CACHE
+    "${CMAKE_BINARY_DIR}/tidy-cache"
+    CACHE STRING "")
 
 if(CMAKE_GENERATOR MATCHES "Make")
-set(CLANG_TIDY_CACHE_SIZE 10 CACHE STRING "")
+    set(CLANG_TIDY_CACHE_SIZE
+        10
+        CACHE STRING "")
 else()
-set(CLANG_TIDY_CACHE_SIZE 0 CACHE STRING "")
+    set(CLANG_TIDY_CACHE_SIZE
+        0
+        CACHE STRING "")
 endif()
 set(CLANG_TIDY_FIXIT_DIR ${CMAKE_BINARY_DIR}/fixits)
 file(MAKE_DIRECTORY ${CLANG_TIDY_FIXIT_DIR})
@@ -66,7 +72,9 @@ set_property(
     APPEND
     PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${CLANG_TIDY_FIXIT_DIR})
 
-set(CLANG_TIDY_DEPEND_ON_TARGET On CACHE BOOL "")
+set(CLANG_TIDY_DEPEND_ON_TARGET
+    On
+    CACHE BOOL "")
 
 macro(rocm_enable_clang_tidy)
     set(options ALL ANALYZE_TEMPORARY_DTORS ENABLE_ALPHA_CHECKS)
@@ -168,7 +176,9 @@ function(rocm_clang_tidy_check TARGET)
                 else()
                     set(BASE_SOURCE ${BASE_SOURCE_NAME})
                 endif()
-                file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/${tidy_target}.cmake "
+                file(
+                    WRITE ${CMAKE_CURRENT_BINARY_DIR}/${tidy_target}.cmake
+                    "
                     set(CLANG_TIDY_COMMAND_LIST \"${CLANG_TIDY_COMMAND}\")
                     execute_process(COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR} --target ${BASE_SOURCE}.i ERROR_QUIET OUTPUT_VARIABLE PP_OUT RESULT_VARIABLE RESULT1)
                     if(NOT RESULT1 EQUAL 0)

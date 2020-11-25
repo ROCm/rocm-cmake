@@ -16,9 +16,7 @@ if(NOT ${RESULT} EQUAL 0)
 endif()
 
 write_version_cmake(
-    ${TMP_DIR}/repo
-    1.0
-    "
+    ${TMP_DIR}/repo 1.0 "
     test_expect_eq(\${CPACK_DEBIAN_PACKAGE_RELEASE} $ENV{CPACK_DEBIAN_PACKAGE_RELEASE})
 ")
 
