@@ -52,6 +52,8 @@ endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+set(CLANG_TIDY_CACHE_SIZE 10 CACHE STRING "")
+
 if(CMAKE_GENERATOR MATCHES "Make")
 set(CLANG_TIDY_CACHE "${CMAKE_BINARY_DIR}/tidy-cache" CACHE STRING "")
 else()
@@ -198,7 +200,7 @@ function(rocm_clang_tidy_check TARGET)
                             list(REMOVE_AT CACHED_HASHES HASH_IDX)
                         endif()
                         list(LENGTH CACHED_HASHES NHASHES)
-                        if(NHASHES GREATER 10)
+                        if(NHASHES GREATER ${CLANG_TIDY_CACHE_SIZE})
                             list(POP_BACK CACHED_HASHES)
                         endif()
                         list(APPEND HASHES \${CACHED_HASHES})
