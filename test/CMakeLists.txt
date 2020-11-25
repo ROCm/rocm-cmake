@@ -2,10 +2,15 @@
 # Copyright (C) 2017 Advanced Micro Devices, Inc.
 ################################################################################
 
+set(ROCM_CMAKE_GENERATOR "" CACHE STRING "")
 
 function(create_test NAME TEST)
-    add_custom_target(${NAME} COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/test.cmake ${TEST} ${CMAKE_CURRENT_BINARY_DIR}/tmp/${NAME})
-    add_test(NAME ${NAME} COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_SOURCE_DIR}/test.cmake ${TEST} ${CMAKE_CURRENT_BINARY_DIR}/tmp/${NAME})
+    set(GENERATOR_FLAG)
+    if(ROCM_CMAKE_GENERATOR)
+        set(GENERATOR_FLAG "-DROCM_CMAKE_GENERATOR=${ROCM_CMAKE_GENERATOR}")
+    endif()
+    add_custom_target(${NAME} COMMAND ${CMAKE_COMMAND} ${GENERATOR_FLAG} -P ${CMAKE_CURRENT_SOURCE_DIR}/test.cmake ${TEST} ${CMAKE_CURRENT_BINARY_DIR}/tmp/${NAME})
+    add_test(NAME ${NAME} COMMAND ${CMAKE_COMMAND} ${GENERATOR_FLAG} -P ${CMAKE_CURRENT_SOURCE_DIR}/test.cmake ${TEST} ${CMAKE_CURRENT_BINARY_DIR}/tmp/${NAME})
 endfunction()
 
 file(GLOB PASS_TESTS pass/*.cmake)
