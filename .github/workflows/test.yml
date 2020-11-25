@@ -44,10 +44,11 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade setuptools pip wheel
-        python -m pip install cget
+        python -m pip install cget ninja
     - name: Run tests
       run: |
         git config --global user.email "you@example.com"
         git config --global user.name "Your Name"
         cget build --test
+        cget build -Cy --test -DROCM_CMAKE_GENERATOR=Ninja
 
