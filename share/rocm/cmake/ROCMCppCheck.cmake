@@ -38,7 +38,7 @@ endif()
 
 processorcount(CPPCHECK_JOBS)
 
-set(CPPCHECK_BUILD_DIR ${CMAKE_BINARY_DIR}/cppcheck-build)
+set(CPPCHECK_BUILD_DIR ${CMAKE_BINARY_DIR}/cppcheck-build CACHE STRING "")
 file(MAKE_DIRECTORY ${CPPCHECK_BUILD_DIR})
 set_property(
     DIRECTORY
