@@ -23,6 +23,7 @@ include(ROCMClangTidy)
 rocm_enable_clang_tidy(
     CHECKS 
         *
+        -llvmlibc-*
     ERRORS
         *
     HEADER_FILTER
