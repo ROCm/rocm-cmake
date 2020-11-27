@@ -24,6 +24,7 @@ find_program(
     PATH_SUFFIXES compiler/bin bin
     PATHS /opt/rocm/llvm/bin /opt/rocm/hcc /usr/local/opt/llvm/bin)
 
+execute_process(COMMAND ${CMAKE_CXX_COMPILER} --version OUTPUT_VARIABLE CLANG_TIDY_COMPILER_VERSION_OUTPUT)
 function(rocm_find_clang_tidy_version VAR)
     execute_process(COMMAND ${CLANG_TIDY_EXE} -version OUTPUT_VARIABLE VERSION_OUTPUT)
     separate_arguments(VERSION_OUTPUT_LIST UNIX_COMMAND "${VERSION_OUTPUT}")
@@ -205,7 +206,10 @@ function(rocm_clang_tidy_check TARGET)
                     execute_process(
                         COMMAND \${CLANG_TIDY_COMMAND_LIST} ${SOURCE} --dump-config
                         OUTPUT_VARIABLE TIDY_CONFIG)
-                    string(MD5 CONFIG_HASH \"\${TIDY_CONFIG}\")
+                    string(MD5 CONFIG_HASH \"
+                        \${TIDY_CONFIG}
+                        ${CLANG_TIDY_COMMAND}
+                        ${CLANG_TIDY_COMPILER_VERSION_OUTPUT}\")
                     set(HASH \${PP_HASH}-\${CONFIG_HASH})
                     set(HASHES \${HASH})
                     set(HASH_FILE ${CLANG_TIDY_CACHE}/${TARGET}-${tidy_file})
