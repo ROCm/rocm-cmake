@@ -208,7 +208,7 @@ function(rocm_clang_tidy_check TARGET)
                         OUTPUT_VARIABLE TIDY_CONFIG)
                     string(MD5 CONFIG_HASH \"
                         \${TIDY_CONFIG}
-                        ${CLANG_TIDY_COMMAND}
+                        ${CLANG_TIDY_EXTRA_ARGS}
                         ${CLANG_TIDY_COMPILER_VERSION_OUTPUT}\")
                     set(HASH \${PP_HASH}-\${CONFIG_HASH})
                     set(HASHES \${HASH})
