@@ -55,14 +55,18 @@ macro(rocm_create_package)
 
     set(DEBIAN_VERSION ${PROJECT_VERSION_TWEAK})
     # Sanitize tweak version for debian
-    string(REGEX REPLACE "[^A-Za-z0-9.+~]" "~" DEBIAN_VERSION ${DEBIAN_VERSION})
+    if(DEBIAN_VERSION)
+        string(REGEX REPLACE "[^A-Za-z0-9.+~]" "~" DEBIAN_VERSION ${DEBIAN_VERSION})
+    endif()
     if(DEFINED ENV{CPACK_DEBIAN_PACKAGE_RELEASE})
         set(DEBIAN_VERSION $ENV{CPACK_DEBIAN_PACKAGE_RELEASE})
     endif()
 
     set(RPM_RELEASE ${PROJECT_VERSION_TWEAK})
     # Sanitize tweak version for rpm
-    string(REPLACE "-" "_" RPM_RELEASE ${RPM_RELEASE})
+    if(RPM_RELEASE)
+        string(REPLACE "-" "_" RPM_RELEASE ${RPM_RELEASE})
+    endif()
     if(DEFINED ENV{CPACK_RPM_PACKAGE_RELEASE})
         set(RPM_RELEASE $ENV{CPACK_RPM_PACKAGE_RELEASE})
     endif()

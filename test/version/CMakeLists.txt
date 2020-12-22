@@ -8,6 +8,7 @@ project(simple)
 find_package(ROCM)
 
 include(ROCMSetupVersion)
+include(ROCMCreatePackage)
 
 rocm_setup_version(VERSION @VERSION@)
 message("VERSION: @VERSION@")
@@ -29,3 +30,9 @@ macro(test_expect_matches X Y)
 endmacro()
 
 @CONTENT@
+
+rocm_create_package(
+    NAME simple 
+    MAINTAINER "Amd amd@amd.com"
+    PTH
+    LDCONFIG)
