@@ -181,6 +181,7 @@ function(rocm_clang_tidy_check TARGET)
                     WRITE ${CMAKE_CURRENT_BINARY_DIR}/${tidy_target}.cmake
                     "
                     set(CLANG_TIDY_COMMAND_LIST \"${CLANG_TIDY_COMMAND}\")
+                    set(GH_ANNOTATIONS ${ROCM_ENABLE_GH_ANNOTATIONS})
                     execute_process(
                         COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR} --target ${BASE_SOURCE}.i
                         ERROR_QUIET
@@ -237,8 +238,12 @@ function(rocm_clang_tidy_check TARGET)
                             RESULT_VARIABLE RESULT3
                             OUTPUT_VARIABLE TIDY_OUTPUT
                             ERROR_VARIABLE TIDY_OUTPUT)
-                        if(ROCM_ENABLE_GH_ANNOTATIONS)
-                            string(REGEX REPLACE \"([^:]+):([0-9]+):([0-9]+): (warning|error): (.+)$\" \"::warning file=\\\\1,line=\\\\2,col=\\\\3::\\\\5\" TIDY_OUTPUT \"\${TIDY_OUTPUT}\")
+                        if(GH_ANNOTATIONS)
+                            string(REGEX REPLACE 
+                                \"(/[^:]+):([0-9]+):([0-9]+): (error|warning): ([^]]+])\" 
+                                \"::warning file=\\\\1,line=\\\\2,col=\\\\3::\\\\5\" 
+                                TIDY_OUTPUT 
+                                \"\${TIDY_OUTPUT}\")
                         endif()
                         message(\${TIDY_OUTPUT})
                         if(RESULT3 EQUAL 0)

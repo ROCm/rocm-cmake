@@ -118,8 +118,8 @@ macro(rocm_enable_cppcheck)
     set(CPPCHECK_TEMPLATE_ARG --template=gcc)
     if(ROCM_ENABLE_GH_ANNOTATIONS)
         set(CPPCHECK_TEMPLATE_ARG 
-            "--template=::warning file={file},line={line},col={column}::{inconclusive:inconclusive: }{message} [{id}]"
-            "--template-location={file}:{line}:{column}: note: {info}\n{code}")
+            "\"--template=::warning file={file},line={line},col={column}::{inconclusive:inconclusive: }{message} [{id}]\""
+            "\"--template-location={file}:{line}:{column}: note: {info}\n{code}\"")
     endif()
 
     file(
