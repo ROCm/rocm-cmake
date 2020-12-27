@@ -234,7 +234,13 @@ function(rocm_clang_tidy_check TARGET)
                                 \${CLANG_TIDY_COMMAND_LIST} ${SOURCE}
                                 \"-export-fixes=${CLANG_TIDY_FIXIT_DIR}/${TARGET}-${tidy_file}.yaml\"
                             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                            RESULT_VARIABLE RESULT3)
+                            RESULT_VARIABLE RESULT3
+                            OUTPUT_VARIABLE TIDY_OUTPUT
+                            ERROR_VARIABLE TIDY_OUTPUT)
+                        if(ROCM_ENABLE_GH_ANNOTATIONS)
+                            string(REGEX REPLACE \"([^:]+):([0-9]+):([0-9]+): (warning|error): (.+)$\" \"::warning file=\\\\1,line=\\\\2,col=\\\\3::\\\\5\" TIDY_OUTPUT \"\${TIDY_OUTPUT}\")
+                        endif()
+                        message(\${TIDY_OUTPUT})
                         if(RESULT3 EQUAL 0)
                             string(REPLACE \";\" \"\\n\" HASH_LINES \"${HASHES}\")
                             file(WRITE \${HASH_FILE} \"\${HASH_LINES}\")

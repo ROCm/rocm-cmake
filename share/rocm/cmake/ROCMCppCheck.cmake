@@ -115,6 +115,13 @@ macro(rocm_enable_cppcheck)
         endif()
     endforeach()
 
+    set(CPPCHECK_TEMPLATE_ARG --template=gcc)
+    if(ROCM_ENABLE_GH_ANNOTATIONS)
+        set(CPPCHECK_TEMPLATE_ARG 
+            "--template=::warning file={file},line={line},col={column}::{inconclusive:inconclusive: }{message} [{id}]"
+            "--template-location={file}:{line}:{column}: note: {info}\n{code}")
+    endif()
+
     file(
         WRITE ${CMAKE_BINARY_DIR}/cppcheck.cmake
         "
@@ -129,8 +136,8 @@ macro(rocm_enable_cppcheck)
             ${CPPCHECK_BUILD_DIR_FLAG}
             ${CPPCHECK_PLATFORM_FLAG}
             ${CPPCHECK_RULE_FILE_ARG}
+            ${CPPCHECK_TEMPLATE_ARG}
             --inline-suppr
-            --template=gcc
             --error-exitcode=1
             -j ${CPPCHECK_JOBS}
             ${CPPCHECK_DEFINES}
