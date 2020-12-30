@@ -119,6 +119,7 @@ macro(rocm_enable_cppcheck)
 
     set(CPPCHECK_TEMPLATE_ARG --template=gcc)
     if(ROCM_ENABLE_GH_ANNOTATIONS)
+        # cmake-lint: disable=C0301
         set(CPPCHECK_TEMPLATE_ARG
             "\"--template=::warning file={file},line={line},col={column}::{severity}: {inconclusive:inconclusive: }{message} [{id}]\""
             "\"--template-location={file}:{line}:{column}: note: {info}\n{code}\"")
