@@ -244,6 +244,7 @@ function(rocm_clang_tidy_check TARGET)
                                 \"::warning file=\\\\1,line=\\\\2,col=\\\\3::\\\\5\" 
                                 TIDY_OUTPUT 
                                 \"\${TIDY_OUTPUT}\")
+                            string(REPLACE \"${CMAKE_SOURCE_DIR}/\" \"\" TIDY_OUTPUT \"\${TIDY_OUTPUT}\")
                         endif()
                         message(\${TIDY_OUTPUT})
                         if(RESULT3 EQUAL 0)
