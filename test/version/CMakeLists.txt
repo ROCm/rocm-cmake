@@ -2,7 +2,7 @@
 # Copyright (C) 2017 Advanced Micro Devices, Inc.
 ################################################################################
 
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 3.5)
 project(simple)
 
 find_package(ROCM)
