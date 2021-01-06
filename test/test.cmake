@@ -80,8 +80,9 @@ function(configure_dir DIR)
     else()
         set(GENERATOR_FLAG)
     endif()
-    test_exec(COMMAND ${CMAKE_COMMAND} -Werror=dev ${GENERATOR_FLAG} -DCMAKE_PREFIX_PATH=${PREFIX} -DCMAKE_INSTALL_PREFIX=${PREFIX}
-                      -DROCM_ERROR_TOOLCHAIN_VAR=On ${PARSE_CMAKE_ARGS} ${DIR} WORKING_DIRECTORY ${BUILD_DIR})
+    test_exec(COMMAND ${CMAKE_COMMAND} -Werror=dev ${GENERATOR_FLAG} -DCMAKE_PREFIX_PATH=${PREFIX}
+                      -DCMAKE_INSTALL_PREFIX=${PREFIX} -DROCM_ERROR_TOOLCHAIN_VAR=On ${PARSE_CMAKE_ARGS} ${DIR}
+              WORKING_DIRECTORY ${BUILD_DIR})
     foreach(TARGET ${PARSE_TARGETS})
         if("${TARGET}" STREQUAL all)
             test_exec(COMMAND ${CMAKE_COMMAND} --build ${BUILD_DIR})
