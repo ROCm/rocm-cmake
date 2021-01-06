@@ -146,7 +146,7 @@ macro(rocm_enable_cppcheck)
             ${CPPCHECK_DEFINES}
             ${CPPCHECK_UNDEFINES}
             ${CPPCHECK_INCLUDES}
-            "--relative-paths=${CMAKE_SOURCE_DIR}"
+            \"--relative-paths=${CMAKE_SOURCE_DIR}\"
             --enable=${CPPCHECK_CHECKS}
             --suppressions-list=${CMAKE_BINARY_DIR}/cppcheck-supressions
             ${SOURCES} \${GSRCS}
