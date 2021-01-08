@@ -8,6 +8,9 @@ set(ROCM_WARN_TOOLCHAIN_VAR
 set(ROCM_ERROR_TOOLCHAIN_VAR
     OFF
     CACHE BOOL "")
+set(ROCM_CHECK_TOOLCHAIN_VAR
+    ON
+    CACHE BOOL "")
 
 function(rocm_check_toolchain_var var access value list_file)
     set(message_type STATUS)
@@ -26,7 +29,7 @@ function(rocm_check_toolchain_var var access value list_file)
         elseif("${base}" MATCHES ".*/CMakeFiles/${CMAKE_VERSION}$")
             set(cmake_module On)
         endif()
-        if(NOT cmake_module)
+        if(NOT cmake_module AND ROCM_CHECK_TOOLCHAIN_VAR)
             message(
                 "
 *******************************************************************************
