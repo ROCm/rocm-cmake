@@ -206,6 +206,7 @@ function(rocm_clang_tidy_check TARGET)
                     file(MD5 ${CMAKE_CURRENT_BINARY_DIR}/\${PP_FILE} PP_HASH)
                     execute_process(
                         COMMAND \${CLANG_TIDY_COMMAND_LIST} ${SOURCE} --dump-config
+                        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                         OUTPUT_VARIABLE TIDY_CONFIG)
                     string(MD5 CONFIG_HASH \"
                         \${TIDY_CONFIG}
