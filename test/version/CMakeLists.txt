@@ -2,12 +2,13 @@
 # Copyright (C) 2017 Advanced Micro Devices, Inc.
 ################################################################################
 
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 3.5)
 project(simple)
 
 find_package(ROCM)
 
 include(ROCMSetupVersion)
+include(ROCMCreatePackage)
 
 rocm_setup_version(VERSION @VERSION@)
 message("VERSION: @VERSION@")
@@ -29,3 +30,9 @@ macro(test_expect_matches X Y)
 endmacro()
 
 @CONTENT@
+
+rocm_create_package(
+    NAME simple 
+    MAINTAINER "Amd amd@amd.com"
+    PTH
+    LDCONFIG)

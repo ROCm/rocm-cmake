@@ -38,7 +38,9 @@ endif()
 
 processorcount(CPPCHECK_JOBS)
 
-set(CPPCHECK_BUILD_DIR ${CMAKE_BINARY_DIR}/cppcheck-build)
+set(CPPCHECK_BUILD_DIR
+    ${CMAKE_BINARY_DIR}/cppcheck-build
+    CACHE STRING "")
 file(MAKE_DIRECTORY ${CPPCHECK_BUILD_DIR})
 set_property(
     DIRECTORY
@@ -115,6 +117,14 @@ macro(rocm_enable_cppcheck)
         endif()
     endforeach()
 
+    set(CPPCHECK_TEMPLATE_ARG --template=gcc)
+    if(ROCM_ENABLE_GH_ANNOTATIONS)
+        # cmake-lint: disable=C0301
+        set(CPPCHECK_TEMPLATE_ARG
+            "\"--template=::warning file={file},line={line},col={column}::{severity}: {inconclusive:inconclusive: }{message} [{id}]\""
+            "\"--template-location={file}:{line}:{column}: note: {info}\n{code}\"")
+    endif()
+
     file(
         WRITE ${CMAKE_BINARY_DIR}/cppcheck.cmake
         "
@@ -129,13 +139,14 @@ macro(rocm_enable_cppcheck)
             ${CPPCHECK_BUILD_DIR_FLAG}
             ${CPPCHECK_PLATFORM_FLAG}
             ${CPPCHECK_RULE_FILE_ARG}
+            ${CPPCHECK_TEMPLATE_ARG}
             --inline-suppr
-            --template=gcc
             --error-exitcode=1
             -j ${CPPCHECK_JOBS}
             ${CPPCHECK_DEFINES}
             ${CPPCHECK_UNDEFINES}
             ${CPPCHECK_INCLUDES}
+            \"--relative-paths=${CMAKE_SOURCE_DIR}\"
             --enable=${CPPCHECK_CHECKS}
             --suppressions-list=${CMAKE_BINARY_DIR}/cppcheck-supressions
             ${SOURCES} \${GSRCS}
