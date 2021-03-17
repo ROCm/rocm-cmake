@@ -241,7 +241,7 @@ function(rocm_clang_tidy_check TARGET)
                             ERROR_VARIABLE TIDY_OUTPUT)
                         if(GH_ANNOTATIONS)
                             string(REGEX REPLACE
-                                \"(/[^:]+):([0-9]+):([0-9]+): (error|warning): ([^]]+])\"
+                                \"(/[^:\\t\\r\\n]+):([0-9]+):([0-9]+): (error|warning): ([^]]+])\"
                                 \"::warning file=\\\\1,line=\\\\2,col=\\\\3::\\\\5\"
                                 TIDY_OUTPUT
                                 \"\${TIDY_OUTPUT}\")
