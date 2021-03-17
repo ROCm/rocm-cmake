@@ -77,6 +77,10 @@ set(CLANG_TIDY_DEPEND_ON_TARGET
     On
     CACHE BOOL "")
 
+set(ROCM_ENABLE_GH_ANNOTATIONS
+    Off
+    CACHE BOOL "Enable github annotations in output")
+
 macro(rocm_enable_clang_tidy)
     set(options ALL ANALYZE_TEMPORARY_DTORS ENABLE_ALPHA_CHECKS)
     set(oneValueArgs HEADER_FILTER)
