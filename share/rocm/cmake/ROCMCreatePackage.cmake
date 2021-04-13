@@ -17,7 +17,7 @@ find_program(DPKG_EXE dpkg)
 macro(rocm_create_package)
     set(options LDCONFIG PTH)
     set(oneValueArgs NAME DESCRIPTION SECTION MAINTAINER LDCONFIG_DIR PREFIX)
-    set(multiValueArgs DEPENDS)
+    set(multiValueArgs DEPENDS COMPONENTS)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -90,10 +90,24 @@ macro(rocm_create_package)
 
     if(EXISTS ${RPMBUILD_EXE})
         list(APPEND CPACK_GENERATOR "RPM")
+        if(PARSE_COMPONENTS)
+            set(CPACK_RPM_COMPONENT_INSTALL ON)
+        endif()
     endif()
 
     if(EXISTS ${DPKG_EXE})
         list(APPEND CPACK_GENERATOR "DEB")
+        if(PARSE_COMPONENTS)
+            set(CPACK_DEB_COMPONENT_INSTALL ON)
+	    execute_process(
+                COMMAND dpkg --print-architecture
+                RESULT_VARIABLE PROC_RESULT
+		OUTPUT_VARIABLE COMMAND_OUTPUT
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+	    if(PROC_RESULT EQUAL "0" AND NOT COMMAND_OUTPUT STREQUAL "")
+                set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "${COMMAND_OUTPUT}")
+            endif()
+        endif()
     endif()
 
     if(PARSE_DEPENDS)
@@ -151,6 +165,21 @@ macro(rocm_create_package)
                 rm ${PYTHON_SITE}/${PARSE_NAME}.pth
             ")
         endforeach()
+    endif()
+    if(PARSE_COMPONENTS)
+       # Setting component specific variables
+       set(CPACK_RPM_MAIN_COMPONENT "Unspecified")
+       set(CPACK_RPM_UNSPECIFIED_DISPLAY_NAME "${CPACK_PACKAGE_NAME}")
+       set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+       list(APPEND CPACK_COMPONENTS_ALL Unspecified)
+       set(CPACK_DEBIAN_UNSPECIFIED_FILE_NAME "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}-${DEBIAN_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
+
+       foreach(COMPONENT ${PARSE_COMPONENTS})
+           list(APPEND CPACK_COMPONENTS_ALL "${COMPONENT}")
+           set(CPACK_RPM_${COMPONENT}_FILE_NAME "RPM-DEFAULT")
+           set(CPACK_DEBIAN_${COMPONENT}_FILE_NAME "DEB-DEFAULT")
+       endforeach()
+
     endif()
     include(CPack)
 endmacro()
