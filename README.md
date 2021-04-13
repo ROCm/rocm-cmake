@@ -107,3 +107,15 @@ rocm_setup_version
     )
 
 Setup the version for the project. This will try to use git tag to set the version if possible unless `NO_GIT_TAG_VERSION` is passed. The `PARENT` argument can be used to set the commit to start the count of number of commits to the current revision.
+
+ROCMCheckTargetIds
+==================
+
+rocm_check_target_ids
+---------------------
+
+    rocm_check_target_ids(<output-variable>
+        TARGETS <target-id>...
+    )
+
+Returns the subset of HIP [target-ids](https://clang.llvm.org/docs/ClangOffloadBundler.html#target-id) supported by the current CXX compiler.
