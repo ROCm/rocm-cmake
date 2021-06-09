@@ -1,6 +1,10 @@
 # Change Log for rocm-cmake
 
 
+## [0.5.1]
+### Added
+    - Add ROCMConfigVersion.cmake file so cmake can check the version
+
 ## [0.5]
 ### Added
     - Change Log added and version number incremented
