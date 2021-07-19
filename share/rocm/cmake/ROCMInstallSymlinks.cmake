@@ -9,7 +9,7 @@ function(rocm_install_symlink_subdir SUBDIR)
     else()
         set(SYMLINK_CMD "execute_process(COMMAND ln -sf \${SRC_REL} \${DEST})")
     endif()
-    install(
+    rocm_install(
         CODE "
         set(SUBDIR \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${SUBDIR})
         file(GLOB_RECURSE FILES RELATIVE \${SUBDIR} \${SUBDIR}/*)

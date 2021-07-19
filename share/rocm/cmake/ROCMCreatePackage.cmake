@@ -71,6 +71,20 @@ macro(rocm_create_package)
         set(RPM_RELEASE $ENV{CPACK_RPM_PACKAGE_RELEASE})
     endif()
 
+    if (DEFINED CACHE{DEVEL_COMPONENT})
+        list(APPEND PARSE_COMPONENTS "$CACHE{DEVEL_COMPONENT}")
+        if(CPACK_DEBIAN_DEVEL_PACKAGE_DEPENDS)
+            string(JOIN ", " CPACK_DEBIAN_DEVEL_PACKAGE_DEPENDS "${CPACK_DEBIAN_DEVEL_PACKAGE_DEPENDS}" "${CPACK_PACKAGE_NAME} (>=${CPACK_PACKAGE_VERSION})")
+        else()
+            set(CPACK_DEBIAN_DEVEL_PACKAGE_DEPENDS "${CPACK_PACKAGE_NAME} (>=${CPACK_PACKAGE_VERSION})")
+        endif()
+        if(CPACK_RPM_DEVEL_PACKAGE_REQUIRES)
+            string(JOIN ", " CPACK_RPM_DEVEL_PACKAGE_REQUIRES "${CPACK_RPM_DEVEL_PACKAGE_REQUIRES}" "${CPACK_PACKAGE_NAME} >=${CPACK_PACKAGE_VERSION}")
+        else()
+            set(CPACK_RPM_DEVEL_PACKAGE_REQUIRES "${CPACK_PACKAGE_NAME} >= ${CPACK_PACKAGE_VERSION}")
+        endif()
+    endif()
+
     # '%{?dist}' breaks manual builds on debian systems due to empty Provides
     execute_process(
         COMMAND rpm --eval %{?dist}

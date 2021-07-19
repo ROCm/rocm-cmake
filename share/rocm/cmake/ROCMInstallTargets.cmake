@@ -7,10 +7,55 @@ include(GNUInstallDirs)
 include(ROCMPackageConfigHelpers)
 
 set(ROCM_INSTALL_LIBDIR lib)
+unset(DEVEL_COMPONENT CACHE)
+
+function(rocm_set_devel_component)
+    if(ARGC EQUAL 0)
+        set(COMPONENT "devel")
+    else()
+        set(COMPONENT "${ARGV0}")
+    endif()
+    if(DEFINED CACHE{DEVEL_COMPONENT})
+        if(NOT "$CACHE{DEVEL_COMPONENT}" STREQUAL ${COMPONENT})
+            message(WARNING "Development component being reset from $CACHE{DEVEL_COMPONENT} to ${COMPONENT}.")
+        endif()
+    endif()
+    set(DEVEL_COMPONENT "${COMPONENT}" CACHE INTERNAL "The component to use for a devel package.")
+endfunction()
+
+function(rocm_install)
+    if(ARGV0 STREQUAL "TARGETS")
+        rocm_install_targets("${ARGN}")
+    else()
+        set(options OPTIONAL EXCLUDE_FROM_ALL)
+        set(oneValueArgs COMPONENT RENAME)
+        set(multiValueArgs FILES PROGRAMS DIRECTORY CODE SCRIPT EXPORT FILES_MATCHING)
+        cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+        set(ACTUAL_COMMAND "${ARGV0};${PARSE_FILES}${PARSE_PROGRAMS}${PARSE_DIRECTORY}${PARSE_CODE}${PARSE_SCRIPT}${PARSE_EXPORT}")
+        if(PARSE_COMPONENT)
+            list(APPEND ACTUAL_COMMAND COMPONENT "${PARSE_COMPONENT}")
+        elseif(DEFINED CACHE{DEVEL_COMPONENT})
+            list(APPEND ACTUAL_COMMAND COMPONENT "$CACHE{DEVEL_COMPONENT}")
+        endif()
+        if(PARSE_RENAME)
+            list(APPEND ACTUAL_COMMAND RENAME "${PARSE_RENAME}")
+        endif()
+        if(PARSE_OPTIONAL)
+            list(APPEND ACTUAL_COMMAND OPTIONAL)
+        endif()
+        if(PARSE_EXCLUDE_FROM_ALL)
+            list(APPEND ACTUAL_COMMAND EXCLUDE_FROM_ALL)
+        endif()
+        if(PARSE_FILES_MATCHING)
+            list(APPEND ACTUAL_COMMAND FILES_MATCHING "${PARSE_FILES_MATCHING}")
+        endif()
+        install(${ACTUAL_COMMAND})
+    endif()
+endfunction()
 
 function(rocm_install_targets)
     set(options)
-    set(oneValueArgs PREFIX EXPORT)
+    set(oneValueArgs PREFIX EXPORT COMPONENT)
     set(multiValueArgs TARGETS INCLUDE)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -44,10 +89,22 @@ function(rocm_install_targets)
         target_include_directories(${TARGET} INTERFACE $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>)
     endforeach()
 
+    if(PARSE_COMPONENT)
+        set(COMPONENT_ARG "COMPONENT;${PARSE_COMPONENT}")
+        set(LIB_COMPONENT_ARG "COMPONENT;${PARSE_COMPONENT}")
+    elseif(DEFINED CACHE{DEVEL_COMPONENT})
+        set(COMPONENT_ARG "COMPONENT;$CACHE{DEVEL_COMPONENT}")
+        set(LIB_COMPONENT_ARG "NAMELINK_COMPONENT;$CACHE{DEVEL_COMPONENT}")
+    else()
+        unset(COMPONENT_ARG)
+        unset(LIB_COMPONENT_ARG)
+    endif()
+
     foreach(INCLUDE ${PARSE_INCLUDE})
         install(
             DIRECTORY ${INCLUDE}/
             DESTINATION ${INCLUDE_INSTALL_DIR}
+            ${COMPONENT_ARG}
             FILES_MATCHING
             PATTERN "*.h"
             PATTERN "*.hpp"
@@ -59,10 +116,17 @@ function(rocm_install_targets)
     install(
         TARGETS ${PARSE_TARGETS}
         EXPORT ${EXPORT_FILE}
-        RUNTIME DESTINATION ${BIN_INSTALL_DIR}
-        LIBRARY DESTINATION ${LIB_INSTALL_DIR}
-        ARCHIVE DESTINATION ${LIB_INSTALL_DIR})
-
+        RUNTIME 
+            DESTINATION ${BIN_INSTALL_DIR}
+            ${COMPONENT_ARG}
+        LIBRARY
+            DESTINATION ${LIB_INSTALL_DIR}
+            ${LIB_COMPONENT_ARG}
+        ARCHIVE 
+            DESTINATION ${LIB_INSTALL_DIR}
+            ${COMPONENT_ARG}
+    )
+    
 endfunction()
 
 set(_rocm_tmp_list_marker "@@__rocm_tmp_list_marker__@@")
@@ -167,7 +231,7 @@ function(rocm_export_targets)
     endif()
 
     foreach(INCLUDE ${PARSE_INCLUDE})
-        install(FILES ${INCLUDE} DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR})
+        rocm_install(FILES ${INCLUDE} DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR})
         get_filename_component(INCLUDE_BASE ${INCLUDE} NAME)
         rocm_write_package_template_function(${CONFIG_TEMPLATE} include "\${CMAKE_CURRENT_LIST_DIR}/${INCLUDE_BASE}")
     endforeach()
@@ -197,12 +261,12 @@ function(rocm_export_targets)
     if(PARSE_NAMESPACE)
         set(NAMESPACE_ARG "NAMESPACE;${PARSE_NAMESPACE}")
     endif()
-    install(
+    rocm_install(
         EXPORT ${TARGET_FILE}
         DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR}
         ${NAMESPACE_ARG})
 
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}.cmake
-                  ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}-version.cmake DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR})
+    rocm_install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}.cmake
+                       ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}-version.cmake DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR})
 
 endfunction()
