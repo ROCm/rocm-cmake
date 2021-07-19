@@ -19,6 +19,7 @@
     - `rocm_create_package`:
         - Package generation will be performed component-wise, and automatically include the devel component, even if the COMPONENTS argument was not provided.
 - Corrects semantic versioning to SameMajorVersion compatibility (e.g. 0.6 is compatible if 0.5 is requested).
+- Moved ROCMConfigVersion.cmake file to share/rocm/cmake directory for better compatibility with automatic installation.
 - Correct CHANGELOG.md formatting
 
 ## [0.5.1]
