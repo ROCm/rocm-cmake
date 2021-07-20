@@ -139,8 +139,13 @@ function(rocm_install_targets)
             DESTINATION ${LIB_INSTALL_DIR}
             ${COMPONENT_ARG}
     )
+    unset(SO_EXPORT)
+    if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
+        set(SO_EXPORT "EXPORT;${EXPORT_FILE}")
+    endif()
     install(
         TARGETS ${PARSE_TARGETS}
+        ${SO_EXPORT}
         LIBRARY
             DESTINATION ${LIB_INSTALL_DIR}
             ${LIB_COMPONENT_ARG}
