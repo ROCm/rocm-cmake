@@ -18,7 +18,7 @@ macro(rocm_join_if_set glue inout_variable)
     if(${inout_variable})
         string(JOIN "${glue}" ${inout_variable} ${${inout_variable}} ${ARGN})
     else()
-        string(JOIN "${glue}" ${inout_variable} "${to_append}" ${ARGN})
+        string(JOIN "${glue}" ${inout_variable} ${ARGN})
     endif()
 endmacro()
 
