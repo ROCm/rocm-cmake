@@ -17,7 +17,7 @@ include(ROCMSetupVersion)
 rocm_setup_version(VERSION 0.6.0)
 
 include(CMakePackageConfigHelpers)
-write_basic_package_version_file(${CMAKE_MODULE_PATH}/ROCMConfigVersion.cmake
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/ROCMConfigVersion.cmake
     COMPATIBILITY SameMajorVersion)
 
 rocm_create_package(
