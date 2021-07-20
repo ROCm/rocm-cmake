@@ -7,49 +7,61 @@ include(GNUInstallDirs)
 include(ROCMPackageConfigHelpers)
 
 set(ROCM_INSTALL_LIBDIR lib)
-unset(ROCM_DEVEL_COMPONENT CACHE)
-
-function(rocm_set_devel_component)
-    if(ARGC EQUAL 0)
-        set(COMPONENT "devel")
-    else()
-        set(COMPONENT "${ARGV0}")
-    endif()
-    if(DEFINED CACHE{ROCM_DEVEL_COMPONENT})
-        if(NOT "$CACHE{ROCM_DEVEL_COMPONENT}" STREQUAL ${COMPONENT})
-            message(WARNING "Development component being reset from $CACHE{ROCM_DEVEL_COMPONENT} to ${COMPONENT}.")
-        endif()
-    endif()
-    set(ROCM_DEVEL_COMPONENT "${COMPONENT}" CACHE INTERNAL "The component to use for a devel package.")
-endfunction()
+if(WIN32)
+    set(ROCM_USE_DEV_COMPONENT OFF CACHE BOOL "Generate a devel package?")
+else()
+    set(ROCM_USE_DEV_COMPONENT ON CACHE BOOL "Generate a devel package?")
+endif()
 
 function(rocm_install)
     if(ARGV0 STREQUAL "TARGETS")
+        # rocm_install_targets deals with the component in its own fashion.
         rocm_install_targets("${ARGN}")
+    elseif(NOT ROCM_USE_DEV_COMPONENT)
+        # If we want legacy behaviour, directly call install with no meddling.
+        install(${ARGN})
     else()
+        # We want to define the COMPONENT argument in the correct position, only if the user did not define
+        #  the COMPONENT argument. Therefore, capture the component argument and any arguments which can
+        #  legally follow it, so we can place those after the inserted COMPONENT argument.
         set(options OPTIONAL EXCLUDE_FROM_ALL)
         set(oneValueArgs COMPONENT RENAME)
+        # Specifying all valid first arguments as multiValueArgs captures all arguments between the first argument
+        #  and the COMPONENT argument (or any argument which can follow COMPONENT) in order.
         set(multiValueArgs FILES PROGRAMS DIRECTORY CODE SCRIPT EXPORT FILES_MATCHING)
+
         cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-        set(ACTUAL_COMMAND "${ARGV0};${PARSE_FILES}${PARSE_PROGRAMS}${PARSE_DIRECTORY}${PARSE_CODE}${PARSE_SCRIPT}${PARSE_EXPORT}")
         if(PARSE_COMPONENT)
-            list(APPEND ACTUAL_COMMAND COMPONENT "${PARSE_COMPONENT}")
-        elseif(DEFINED CACHE{ROCM_DEVEL_COMPONENT})
-            list(APPEND ACTUAL_COMMAND COMPONENT "$CACHE{ROCM_DEVEL_COMPONENT}")
+            # The user specified the component, so don't do anything.
+            install(${ARGN})
+            return()
         endif()
+        set(INSTALL_ARGS "${ARGV0};"
+            "${PARSE_FILES}"
+            "${PARSE_PROGRAMS}"
+            "${PARSE_DIRECTORY}"
+            "${PARSE_CODE}"
+            "${PARSE_SCRIPT}"
+            "${PARSE_EXPORT}")
+        if(PARSE_COMPONENT)
+            list(APPEND INSTALL_ARGS COMPONENT "${PARSE_COMPONENT}")
+        else()
+            list(APPEND INSTALL_ARGS COMPONENT devel)
+        endif()
+
         if(PARSE_RENAME)
-            list(APPEND ACTUAL_COMMAND RENAME "${PARSE_RENAME}")
+            list(APPEND INSTALL_ARGS RENAME "${PARSE_RENAME}")
         endif()
         if(PARSE_OPTIONAL)
-            list(APPEND ACTUAL_COMMAND OPTIONAL)
+            list(APPEND INSTALL_ARGS OPTIONAL)
         endif()
         if(PARSE_EXCLUDE_FROM_ALL)
-            list(APPEND ACTUAL_COMMAND EXCLUDE_FROM_ALL)
+            list(APPEND INSTALL_ARGS EXCLUDE_FROM_ALL)
         endif()
         if(PARSE_FILES_MATCHING)
-            list(APPEND ACTUAL_COMMAND FILES_MATCHING "${PARSE_FILES_MATCHING}")
+            list(APPEND INSTALL_ARGS FILES_MATCHING "${PARSE_FILES_MATCHING}")
         endif()
-        install(${ACTUAL_COMMAND})
+        install(${INSTALL_ARGS})
     endif()
 endfunction()
 
@@ -92,9 +104,9 @@ function(rocm_install_targets)
     if(PARSE_COMPONENT)
         set(COMPONENT_ARG "COMPONENT;${PARSE_COMPONENT}")
         set(LIB_COMPONENT_ARG "COMPONENT;${PARSE_COMPONENT}")
-    elseif(DEFINED CACHE{ROCM_DEVEL_COMPONENT})
-        set(COMPONENT_ARG "COMPONENT;$CACHE{ROCM_DEVEL_COMPONENT}")
-        set(LIB_COMPONENT_ARG "NAMELINK_COMPONENT;$CACHE{ROCM_DEVEL_COMPONENT}")
+    elseif(ROCM_USE_DEV_COMPONENT)
+        set(COMPONENT_ARG "COMPONENT;devel")
+        set(LIB_COMPONENT_ARG "NAMELINK_COMPONENT;devel")
     else()
         unset(COMPONENT_ARG)
         unset(LIB_COMPONENT_ARG)

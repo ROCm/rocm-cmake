@@ -14,6 +14,14 @@ find_program(MAKE_NSIS_EXE makensis)
 find_program(RPMBUILD_EXE rpmbuild)
 find_program(DPKG_EXE dpkg)
 
+macro(rocm_join_if_set glue inout_variable)
+    if(${inout_variable})
+        string(JOIN "${glue}" ${inout_variable} ${${inout_variable}} ${ARGN})
+    else()
+        string(JOIN "${glue}" ${inout_variable} "${to_append}" ${ARGN})
+    endif()
+endmacro()
+
 macro(rocm_create_package)
     set(options LDCONFIG PTH)
     set(oneValueArgs NAME DESCRIPTION SECTION MAINTAINER LDCONFIG_DIR PREFIX)
@@ -71,18 +79,16 @@ macro(rocm_create_package)
         set(RPM_RELEASE $ENV{CPACK_RPM_PACKAGE_RELEASE})
     endif()
 
-    if (DEFINED CACHE{ROCM_DEVEL_COMPONENT})
-        list(APPEND PARSE_COMPONENTS "$CACHE{ROCM_DEVEL_COMPONENT}")
-        if(CPACK_DEBIAN_DEVEL_PACKAGE_DEPENDS)
-            string(JOIN ", " CPACK_DEBIAN_DEVEL_PACKAGE_DEPENDS "${CPACK_DEBIAN_DEVEL_PACKAGE_DEPENDS}" "${CPACK_PACKAGE_NAME} (>=${CPACK_PACKAGE_VERSION})")
-        else()
-            set(CPACK_DEBIAN_DEVEL_PACKAGE_DEPENDS "${CPACK_PACKAGE_NAME} (>=${CPACK_PACKAGE_VERSION})")
-        endif()
-        if(CPACK_RPM_DEVEL_PACKAGE_REQUIRES)
-            string(JOIN ", " CPACK_RPM_DEVEL_PACKAGE_REQUIRES "${CPACK_RPM_DEVEL_PACKAGE_REQUIRES}" "${CPACK_PACKAGE_NAME} >=${CPACK_PACKAGE_VERSION}")
-        else()
-            set(CPACK_RPM_DEVEL_PACKAGE_REQUIRES "${CPACK_PACKAGE_NAME} >= ${CPACK_PACKAGE_VERSION}")
-        endif()
+    if (ROCM_USE_DEV_COMPONENT)
+        list(APPEND PARSE_COMPONENTS devel)
+        rocm_join_if_set(", " CPACK_DEBIAN_DEVEL_PACKAGE_DEPENDS 
+            "${CPACK_PACKAGE_NAME} (>=${CPACK_PACKAGE_VERSION})")
+        rocm_join_if_set(", " CPACK_DEBIAN_UNSPECIFIED_PACKAGE_RECOMMENDS 
+            "${CPACK_PACKAGE_NAME}-devel (>=${CPACK_PACKAGE_VERSION})")
+        rocm_join_if_set(", " CPACK_RPM_DEVEL_PACKAGE_REQUIRES
+            "${CPACK_PACKAGE_NAME} >=${CPACK_PACKAGE_VERSION}")
+        rocm_join_if_set(", " CPACK_RPM_UNSPECIFIED_PACKAGE_SUGGESTS
+            "${CPACK_PACKAGE_NAME}-devel >= ${CPACK_PACKAGE_VERSION}")
     endif()
 
     # '%{?dist}' breaks manual builds on debian systems due to empty Provides
