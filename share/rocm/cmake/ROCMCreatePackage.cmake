@@ -86,7 +86,7 @@ macro(rocm_create_package)
         rocm_join_if_set(", " CPACK_DEBIAN_UNSPECIFIED_PACKAGE_RECOMMENDS 
             "${CPACK_PACKAGE_NAME}-devel (>=${CPACK_PACKAGE_VERSION})")
         rocm_join_if_set(", " CPACK_RPM_DEVEL_PACKAGE_REQUIRES
-            "${CPACK_PACKAGE_NAME} >=${CPACK_PACKAGE_VERSION}")
+            "${CPACK_PACKAGE_NAME} >= ${CPACK_PACKAGE_VERSION}")
         rocm_join_if_set(", " CPACK_RPM_UNSPECIFIED_PACKAGE_SUGGESTS
             "${CPACK_PACKAGE_NAME}-devel >= ${CPACK_PACKAGE_VERSION}")
     endif()
