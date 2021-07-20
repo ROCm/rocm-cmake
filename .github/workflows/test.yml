@@ -50,6 +50,7 @@ jobs:
         git config --global user.email "you@example.com"
         git config --global user.name "Your Name"
         cmake --version
+        which cmake
         cget build --test
         cget build -Cy --test -DROCM_CMAKE_GENERATOR=Ninja
 
