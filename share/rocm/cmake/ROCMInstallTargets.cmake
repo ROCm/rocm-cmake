@@ -141,7 +141,6 @@ function(rocm_install_targets)
     )
     install(
         TARGETS ${PARSE_TARGETS}
-        EXPORT ${EXPORT_FILE}
         LIBRARY
             DESTINATION ${LIB_INSTALL_DIR}
             ${LIB_COMPONENT_ARG}
