@@ -106,7 +106,7 @@ function(rocm_install_targets)
         set(LIB_COMPONENT_ARG "COMPONENT;${PARSE_COMPONENT}")
     elseif(ROCM_USE_DEV_COMPONENT)
         set(COMPONENT_ARG "COMPONENT;devel")
-        set(LIB_COMPONENT_ARG "NAMELINK_COMPONENT;devel")
+        set(LIB_COMPONENT_ARG "COMPONENT;Unspecified")
     else()
         unset(COMPONENT_ARG)
         unset(LIB_COMPONENT_ARG)
@@ -128,15 +128,24 @@ function(rocm_install_targets)
     install(
         TARGETS ${PARSE_TARGETS}
         EXPORT ${EXPORT_FILE}
-        RUNTIME 
+        RUNTIME
             DESTINATION ${BIN_INSTALL_DIR}
             ${COMPONENT_ARG}
         LIBRARY
             DESTINATION ${LIB_INSTALL_DIR}
-            ${LIB_COMPONENT_ARG}
-        ARCHIVE 
+            ${COMPONENT_ARG}
+            NAMELINK_ONLY
+        ARCHIVE
             DESTINATION ${LIB_INSTALL_DIR}
             ${COMPONENT_ARG}
+    )
+    install(
+        TARGETS ${PARSE_TARGETS}
+        EXPORT ${EXPORT_FILE}
+        LIBRARY
+            DESTINATION ${LIB_INSTALL_DIR}
+            ${LIB_COMPONENT_ARG}
+            NAMELINK_SKIP
     )
     
 endfunction()
