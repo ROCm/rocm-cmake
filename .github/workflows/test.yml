@@ -41,12 +41,12 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
     - name: Install dependencies
       run: |
         python -m pip install --upgrade setuptools pip wheel
         python -m pip install cget ninja
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
     - name: Run tests
       run: |
         git config --global user.email "you@example.com"
