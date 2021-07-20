@@ -140,7 +140,7 @@ function(rocm_install_targets)
             ${COMPONENT_ARG}
     )
     unset(SO_EXPORT)
-    if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
+    if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0" AND ${CMAKE_VERSION} VERSION_LESS "3.19.0")
         set(SO_EXPORT "EXPORT;${EXPORT_FILE}")
     endif()
     install(
