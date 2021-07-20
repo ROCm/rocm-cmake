@@ -64,7 +64,7 @@ rocm_install_targets
         [COMPONENT <component>]
     )
 
-Install targets into the appropriate directory. 
+Install targets into the appropriate directory. Unless COMPONENT is specified, libraries will be installed to the base package and namelinked in the `devel` package, and everything else will be installed to the `devel` package.
 
 rocm_export_targets
 -------------------
