@@ -125,33 +125,48 @@ function(rocm_install_targets)
             PATTERN "*.inl")
     endforeach()
 
-    install(
-        TARGETS ${PARSE_TARGETS}
-        EXPORT ${EXPORT_FILE}
-        RUNTIME
-            DESTINATION ${BIN_INSTALL_DIR}
-            ${COMPONENT_ARG}
-        LIBRARY
-            DESTINATION ${LIB_INSTALL_DIR}
-            ${COMPONENT_ARG}
-            NAMELINK_ONLY
-        ARCHIVE
-            DESTINATION ${LIB_INSTALL_DIR}
-            ${COMPONENT_ARG}
-    )
-    unset(SO_EXPORT)
-    if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0" AND ${CMAKE_VERSION} VERSION_LESS "3.19.0")
-        set(SO_EXPORT "EXPORT;${EXPORT_FILE}")
+    if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
+        if(COMPONENT_ARG)
+            set(NL_COMPONENT_ARG "NAMELINK_${COMPONENT_ARG}")
+        endif()
+        install(
+            TARGETS ${PARSE_TARGETS}
+            EXPORT ${EXPORT_FILE}
+            RUNTIME
+                DESTINATION ${BIN_INSTALL_DIR}
+                ${COMPONENT_ARG}
+            LIBRARY
+                DESTINATION ${LIB_INSTALL_DIR}
+                ${LIB_COMPONENT_ARG}
+                ${NL_COMPONENT_ARG}
+            ARCHIVE
+                DESTINATION ${LIB_INSTALL_DIR}
+                ${COMPONENT_ARG}
+        )
+    else()
+        install(
+            TARGETS ${PARSE_TARGETS}
+            EXPORT ${EXPORT_FILE}
+            RUNTIME
+                DESTINATION ${BIN_INSTALL_DIR}
+                ${COMPONENT_ARG}
+            LIBRARY
+                DESTINATION ${LIB_INSTALL_DIR}
+                ${COMPONENT_ARG}
+                NAMELINK_ONLY
+            ARCHIVE
+                DESTINATION ${LIB_INSTALL_DIR}
+                ${COMPONENT_ARG}
+        )
+        install(
+            TARGETS ${PARSE_TARGETS}
+            EXPORT ${EXPORT_FILE}
+            LIBRARY
+                DESTINATION ${LIB_INSTALL_DIR}
+                ${LIB_COMPONENT_ARG}
+                NAMELINK_SKIP
+        )
     endif()
-    install(
-        TARGETS ${PARSE_TARGETS}
-        ${SO_EXPORT}
-        LIBRARY
-            DESTINATION ${LIB_INSTALL_DIR}
-            ${LIB_COMPONENT_ARG}
-            NAMELINK_SKIP
-    )
-    
 endfunction()
 
 set(_rocm_tmp_list_marker "@@__rocm_tmp_list_marker__@@")
