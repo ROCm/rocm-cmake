@@ -40,7 +40,6 @@ else()
     endfunction()
 endif()
 
-
 macro(rocm_create_package)
     set(options LDCONFIG PTH)
     set(oneValueArgs NAME DESCRIPTION SECTION MAINTAINER LDCONFIG_DIR PREFIX)
@@ -80,29 +79,25 @@ macro(rocm_create_package)
         CACHE BOOL "turns off rpm autoreqprov field; packages explicity list dependencies")
     set(CPACK_RPM_FILE_NAME "RPM-DEFAULT")
 
-    set(DEBIAN_VERSION ${PROJECT_VERSION_TWEAK})
-    # Sanitize tweak version for debian
-    if(DEBIAN_VERSION)
-        string(REGEX REPLACE "[^A-Za-z0-9.+~]" "~" DEBIAN_VERSION ${DEBIAN_VERSION})
-    endif()
     if(DEFINED ENV{CPACK_DEBIAN_PACKAGE_RELEASE})
         set(DEBIAN_VERSION $ENV{CPACK_DEBIAN_PACKAGE_RELEASE})
+    elseif(PROJECT_VERSION_TWEAK)
+        # Sanitize tweak version for debian
+        string(REGEX REPLACE "[^A-Za-z0-9.+~]" "~" DEBIAN_VERSION ${PROJECT_VERSION_TWEAK})
     endif()
 
-    set(RPM_RELEASE ${PROJECT_VERSION_TWEAK})
-    # Sanitize tweak version for rpm
-    if(RPM_RELEASE)
-        string(REPLACE "-" "_" RPM_RELEASE ${RPM_RELEASE})
-    endif()
     if(DEFINED ENV{CPACK_RPM_PACKAGE_RELEASE})
         set(RPM_RELEASE $ENV{CPACK_RPM_PACKAGE_RELEASE})
+    elseif(PROJECT_VERSION_TWEAK)
+        # Sanitize tweak version for rpm
+        string(REPLACE "-" "_" RPM_RELEASE ${PROJECT_VERSION_TWEAK})
     endif()
 
     if (ROCM_USE_DEV_COMPONENT)
         list(APPEND PARSE_COMPONENTS devel)
-        rocm_join_if_set(", " CPACK_DEBIAN_DEVEL_PACKAGE_DEPENDS 
+        rocm_join_if_set(", " CPACK_DEBIAN_DEVEL_PACKAGE_DEPENDS
             "${CPACK_PACKAGE_NAME} (>=${CPACK_PACKAGE_VERSION})")
-        rocm_join_if_set(", " CPACK_DEBIAN_UNSPECIFIED_PACKAGE_RECOMMENDS 
+        rocm_join_if_set(", " CPACK_DEBIAN_UNSPECIFIED_PACKAGE_RECOMMENDS
             "${CPACK_PACKAGE_NAME}-devel (>=${CPACK_PACKAGE_VERSION})")
         rocm_join_if_set(", " CPACK_RPM_DEVEL_PACKAGE_REQUIRES
             "${CPACK_PACKAGE_NAME} >= ${CPACK_PACKAGE_VERSION}")

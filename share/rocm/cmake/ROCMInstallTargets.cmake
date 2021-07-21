@@ -153,11 +153,11 @@ function(rocm_install_targets)
                 DESTINATION ${LIB_INSTALL_DIR}
                 COMPONENT ${development}
         )
-        foreach(T IN LISTS PARSE_TARGETS)
-            get_target_property(T_TYPE ${T} TYPE)
+        foreach(TARGET IN LISTS PARSE_TARGETS)
+            get_target_property(T_TYPE ${TARGET} TYPE)
             if(T_TYPE STREQUAL "SHARED_LIBRARY")
                 install(
-                    TARGETS ${T}
+                    TARGETS ${TARGET}
                     EXPORT ${EXPORT_FILE}
                     LIBRARY
                         DESTINATION ${LIB_INSTALL_DIR}
@@ -306,7 +306,11 @@ function(rocm_export_targets)
         DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR}
         ${NAMESPACE_ARG})
 
-    rocm_install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}.cmake
-                       ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}-version.cmake DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR})
+    rocm_install(
+        FILES
+            ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}.cmake
+            ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}-version.cmake
+        DESTINATION
+            ${CONFIG_PACKAGE_INSTALL_DIR})
 
 endfunction()
