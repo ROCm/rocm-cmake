@@ -101,22 +101,20 @@ function(rocm_install_targets)
         target_include_directories(${TARGET} INTERFACE $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>)
     endforeach()
 
+    set(runtime "Unspecified")
+    set(development "Unspecified")
     if(PARSE_COMPONENT)
-        set(COMPONENT_ARG "COMPONENT;${PARSE_COMPONENT}")
-        set(LIB_COMPONENT_ARG "COMPONENT;${PARSE_COMPONENT}")
+        set(runtime "${PARSE_COMPONENT}")
+        set(development "${PARSE_COMPONENT}")
     elseif(ROCM_USE_DEV_COMPONENT)
-        set(COMPONENT_ARG "COMPONENT;devel")
-        set(LIB_COMPONENT_ARG "COMPONENT;Unspecified")
-    else()
-        unset(COMPONENT_ARG)
-        unset(LIB_COMPONENT_ARG)
+        set(development "devel")
     endif()
 
     foreach(INCLUDE ${PARSE_INCLUDE})
         install(
             DIRECTORY ${INCLUDE}/
             DESTINATION ${INCLUDE_INSTALL_DIR}
-            ${COMPONENT_ARG}
+            COMPONENT ${development}
             FILES_MATCHING
             PATTERN "*.h"
             PATTERN "*.hpp"
@@ -126,22 +124,19 @@ function(rocm_install_targets)
     endforeach()
 
     if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
-        if(COMPONENT_ARG)
-            set(NL_COMPONENT_ARG "NAMELINK_${COMPONENT_ARG}")
-        endif()
         install(
             TARGETS ${PARSE_TARGETS}
             EXPORT ${EXPORT_FILE}
             RUNTIME
                 DESTINATION ${BIN_INSTALL_DIR}
-                ${COMPONENT_ARG}
+                COMPONENT ${development}
             LIBRARY
                 DESTINATION ${LIB_INSTALL_DIR}
-                ${LIB_COMPONENT_ARG}
-                ${NL_COMPONENT_ARG}
+                COMPONENT ${runtime}
+                NAMELINK_COMPONENT ${development}
             ARCHIVE
                 DESTINATION ${LIB_INSTALL_DIR}
-                ${COMPONENT_ARG}
+                COMPONENT ${development}
         )
     else()
         install(
@@ -149,23 +144,28 @@ function(rocm_install_targets)
             EXPORT ${EXPORT_FILE}
             RUNTIME
                 DESTINATION ${BIN_INSTALL_DIR}
-                ${COMPONENT_ARG}
+                COMPONENT ${development}
             LIBRARY
                 DESTINATION ${LIB_INSTALL_DIR}
-                ${COMPONENT_ARG}
-                NAMELINK_ONLY
+                COMPONENT ${runtime}
+                NAMELINK_SKIP
             ARCHIVE
                 DESTINATION ${LIB_INSTALL_DIR}
-                ${COMPONENT_ARG}
+                COMPONENT ${development}
         )
-        install(
-            TARGETS ${PARSE_TARGETS}
-            EXPORT ${EXPORT_FILE}
-            LIBRARY
-                DESTINATION ${LIB_INSTALL_DIR}
-                ${LIB_COMPONENT_ARG}
-                NAMELINK_SKIP
-        )
+        foreach(T IN LISTS PARSE_TARGETS)
+            get_target_property(T_TYPE ${T} TYPE)
+            if(T_TYPE STREQUAL "SHARED_LIBRARY")
+                install(
+                    TARGETS ${T}
+                    EXPORT ${EXPORT_FILE}
+                    LIBRARY
+                        DESTINATION ${LIB_INSTALL_DIR}
+                        COMPONENT ${development}
+                        NAMELINK_ONLY
+                )
+            endif()
+        endforeach()
     endif()
 endfunction()
 
