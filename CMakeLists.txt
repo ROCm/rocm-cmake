@@ -9,7 +9,7 @@ set(CMAKE_INSTALL_PREFIX "/opt/rocm" CACHE PATH "")
 project(rocm-cmake)
 
 install(DIRECTORY share DESTINATION .)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ROCMConfigVersion.cmake DESTINATION "share/rocm/cmake")
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ROCMConfigVersion.cmake DESTINATION share/rocm/cmake)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/share/rocm/cmake)
 include(ROCMCreatePackage)
