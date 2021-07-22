@@ -43,9 +43,11 @@ function(rocm_install)
             "${PARSE_CODE}"
             "${PARSE_SCRIPT}"
             "${PARSE_EXPORT}")
+        
+        set(RUNTIME_MODES "PROGRAMS")
         if(PARSE_COMPONENT)
             list(APPEND INSTALL_ARGS COMPONENT "${PARSE_COMPONENT}")
-        else()
+        elseif(NOT ARGV0 IN_LIST RUNTIME_MODES)
             list(APPEND INSTALL_ARGS COMPONENT devel)
         endif()
 
@@ -128,7 +130,7 @@ function(rocm_install_targets)
         EXPORT ${EXPORT_FILE}
         RUNTIME
             DESTINATION ${BIN_INSTALL_DIR}
-            COMPONENT ${development}
+            COMPONENT ${runtime}
         LIBRARY
             DESTINATION ${LIB_INSTALL_DIR}
             COMPONENT ${runtime}
