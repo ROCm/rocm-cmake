@@ -43,7 +43,7 @@ function(rocm_install)
             "${PARSE_CODE}"
             "${PARSE_SCRIPT}"
             "${PARSE_EXPORT}")
-        
+
         set(RUNTIME_MODES "PROGRAMS")
         if(PARSE_COMPONENT)
             list(APPEND INSTALL_ARGS COMPONENT "${PARSE_COMPONENT}")
@@ -149,9 +149,9 @@ function(rocm_install_targets)
                         DESTINATION ${LIB_INSTALL_DIR}
                         COMPONENT ${development}
                         NAMELINK_ONLY
-                )
-            endif()
-        endforeach()
+            )
+        endif()
+    endforeach()
 endfunction()
 
 set(_rocm_tmp_list_marker "@@__rocm_tmp_list_marker__@@")
