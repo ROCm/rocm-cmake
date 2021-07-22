@@ -123,40 +123,24 @@ function(rocm_install_targets)
             PATTERN "*.inl")
     endforeach()
 
-    if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
-        install(
-            TARGETS ${PARSE_TARGETS}
-            EXPORT ${EXPORT_FILE}
-            RUNTIME
-                DESTINATION ${BIN_INSTALL_DIR}
-                COMPONENT ${development}
-            LIBRARY
-                DESTINATION ${LIB_INSTALL_DIR}
-                COMPONENT ${runtime}
-                NAMELINK_COMPONENT ${development}
-            ARCHIVE
-                DESTINATION ${LIB_INSTALL_DIR}
-                COMPONENT ${development}
-        )
-    else()
-        install(
-            TARGETS ${PARSE_TARGETS}
-            EXPORT ${EXPORT_FILE}
-            RUNTIME
-                DESTINATION ${BIN_INSTALL_DIR}
-                COMPONENT ${development}
-            LIBRARY
-                DESTINATION ${LIB_INSTALL_DIR}
-                COMPONENT ${runtime}
-                NAMELINK_SKIP
-            ARCHIVE
-                DESTINATION ${LIB_INSTALL_DIR}
-                COMPONENT ${development}
-        )
-        foreach(TARGET IN LISTS PARSE_TARGETS)
-            get_target_property(T_TYPE ${TARGET} TYPE)
-            if(T_TYPE STREQUAL "SHARED_LIBRARY")
-                install(
+    install(
+        TARGETS ${PARSE_TARGETS}
+        EXPORT ${EXPORT_FILE}
+        RUNTIME
+            DESTINATION ${BIN_INSTALL_DIR}
+            COMPONENT ${development}
+        LIBRARY
+            DESTINATION ${LIB_INSTALL_DIR}
+            COMPONENT ${runtime}
+            NAMELINK_SKIP
+        ARCHIVE
+            DESTINATION ${LIB_INSTALL_DIR}
+            COMPONENT ${development}
+    )
+    foreach(TARGET IN LISTS PARSE_TARGETS)
+        get_target_property(T_TYPE ${TARGET} TYPE)
+        if(T_TYPE STREQUAL "SHARED_LIBRARY")
+            install(
                     TARGETS ${TARGET}
                     EXPORT ${EXPORT_FILE}
                     LIBRARY
@@ -166,7 +150,6 @@ function(rocm_install_targets)
                 )
             endif()
         endforeach()
-    endif()
 endfunction()
 
 set(_rocm_tmp_list_marker "@@__rocm_tmp_list_marker__@@")
