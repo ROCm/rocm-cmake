@@ -14,6 +14,32 @@ find_program(MAKE_NSIS_EXE makensis)
 find_program(RPMBUILD_EXE rpmbuild)
 find_program(DPKG_EXE dpkg)
 
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
+    function(rocm_join_if_set glue inout_variable)
+        string(JOIN "${glue}" to_set_parent ${ARGN})
+        if(${inout_variable})
+            set(${inout_variable} "${${inout_variable}}${glue}${to_set_parent}" PARENT_SCOPE)
+        else()
+            set(${inout_variable} "${to_set_parent}" PARENT_SCOPE)
+        endif()
+    endfunction()
+else()
+    function(rocm_join_if_set glue inout_variable)
+        set(accumulator)
+        if(${inout_variable})
+            set(accumulator "${${inout_variable}}")
+        endif()
+        foreach(ITEM IN LISTS ARGN)
+            if(accumulator)
+                string(CONCAT accumulator "${accumulator}" "${glue}" "${ITEM}")
+            else()
+                set(accumulator "${ITEM}")
+            endif()
+        endforeach()
+        set(${inout_variable} "${accumulator}")
+    endfunction()
+endif()
+
 macro(rocm_create_package)
     set(options LDCONFIG PTH)
     set(oneValueArgs NAME DESCRIPTION SECTION MAINTAINER LDCONFIG_DIR PREFIX)
@@ -53,22 +79,30 @@ macro(rocm_create_package)
         CACHE BOOL "turns off rpm autoreqprov field; packages explicity list dependencies")
     set(CPACK_RPM_FILE_NAME "RPM-DEFAULT")
 
-    set(DEBIAN_VERSION ${PROJECT_VERSION_TWEAK})
-    # Sanitize tweak version for debian
-    if(DEBIAN_VERSION)
-        string(REGEX REPLACE "[^A-Za-z0-9.+~]" "~" DEBIAN_VERSION ${DEBIAN_VERSION})
-    endif()
     if(DEFINED ENV{CPACK_DEBIAN_PACKAGE_RELEASE})
         set(DEBIAN_VERSION $ENV{CPACK_DEBIAN_PACKAGE_RELEASE})
+    elseif(PROJECT_VERSION_TWEAK)
+        # Sanitize tweak version for debian
+        string(REGEX REPLACE "[^A-Za-z0-9.+~]" "~" DEBIAN_VERSION ${PROJECT_VERSION_TWEAK})
     endif()
 
-    set(RPM_RELEASE ${PROJECT_VERSION_TWEAK})
-    # Sanitize tweak version for rpm
-    if(RPM_RELEASE)
-        string(REPLACE "-" "_" RPM_RELEASE ${RPM_RELEASE})
-    endif()
     if(DEFINED ENV{CPACK_RPM_PACKAGE_RELEASE})
         set(RPM_RELEASE $ENV{CPACK_RPM_PACKAGE_RELEASE})
+    elseif(PROJECT_VERSION_TWEAK)
+        # Sanitize tweak version for rpm
+        string(REPLACE "-" "_" RPM_RELEASE ${PROJECT_VERSION_TWEAK})
+    endif()
+
+    if (ROCM_USE_DEV_COMPONENT)
+        list(APPEND PARSE_COMPONENTS devel)
+        rocm_join_if_set(", " CPACK_DEBIAN_DEVEL_PACKAGE_DEPENDS
+            "${CPACK_PACKAGE_NAME} (>=${CPACK_PACKAGE_VERSION})")
+        rocm_join_if_set(", " CPACK_DEBIAN_UNSPECIFIED_PACKAGE_RECOMMENDS
+            "${CPACK_PACKAGE_NAME}-devel (>=${CPACK_PACKAGE_VERSION})")
+        rocm_join_if_set(", " CPACK_RPM_DEVEL_PACKAGE_REQUIRES
+            "${CPACK_PACKAGE_NAME} >= ${CPACK_PACKAGE_VERSION}")
+        rocm_join_if_set(", " CPACK_RPM_UNSPECIFIED_PACKAGE_SUGGESTS
+            "${CPACK_PACKAGE_NAME}-devel >= ${CPACK_PACKAGE_VERSION}")
     endif()
 
     # '%{?dist}' breaks manual builds on debian systems due to empty Provides

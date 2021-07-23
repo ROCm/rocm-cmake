@@ -7,10 +7,69 @@ include(GNUInstallDirs)
 include(ROCMPackageConfigHelpers)
 
 set(ROCM_INSTALL_LIBDIR lib)
+if(WIN32)
+    set(ROCM_USE_DEV_COMPONENT OFF CACHE BOOL "Generate a devel package?")
+else()
+    set(ROCM_USE_DEV_COMPONENT ON CACHE BOOL "Generate a devel package?")
+endif()
+
+function(rocm_install)
+    if(ARGV0 STREQUAL "TARGETS")
+        # rocm_install_targets deals with the component in its own fashion.
+        rocm_install_targets("${ARGN}")
+    elseif(NOT ROCM_USE_DEV_COMPONENT)
+        # If we want legacy behaviour, directly call install with no meddling.
+        install(${ARGN})
+    else()
+        # We want to define the COMPONENT argument in the correct position, only if the user did not define
+        #  the COMPONENT argument. Therefore, capture the component argument and any arguments which can
+        #  legally follow it, so we can place those after the inserted COMPONENT argument.
+        set(options OPTIONAL EXCLUDE_FROM_ALL)
+        set(oneValueArgs COMPONENT RENAME)
+        # Specifying all valid first arguments as multiValueArgs captures all arguments between the first argument
+        #  and the COMPONENT argument (or any argument which can follow COMPONENT) in order.
+        set(multiValueArgs FILES PROGRAMS DIRECTORY CODE SCRIPT EXPORT FILES_MATCHING)
+
+        cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+        if(PARSE_COMPONENT)
+            # The user specified the component, so don't do anything.
+            install(${ARGN})
+            return()
+        endif()
+        set(INSTALL_ARGS "${ARGV0};"
+            "${PARSE_FILES}"
+            "${PARSE_PROGRAMS}"
+            "${PARSE_DIRECTORY}"
+            "${PARSE_CODE}"
+            "${PARSE_SCRIPT}"
+            "${PARSE_EXPORT}")
+
+        set(RUNTIME_MODES "PROGRAMS")
+        if(PARSE_COMPONENT)
+            list(APPEND INSTALL_ARGS COMPONENT "${PARSE_COMPONENT}")
+        elseif(NOT ARGV0 IN_LIST RUNTIME_MODES)
+            list(APPEND INSTALL_ARGS COMPONENT devel)
+        endif()
+
+        if(PARSE_RENAME)
+            list(APPEND INSTALL_ARGS RENAME "${PARSE_RENAME}")
+        endif()
+        if(PARSE_OPTIONAL)
+            list(APPEND INSTALL_ARGS OPTIONAL)
+        endif()
+        if(PARSE_EXCLUDE_FROM_ALL)
+            list(APPEND INSTALL_ARGS EXCLUDE_FROM_ALL)
+        endif()
+        if(PARSE_FILES_MATCHING)
+            list(APPEND INSTALL_ARGS FILES_MATCHING "${PARSE_FILES_MATCHING}")
+        endif()
+        install(${INSTALL_ARGS})
+    endif()
+endfunction()
 
 function(rocm_install_targets)
     set(options)
-    set(oneValueArgs PREFIX EXPORT)
+    set(oneValueArgs PREFIX EXPORT COMPONENT)
     set(multiValueArgs TARGETS INCLUDE)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -44,10 +103,20 @@ function(rocm_install_targets)
         target_include_directories(${TARGET} INTERFACE $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>)
     endforeach()
 
+    set(runtime "Unspecified")
+    set(development "Unspecified")
+    if(PARSE_COMPONENT)
+        set(runtime "${PARSE_COMPONENT}")
+        set(development "${PARSE_COMPONENT}")
+    elseif(ROCM_USE_DEV_COMPONENT)
+        set(development "devel")
+    endif()
+
     foreach(INCLUDE ${PARSE_INCLUDE})
         install(
             DIRECTORY ${INCLUDE}/
             DESTINATION ${INCLUDE_INSTALL_DIR}
+            COMPONENT ${development}
             FILES_MATCHING
             PATTERN "*.h"
             PATTERN "*.hpp"
@@ -59,10 +128,30 @@ function(rocm_install_targets)
     install(
         TARGETS ${PARSE_TARGETS}
         EXPORT ${EXPORT_FILE}
-        RUNTIME DESTINATION ${BIN_INSTALL_DIR}
-        LIBRARY DESTINATION ${LIB_INSTALL_DIR}
-        ARCHIVE DESTINATION ${LIB_INSTALL_DIR})
-
+        RUNTIME
+            DESTINATION ${BIN_INSTALL_DIR}
+            COMPONENT ${runtime}
+        LIBRARY
+            DESTINATION ${LIB_INSTALL_DIR}
+            COMPONENT ${runtime}
+            NAMELINK_SKIP
+        ARCHIVE
+            DESTINATION ${LIB_INSTALL_DIR}
+            COMPONENT ${development}
+    )
+    foreach(TARGET IN LISTS PARSE_TARGETS)
+        get_target_property(T_TYPE ${TARGET} TYPE)
+        if(T_TYPE STREQUAL "SHARED_LIBRARY")
+            install(
+                    TARGETS ${TARGET}
+                    EXPORT ${EXPORT_FILE}
+                    LIBRARY
+                        DESTINATION ${LIB_INSTALL_DIR}
+                        COMPONENT ${development}
+                        NAMELINK_ONLY
+            )
+        endif()
+    endforeach()
 endfunction()
 
 set(_rocm_tmp_list_marker "@@__rocm_tmp_list_marker__@@")
@@ -167,7 +256,7 @@ function(rocm_export_targets)
     endif()
 
     foreach(INCLUDE ${PARSE_INCLUDE})
-        install(FILES ${INCLUDE} DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR})
+        rocm_install(FILES ${INCLUDE} DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR})
         get_filename_component(INCLUDE_BASE ${INCLUDE} NAME)
         rocm_write_package_template_function(${CONFIG_TEMPLATE} include "\${CMAKE_CURRENT_LIST_DIR}/${INCLUDE_BASE}")
     endforeach()
@@ -197,12 +286,16 @@ function(rocm_export_targets)
     if(PARSE_NAMESPACE)
         set(NAMESPACE_ARG "NAMESPACE;${PARSE_NAMESPACE}")
     endif()
-    install(
+    rocm_install(
         EXPORT ${TARGET_FILE}
         DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR}
         ${NAMESPACE_ARG})
 
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}.cmake
-                  ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}-version.cmake DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR})
+    rocm_install(
+        FILES
+            ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}.cmake
+            ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}-version.cmake
+        DESTINATION
+            ${CONFIG_PACKAGE_INSTALL_DIR})
 
 endfunction()
