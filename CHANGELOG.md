@@ -1,5 +1,10 @@
 # Change Log for rocm-cmake
 
+## [0.6.1]
+### Fixed
+- Add `cmake_minimum_required` check to `ROCMInstallTargets.cmake` to fix error with `CMP0057` not set
+- Unset `CPACK_PACKAGING_INSTALL_PREFIX` when `CPACK_USE_DESTDIR` is set to fix error with TGZ generator
+
 ## [0.6.0]
 ### Added
 - The cache variable `ROCM_USE_DEV_COMPONENT` may be set to `OFF` to build with legacy behaviour.
