@@ -2,6 +2,8 @@
 # Copyright (C) 2017 Advanced Micro Devices, Inc.
 # ######################################################################################################################
 
+cmake_minimum_required( VERSION 3.6 )
+
 include(CMakeParseArguments)
 include(GNUInstallDirs)
 include(ROCMPackageConfigHelpers)

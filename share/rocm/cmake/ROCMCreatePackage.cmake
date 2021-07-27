@@ -56,6 +56,7 @@ macro(rocm_create_package)
     set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
     set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
     if(NOT CMAKE_HOST_WIN32)
+        unset(CPACK_PACKAGING_INSTALL_PREFIX)
         set(CPACK_SET_DESTDIR
             ON
             CACHE BOOL "Boolean toggle to make CPack use DESTDIR mechanism when packaging")
