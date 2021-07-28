@@ -56,6 +56,7 @@ macro(rocm_create_package)
     set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
     set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
     if(NOT CMAKE_HOST_WIN32)
+        unset(CPACK_PACKAGING_INSTALL_PREFIX)
         set(CPACK_SET_DESTDIR
             ON
             CACHE BOOL "Boolean toggle to make CPack use DESTDIR mechanism when packaging")
@@ -108,7 +109,7 @@ macro(rocm_create_package)
             OUTPUT_STRIP_TRAILING_WHITESPACE
         )
         if(PROC_RESULT EQUAL "0" AND NOT EVAL_RESULT STREQUAL "")
-            string(REGEX MATCH "[0-9]+\.[0-9]+\.[0-9]+$" RPMBUILD_VERSION "${EVAL_RESULT}")
+            string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+$" RPMBUILD_VERSION "${EVAL_RESULT}")
             if (RPMBUILD_VERSION VERSION_GREATER_EQUAL "4.12.0")
                 rocm_join_if_set(", " CPACK_RPM_UNSPECIFIED_PACKAGE_SUGGESTS
                     "${CPACK_PACKAGE_NAME}-devel >= ${CPACK_PACKAGE_VERSION}")
