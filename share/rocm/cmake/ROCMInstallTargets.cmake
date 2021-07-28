@@ -2,7 +2,7 @@
 # Copyright (C) 2017 Advanced Micro Devices, Inc.
 # ######################################################################################################################
 
-cmake_minimum_required( VERSION 3.6 )
+cmake_policy(SET CMP0057 NEW)
 
 include(CMakeParseArguments)
 include(GNUInstallDirs)
