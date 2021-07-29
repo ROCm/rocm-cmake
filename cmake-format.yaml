@@ -378,7 +378,7 @@ lint:
   max_branches: 20
   max_arguments: 5
   max_localvars: 15
-  max_statements: 100
+  max_statements: 120
 # Options affecting file encoding
 encode:
   # If true, emit the unicode byte-order mark (BOM) at the start
