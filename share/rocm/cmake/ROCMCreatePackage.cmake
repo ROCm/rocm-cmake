@@ -98,12 +98,8 @@ macro(rocm_create_package)
 
     if (ROCM_USE_DEV_COMPONENT)
         list(APPEND PARSE_COMPONENTS devel)
-        rocm_join_if_set(", " CPACK_DEBIAN_DEVEL_PACKAGE_DEPENDS
-            "${CPACK_PACKAGE_NAME} (>=${CPACK_PACKAGE_VERSION})")
         rocm_join_if_set(", " CPACK_DEBIAN_UNSPECIFIED_PACKAGE_RECOMMENDS
             "${CPACK_PACKAGE_NAME}-devel (>=${CPACK_PACKAGE_VERSION})")
-        rocm_join_if_set(", " CPACK_RPM_DEVEL_PACKAGE_REQUIRES
-            "${CPACK_PACKAGE_NAME} >= ${CPACK_PACKAGE_VERSION}")
         execute_process(
             COMMAND rpmbuild --version
             RESULT_VARIABLE PROC_RESULT
@@ -120,6 +116,11 @@ macro(rocm_create_package)
         if(PARSE_HEADER_ONLY)
             set(CPACK_DEBIAN_DEVEL_PACKAGE_PROVIDES "${CPACK_PACKAGE_NAME} (= ${CPACK_PACKAGE_VERSION})")
             set(CPACK_RPM_DEVEL_PACKAGE_PROVIDES "${CPACK_PACKAGE_NAME} = ${CPACK_PACKAGE_VERSION}")
+        else()
+            rocm_join_if_set(", " CPACK_DEBIAN_DEVEL_PACKAGE_DEPENDS
+                "${CPACK_PACKAGE_NAME} (>=${CPACK_PACKAGE_VERSION})")
+            rocm_join_if_set(", " CPACK_RPM_DEVEL_PACKAGE_REQUIRES
+                "${CPACK_PACKAGE_NAME} >= ${CPACK_PACKAGE_VERSION}")
         endif()
     endif()
 
@@ -219,7 +220,7 @@ macro(rocm_create_package)
         endforeach()
     endif()
     if(PARSE_COMPONENTS)
-        rocm_set_comp_cpackvar("${PARSE_COMPONENTS}")
+        rocm_set_comp_cpackvar(PARSE_HEADER_ONLY "${PARSE_COMPONENTS}")
     endif()
     include(CPack)
 endmacro()
@@ -254,15 +255,17 @@ function(rocm_read_os_release OUTPUT KEYVALUE)
         PARENT_SCOPE)
 endfunction()
 
-macro(rocm_set_comp_cpackvar components)
+macro(rocm_set_comp_cpackvar HEADER_ONLY components)
     # Setting component specific variables
-    set(CPACK_RPM_MAIN_COMPONENT "Unspecified")
-    set(CPACK_RPM_UNSPECIFIED_DISPLAY_NAME "${CPACK_PACKAGE_NAME}")
     set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
-    list(APPEND CPACK_COMPONENTS_ALL Unspecified)
-    set(CPACK_DEBIAN_UNSPECIFIED_FILE_NAME
-       "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}-${DEBIAN_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
-    set(CPACK_DEBIAN_UNSPECIFIED_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
+    if(NOT ${HEADER_ONLY})
+        set(CPACK_RPM_MAIN_COMPONENT "Unspecified")
+        set(CPACK_RPM_UNSPECIFIED_DISPLAY_NAME "${CPACK_PACKAGE_NAME}")
+        list(APPEND CPACK_COMPONENTS_ALL Unspecified)
+        set(CPACK_DEBIAN_UNSPECIFIED_FILE_NAME
+           "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}-${DEBIAN_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
+        set(CPACK_DEBIAN_UNSPECIFIED_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
+    endif()
 
     foreach(COMPONENT ${components})
         list(APPEND CPACK_COMPONENTS_ALL "${COMPONENT}")
