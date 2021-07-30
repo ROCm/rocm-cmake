@@ -2,6 +2,8 @@
 # Copyright (C) 2017 Advanced Micro Devices, Inc.
 # ######################################################################################################################
 
+cmake_policy(SET CMP0057 NEW)
+
 include(CMakeParseArguments)
 include(GNUInstallDirs)
 include(ROCMPackageConfigHelpers)
