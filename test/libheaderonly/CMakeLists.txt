@@ -22,13 +22,15 @@ rocm_create_package(
     PREFIX ${ROCM_PREFIX}
     MAINTAINER "Amd amd@amd.com"
     PTH
-    LDCONFIG)
+    LDCONFIG
+    HEADER_ONLY)
 else()
 rocm_create_package(
     NAME headeronly 
     MAINTAINER "Amd amd@amd.com"
     PTH
-    LDCONFIG)
+    LDCONFIG
+    HEADER_ONLY)
 endif()
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
