@@ -41,7 +41,7 @@ else()
 endif()
 
 macro(rocm_create_package)
-    set(options LDCONFIG PTH)
+    set(options LDCONFIG PTH HEADER_ONLY)
     set(oneValueArgs NAME DESCRIPTION SECTION MAINTAINER LDCONFIG_DIR PREFIX)
     set(multiValueArgs DEPENDS COMPONENTS)
 
@@ -116,6 +116,10 @@ macro(rocm_create_package)
                 rocm_join_if_set(", " CPACK_RPM_UNSPECIFIED_PACKAGE_SUGGESTS
                     "${CPACK_PACKAGE_NAME}-devel >= ${CPACK_PACKAGE_VERSION}")
             endif()
+        endif()
+        if(PARSE_HEADER_ONLY)
+            set(CPACK_DEBIAN_DEVEL_PACKAGE_PROVIDES "${CPACK_PACKAGE_NAME} (= ${CPACK_PACKAGE_VERSION})")
+            set(CPACK_RPM_DEVEL_PACKAGE_PROVIDES "${CPACK_PACKAGE_NAME} = ${CPACK_PACKAGE_VERSION}")
         endif()
     endif()
 
