@@ -24,6 +24,7 @@ rocm_create_package
         [LDCONFIG_DIR <lib-directory>]
         [PREFIX <path>]
         [LDCONFIG]
+        [HEADER_ONLY]
     )
 
 Sets up CPack packaging.
