@@ -98,8 +98,9 @@ macro(rocm_create_package)
 
     if (ROCM_USE_DEV_COMPONENT)
         list(APPEND PARSE_COMPONENTS devel)
+        set(CPACK_DEBIAN_DEVEL_PACKAGE_NAME "${CPACK_PACKAGE_NAME}-dev")
         rocm_join_if_set(", " CPACK_DEBIAN_UNSPECIFIED_PACKAGE_RECOMMENDS
-            "${CPACK_PACKAGE_NAME}-devel (>=${CPACK_PACKAGE_VERSION})")
+            "${CPACK_PACKAGE_NAME}-dev (>=${CPACK_PACKAGE_VERSION})")
         execute_process(
             COMMAND rpmbuild --version
             RESULT_VARIABLE PROC_RESULT
