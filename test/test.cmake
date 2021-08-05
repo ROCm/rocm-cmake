@@ -63,6 +63,10 @@ macro(test_exec)
     endif()
 endmacro()
 
+macro(use_rocm_cmake)
+    list(APPEND CMAKE_MODULE_PATH ${PREFIX}/share/rocm/cmake)
+endmacro()
+
 function(configure_dir DIR)
     set(options)
     set(oneValueArgs)
