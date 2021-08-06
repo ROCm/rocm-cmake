@@ -9,36 +9,11 @@ set(ROCM_DISABLE_LDCONFIG
 include(CMakeParseArguments)
 include(GNUInstallDirs)
 include(ROCMSetupVersion)
+include(ROCMUtilities)
 
 find_program(MAKE_NSIS_EXE makensis)
 find_program(RPMBUILD_EXE rpmbuild)
 find_program(DPKG_EXE dpkg)
-
-if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
-    function(rocm_join_if_set glue inout_variable)
-        string(JOIN "${glue}" to_set_parent ${ARGN})
-        if(${inout_variable})
-            set(${inout_variable} "${${inout_variable}}${glue}${to_set_parent}" PARENT_SCOPE)
-        else()
-            set(${inout_variable} "${to_set_parent}" PARENT_SCOPE)
-        endif()
-    endfunction()
-else()
-    function(rocm_join_if_set glue inout_variable)
-        set(accumulator)
-        if(${inout_variable})
-            set(accumulator "${${inout_variable}}")
-        endif()
-        foreach(ITEM IN LISTS ARGN)
-            if(accumulator)
-                string(CONCAT accumulator "${accumulator}" "${glue}" "${ITEM}")
-            else()
-                set(accumulator "${ITEM}")
-            endif()
-        endforeach()
-        set(${inout_variable} "${accumulator}")
-    endfunction()
-endif()
 
 macro(rocm_create_package)
     set(options LDCONFIG PTH HEADER_ONLY)
@@ -101,18 +76,12 @@ macro(rocm_create_package)
         set(CPACK_DEBIAN_DEVEL_PACKAGE_NAME "${CPACK_PACKAGE_NAME}-dev")
         rocm_join_if_set(", " CPACK_DEBIAN_UNSPECIFIED_PACKAGE_RECOMMENDS
             "${CPACK_PACKAGE_NAME}-dev (>=${CPACK_PACKAGE_VERSION})")
-        execute_process(
-            COMMAND rpmbuild --version
-            RESULT_VARIABLE PROC_RESULT
-            OUTPUT_VARIABLE EVAL_RESULT
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-        if(PROC_RESULT EQUAL "0" AND NOT EVAL_RESULT STREQUAL "")
-            string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+$" RPMBUILD_VERSION "${EVAL_RESULT}")
-            if (RPMBUILD_VERSION VERSION_GREATER_EQUAL "4.12.0")
-                rocm_join_if_set(", " CPACK_RPM_UNSPECIFIED_PACKAGE_SUGGESTS
-                    "${CPACK_PACKAGE_NAME}-devel >= ${CPACK_PACKAGE_VERSION}")
-            endif()
+        
+        rocm_find_program_version(rpmbuild GREATER_EQUAL 4.12.0)
+        if(rpmbuild_VERSION_OK)
+            rocm_join_if_set(", " CPACK_RPM_UNSPECIFIED_PACKAGE_SUGGESTS
+                "${CPACK_PACKAGE_NAME}-devel >= ${CPACK_PACKAGE_VERSION}"
+            )
         endif()
         if(PARSE_HEADER_ONLY)
             set(CPACK_DEBIAN_DEVEL_PACKAGE_PROVIDES "${CPACK_PACKAGE_NAME} (= ${CPACK_PACKAGE_VERSION})")
