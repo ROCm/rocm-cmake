@@ -87,10 +87,7 @@ macro(rocm_create_package)
             set(CPACK_DEBIAN_DEVEL_PACKAGE_PROVIDES "${CPACK_PACKAGE_NAME} (= ${CPACK_PACKAGE_VERSION})")
             set(CPACK_RPM_DEVEL_PACKAGE_PROVIDES "${CPACK_PACKAGE_NAME} = ${CPACK_PACKAGE_VERSION}")
         else()
-            rocm_join_if_set(", " CPACK_DEBIAN_DEVEL_PACKAGE_DEPENDS
-                "${CPACK_PACKAGE_NAME} (>=${CPACK_PACKAGE_VERSION})")
-            rocm_join_if_set(", " CPACK_RPM_DEVEL_PACKAGE_REQUIRES
-                "${CPACK_PACKAGE_NAME} >= ${CPACK_PACKAGE_VERSION}")
+            rocm_add_dependencies(COMPONENT devel "${CPACK_PACKAGE_NAME} >= ${CPACK_PACKAGE_VERSION}")
         endif()
     endif()
 
@@ -138,9 +135,7 @@ macro(rocm_create_package)
     endif()
 
     if(PARSE_DEPENDS)
-        string(REPLACE ";" ", " DEPENDS "${PARSE_DEPENDS}")
-        set(CPACK_DEBIAN_PACKAGE_DEPENDS "${DEPENDS}")
-        set(CPACK_RPM_PACKAGE_REQUIRES "${DEPENDS}")
+        rocm_add_dependencies(${PARSE_DEPENDS})
     endif()
 
     set(LIB_DIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
