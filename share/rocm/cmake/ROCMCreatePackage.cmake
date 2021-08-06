@@ -125,6 +125,10 @@ macro(rocm_create_package)
         endif()
     endif()
 
+    if(ROCM_BUILD_CLIENTS)
+        list(APPEND PARSE_COMPONENTS ${ROCM_BUILD_CLIENTS} clients)
+    endif()
+
     # '%{?dist}' breaks manual builds on debian systems due to empty Provides
     execute_process(
         COMMAND rpm --eval %{?dist}
