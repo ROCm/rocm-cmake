@@ -23,7 +23,7 @@ macro(rocm_setup_client_component COMPONENT_NAME)
 
     set(CPACK_DEBIAN_${COMPONENT_NAME}_PACKAGE_NAME "${PROJECT_NAME}-${PARSE_PACKAGE_NAME}")
 
-    if(DEFINED PARSE_DEPENDS)
+    if(DEFINED PARSE_DEPENDS OR BUILD_SHARED_LIBS)
         cmake_parse_arguments(DEPENDS "" "" "COMMON;DEBIAN;RPM" ${PARSE_DEPENDS})
         if(BUILD_SHARED_LIBS)
             rocm_join_if_set(";" DEPENDS_COMMON "${PROJECT_NAME} >= ${${PROJECT_NAME}_VERSION}")
