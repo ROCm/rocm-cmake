@@ -62,6 +62,7 @@ macro(rocm_install_client_with_symlink TARGET COMPONENT)
             TARGET ${TARGET} POST_BUILD
             COMMAND mklink "${_DEST}" "${REL_PATH}\\${TARGET}.exe"
             BYPRODUCTS "${_DEST}"
+            VERBATIM
         )
         install(
             FILES "${_DEST}"
