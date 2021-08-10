@@ -27,7 +27,7 @@ rocm_create_package
         [HEADER_ONLY]
     )
 
-Sets up CPack packaging.
+Sets up CPack packaging. If the `devel` component is used, or if any components are set up using `rocm_setup_client_component`, these packages will be configured as well.
 
 ROCMInstallSymlinks
 ===================
@@ -133,3 +133,68 @@ rocm_check_target_ids
     )
 
 Returns the subset of HIP [target-ids](https://clang.llvm.org/docs/ClangOffloadBundler.html#target-id) supported by the current CXX compiler.
+
+ROCMClients
+===========
+
+rocm_setup_client_component
+---------------------------
+
+    rocm_setup_client_component(<component_name>
+        [PACKAGE_NAME <package_name>]
+        [LIBRARY_NAME <library_name>]
+        [DEPENDS 
+            [COMMON <common-dep>...]
+            [DEBIAN <debian-dep>...]
+            [RPM <rpm-dep>...]]
+    )
+
+Sets up the named component to generate a package named `<library_name>-<package_name>`. `<library_name>` defaults to `PROJECT_NAME`, and `<package_name>` defaults to `<component_name>`. The dependencies should all be listed in RPM style, e.g. `foo >= 1.0`.
+
+rocm_install_client_with_symlink
+--------------------------------
+
+    rocm_install_client_with_symlink(
+        <target> <component>
+        [EXE_DESTINATION <exe_dest>]
+        [SYMLINK_DESTINATION <symlink_dest>]
+    )
+
+Installs the named target to the named component in the directory `${CMAKE_INSTALL_PREFIX}/<exe_dest>`, and installs a symbolic link to that target in `${CMAKE_INSTALL_PREFIX}/<symlink_dest>`. On Windows, a copy of the target is installed instead of a symbolic link.
+
+ROCMUtilities
+=============
+
+rocm_join_if_set
+----------------
+
+    rocm_join_if_set(<glue> <inout_variable> <inputs>...)
+
+Joins the `<inputs>` together with the `<glue>` string, then is appended to `<inout_variable>` with a `<glue>` string between if `<inout_variable>` is set and non-empty, otherwise `<inout_variable>` is set to this `<glue>`d string of `<inputs>`.
+
+rocm_add_rpm_dependencies
+-------------------------
+
+    rocm_add_rpm_dependencies(<rpm-dep>...
+        [COMPONENT <component>]
+    )
+
+Adds the listed `<rpm-dep>`s to the RPM package for the associated `<component>`, or for the package overall if a `<component>` is not given.
+
+rocm_add_deb_dependencies
+-------------------------
+
+    rocm_add_deb_dependencies(<deb-dep>...
+        [COMPONENT <component>]
+    )
+
+Adds the listed `<deb-dep>`s to the DEB package for the associated `<component>`, or for the package overall if a `<component>` is not given. NOTE: this dependency should be given in the RPM style (e.g. `foo >= 1.0`), NOT in the Debian style (e.g. `foo (>= 1.0)`).
+
+rocm_add_dependencies
+---------------------
+
+    rocm_add_dependencies(<common-dep>...
+        [COMPONENT <component>]
+    )
+
+Adds the listed `<common-dep>`s to both the DEB and RPM packages for the associated `<component>`, or for the package overall if a `<component>` is not given. NOTE: this dependency should be given in the RPM style (e.g. `foo >= 1.0`), NOT in the Debian style (e.g. `foo (>= 1.0)`)
