@@ -56,12 +56,12 @@ macro(rocm_install_client_with_symlink TARGET COMPONENT)
     rocm_find_relative_path("${PARSE_SYMLINK_DESTINATION}" "${PARSE_EXE_DESTINATION}" REL_PATH)
     set(_DEST "${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.symlink")
     if(WIN32)
-        string(REPLACE "/" "\\" _DEST "${_DEST}")
+        string(REPLACE "/" "\\" ESCAPED_DEST "${_DEST}")
         string(REPLACE "/" "\\" REL_PATH "${REL_PATH}")
         add_custom_command(
             TARGET ${TARGET} POST_BUILD
-            COMMAND mklink "${_DEST}" "${REL_PATH}\\${TARGET}.exe"
-            BYPRODUCTS "${_DEST}"
+            COMMAND mklink "${ESCAPED_DEST}" "${REL_PATH}\\${TARGET}.exe"
+            BYPRODUCTS "${ESCAPED_DEST}"
             VERBATIM
         )
         install(
