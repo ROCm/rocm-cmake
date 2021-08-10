@@ -93,6 +93,10 @@ macro(rocm_create_package)
 
     if(ROCM_BUILD_CLIENTS)
         list(APPEND PARSE_COMPONENTS ${ROCM_BUILD_CLIENTS} clients)
+        foreach(CLIENT IN LISTS ROCM_BUILD_CLIENTS)
+            rocm_add_dependencies(COMPONENT clients "${CPACK_PACKAGE_NAME}-${CLIENT} >= ${CPACK_PACKAGE_VERSION}")
+        endforeach()
+        set(CPACK_COMPONENT_clients_DESCRIPTION "All precompiled binaries for the ${PARSE_NAME} library.")
     endif()
 
     # '%{?dist}' breaks manual builds on debian systems due to empty Provides
