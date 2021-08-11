@@ -3,6 +3,7 @@
 # ######################################################################################################################
 
 include(CMakeParseArguments)
+cmake_policy(SET CMP0011 NEW)
 
 set(SCRIPT_CMAKE_ARGS)
 # cmake-lint: disable=E1120
