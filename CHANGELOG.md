@@ -2,24 +2,24 @@
 
 ## [0.7.0]
 ### Added
-- Client packaging functionality:
-    - `rocm_setup_client_component` sets up a client component, with the given name and values for the component and associated package.
-    - `rocm_install_client_with_symlink` installs a single client target into a specified location, and installs a symlink to that target in a second specified location. 
-        - On Windows, a copy of the target is installed to the second location instead.
-    - The variable `ROCM_BUILD_CLIENTS` stores a list of the clients which have been set up with `rocm_setup_client_component`.
+- Component packaging functionality:
+    - `rocm_package_setup_component` sets up a component for packaging, with the given name and values for the component and associated package.
+
+        - The variable `ROCM_PACKAGE_COMPONENTS` stores a list of the components which have been set up with `rocm_package_setup_component`.
+    - `rocm_package_add_rpm_dependencies` adds any number of dependencies to the RPM package for an optional specified component, including version checks (e.g. `foo >= 1.0`)
+    - `rocm_package_add_deb_dependencies` adds any number of dependencies to the DEB package for an optional specified component, including version checks (e.g. `foo >= 1.0`)
+        - Note that this version format matches RPM, it is reformatted to the Debian package format. This is to reduce code duplication.
+    - `rocm_package_add_dependencies` is a convenience wrapper which calls both `rocm_add_rpm_dependencies` and `rocm_add_deb_dependencies` to add any number of dependencies to both packages for an optional specified component.
+- Client packaging functions:
+    - `rocm_package_setup_client_component` is a convenience wrapper which adds the library as a runtime dependency if shared libraries were built, and sets the parent of the client package to `clients`.
 - Utility functions:
     - `rocm_join_if_set` joins any number of non-empty strings to the end of a given variable interspersed with a specified glue string, setting that variable if it was previously empty
-    - `rocm_add_rpm_dependencies` adds any number of dependencies to the RPM package for an optional specified component, including version checks (e.g. `foo >= 1.0`)
-    - `rocm_add_deb_dependencies` adds any number of dependencies to the DEB package for an optional specified component, including version checks (e.g. `foo >= 1.0`)
-        - Note that this version format matches RPM, it is reformatted to the Debian package format. This is to reduce code duplication.
-    - `rocm_add_dependencies` is a convenience wrapper which calls both `rocm_add_rpm_dependencies` and `rocm_add_deb_dependencies` to add any number of dependencies to both packages for an optional specified component.
     - `rocm_find_program_version` checks to see if the given command is available, and if it is available that the version matches some criteria. The detected version is returned in `<output_variable>`, and whether it matches all given criteria in `<output_variable>_OK`.
         - `<output_variable>` defaults to `<program>_VERSION` if not specified.
-    - `rocm_get_path_items` converts a relative or absolute path to a list of path items.
-    - `rocm_find_relative_path` finds the relative path to `DEST` from `SRC`, where `DEST` and `SRC` are either relative paths from the same directory, or both absolute paths.
-        - This does not work for absolute paths on Windows which cross drives, e.g. it will not work for finding the relative path from `C:\foo` to `D:\bar`.
 ### Changed
-- If `ROCM_BUILD_CLIENTS` is set (either manually or by `rocm_setup_client_component`), then the components listed in `ROCM_BUILD_CLIENTS` will be built as separate packages, and a metapackage component will be generated with the name `clients` which depends on all those components. The components will also depend on the base library if `BUILD_SHARED_LIBS` is set.
+- If `ROCM_PACKAGE_COMPONENTS` is set (either manually or by `rocm_package_setup_component`), then the components listed in `ROCM_PACKAGE_COMPONENTS` will be built as separate packages.
+- `rocm_read_os_release` and `rocm_set_os_id` moved to the utilities file. As this file is included in `ROCMCreatePackage.cmake`, this change is backwards compatible.
+- `rocm_install_symlink_subdir` now accepts a `COMPONENT` argument, which controls the component that the symlinks are installed into, and a `NAME_PREFIX`, which adds a prefix to the name of each symlink generated.
 
 ## [0.6.0]
 ### Added
