@@ -2,80 +2,33 @@
 # Copyright 2016-2021 Advanced Micro Devices, Inc.
 # ########################################################################
 
+include(ROCMInstallSymlinks)
 include(ROCMUtilities)
 
-macro(rocm_setup_client_component COMPONENT_NAME)
+macro(rocm_package_setup_client_component COMPONENT_NAME)
     set(options)
     set(oneValueArgs PACKAGE_NAME LIBRARY_NAME)
     set(multipleValueArgs DEPENDS)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multipleValueArgs}" ${ARGN})
 
-    list(APPEND ROCM_BUILD_CLIENTS ${COMPONENT_NAME})
-
-    if(NOT DEFINED PARSE_PACKAGE_NAME)
-        string(TOLOWER "${COMPONENT_NAME}" PARSE_PACKAGE_NAME)
+    if(BUILD_SHARED_LIBS)
+        list(APPEND PARSE_DEPENDS RUNTIME)
     endif()
 
-    if(NOT BUILD_SHARED_LIBS)
-        set(PARSE_PACKAGE_NAME "${PARSE_PACKAGE_NAME}-static")
+    if(DEFINED PARSE_PACKAGE_NAME)
+        set(_PACKAGE_NAME_ARG "PACKAGE_NAME ${PARSE_PACKAGE_NAME}")
     endif()
 
-    if(NOT DEFINED PARSE_LIBRARY_NAME)
-        set(PARSE_LIBRARY_NAME "${PROJECT_NAME}")
+    if(DEFINED LIBRARY_NAME)
+        set(_LIBRARY_NAME_ARG "LIBRARY_NAME ${PARSE_LIBRARY_NAME}")
     endif()
 
-    set(CPACK_DEBIAN_${COMPONENT_NAME}_PACKAGE_NAME "${PARSE_LIBRARY_NAME}-${PARSE_PACKAGE_NAME}")
-
-    if(DEFINED PARSE_DEPENDS OR BUILD_SHARED_LIBS)
-        cmake_parse_arguments(DEPENDS "" "" "COMMON;DEBIAN;RPM" ${PARSE_DEPENDS})
-        if(BUILD_SHARED_LIBS)
-            rocm_join_if_set(";" DEPENDS_COMMON "${PARSE_LIBRARY_NAME} >= ${${PARSE_LIBRARY_NAME}_VERSION}")
-        endif()
-        rocm_add_deb_dependencies(COMPONENT ${COMPONENT_NAME} ${DEPENDS_COMMON} ${DEPENDS_DEBIAN})
-        rocm_add_rpm_dependencies(COMPONENT ${COMPONENT_NAME} ${DEPENDS_COMMON} ${DEPENDS_RPM})
-    endif()
-endmacro()
-
-macro(rocm_install_client_with_symlink TARGET COMPONENT)
-    set(options)
-    set(oneValueArgs EXE_DESTINATION SYMLINK_DESTINATION)
-    set(multipleValueArgs)
-
-    cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multipleValueArgs}" ${ARGN})
-
-    if(NOT DEFINED PARSE_EXE_DESTINATION)
-        set(PARSE_EXE_DESTINATION "${CMAKE_PROJECT_NAME}/bin")
-    endif()
-
-    if(NOT DEFINED PARSE_SYMLINK_DESTINATION)
-        set(PARSE_SYMLINK_DESTINATION "bin")
-    endif()
-
-    install(
-        TARGETS ${TARGET}
-        DESTINATION "${PARSE_EXE_DESTINATION}"
-        COMPONENT ${COMPONENT}
+    rocm_package_setup_component(
+        ${COMPONENT_NAME}
+        ${_PACKAGE_NAME_ARG}
+        ${_LIBRARY_NAME_ARG}
+        PARENT clients
+        DEPENDS ${PARSE_DEPENDS}
     )
-    rocm_find_relative_path("${PARSE_SYMLINK_DESTINATION}" "${PARSE_EXE_DESTINATION}" REL_PATH)
-    set(_DEST "${CMAKE_CURRENT_BINARY_DIR}/${TARGET}.symlink")
-    if(WIN32)
-        install(
-            TARGETS ${TARGET}
-            DESTINATION "${PARSE_SYMLINK_DESTINATION}"
-            COMPONENT ${COMPONENT}
-        )
-    else()
-        add_custom_command(
-            TARGET ${TARGET} POST_BUILD
-            COMMAND ln -sf "${REL_PATH}/${TARGET}" "${_DEST}"
-            BYPRODUCTS "${_DEST}"
-        )
-        install(
-            FILES "${_DEST}"
-            DESTINATION "${PARSE_SYMLINK_DESTINATION}"
-            RENAME "${TARGET}"
-            COMPONENT ${COMPONENT}
-        )
-    endif()
 endmacro()
