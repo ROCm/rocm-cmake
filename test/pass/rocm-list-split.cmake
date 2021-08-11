@@ -1,4 +1,4 @@
-
+cmake_policy(SET CMP0011 NEW)
 use_rocm_cmake()
 include(ROCMInstallTargets)
 
