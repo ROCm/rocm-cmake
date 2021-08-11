@@ -8,20 +8,20 @@ include(ROCMUtilities)
 macro(rocm_package_setup_client_component COMPONENT_NAME)
     set(options)
     set(oneValueArgs PACKAGE_NAME LIBRARY_NAME)
-    set(multipleValueArgs DEPENDS)
+    set(multiValueArgs DEPENDS)
 
-    cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multipleValueArgs}" ${ARGN})
+    cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     if(BUILD_SHARED_LIBS)
         list(APPEND PARSE_DEPENDS RUNTIME)
     endif()
 
     if(DEFINED PARSE_PACKAGE_NAME)
-        set(_PACKAGE_NAME_ARG "PACKAGE_NAME ${PARSE_PACKAGE_NAME}")
+        set(_PACKAGE_NAME_ARG "PACKAGE_NAME;${PARSE_PACKAGE_NAME}")
     endif()
 
     if(DEFINED LIBRARY_NAME)
-        set(_LIBRARY_NAME_ARG "LIBRARY_NAME ${PARSE_LIBRARY_NAME}")
+        set(_LIBRARY_NAME_ARG "LIBRARY_NAME;${PARSE_LIBRARY_NAME}")
     endif()
 
     rocm_package_setup_component(
