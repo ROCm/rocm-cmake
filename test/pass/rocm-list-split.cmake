@@ -1,4 +1,3 @@
-
 use_rocm_cmake()
 include(ROCMInstallTargets)
 
