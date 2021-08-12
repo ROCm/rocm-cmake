@@ -13,7 +13,11 @@ macro(rocm_package_setup_client_component COMPONENT_NAME)
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     if(BUILD_SHARED_LIBS)
-        list(APPEND PARSE_DEPENDS RUNTIME)
+        set(APPEND PARSE_DEPENDS RUNTIME)
+    endif()
+
+    if(DEFINED PARSE_DEPENDS)
+        set(_DEPENDS_ARG "DEPENDS;${PARSE_DEPENDS}")
     endif()
 
     if(DEFINED PARSE_PACKAGE_NAME)
@@ -29,6 +33,6 @@ macro(rocm_package_setup_client_component COMPONENT_NAME)
         ${_PACKAGE_NAME_ARG}
         ${_LIBRARY_NAME_ARG}
         PARENT clients
-        DEPENDS ${PARSE_DEPENDS}
+        ${_DEPENDS_ARG}
     )
 endmacro()
