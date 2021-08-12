@@ -15,6 +15,8 @@ find_program(MAKE_NSIS_EXE makensis)
 find_program(RPMBUILD_EXE rpmbuild)
 find_program(DPKG_EXE dpkg)
 
+set(ROCM_PACKAGE_CREATED FALSE CACHE INTERNAL "Track whether rocm_create_package has been called.")
+
 function(rocm_package_add_rpm_dependencies)
     if(${ROCM_PACKAGE_CREATED})
         message(AUTHOR_WARNING "rocm_package_add_rpm_dependencies called after rocm_create_package!")
