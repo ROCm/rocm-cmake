@@ -3,26 +3,22 @@
 # ######################################################################################################################
 
 if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
+    # pretty much just a wrapper around string JOIN
     function(rocm_join_if_set glue inout_variable)
-        string(JOIN "${glue}" to_set_parent ${ARGN})
-        if(DEFINED ${inout_variable} AND NOT ${inout_variable} STREQUAL "")
-            set(${inout_variable} "${${inout_variable}}${glue}${to_set_parent}" PARENT_SCOPE)
-        else()
-            set(${inout_variable} "${to_set_parent}" PARENT_SCOPE)
-        endif()
+        string(JOIN "${glue}" to_set_parent ${${inout_variable}} ${ARGN})
+        set(${inout_variable} "${to_set_parent}" PARENT_SCOPE)
     endfunction()
 else()
+    # cmake < 3.12 doesn't have string JOIN
     function(rocm_join_if_set glue inout_variable)
-        set(accumulator "")
-        if(DEFINED ${inout_variable} AND NOT ${inout_variable} STREQUAL "")
-            set(accumulator "${${inout_variable}}")
+        set(accumulator "${${inout_variable}}")
+        set(tglue ${glue})
+        if(accumulator STREQUAL "")
+            set(tglue "")       # No glue needed if initially unset
         endif()
         foreach(ITEM IN LISTS ARGN)
-            if(NOT accumulator STREQUAL "" AND NOT ITEM STREQUAL "")
-                string(CONCAT accumulator "${accumulator}" "${glue}" "${ITEM}")
-            elseif(NOT ITEM STREQUAL "")
-                set(accumulator "${ITEM}")
-            endif()
+            string(CONCAT accumulator "${accumulator}" "${tglue}" "${ITEM}")
+            set(tglue ${glue})  # Always need glue after the first concatenate
         endforeach()
         set(${inout_variable} "${accumulator}" PARENT_SCOPE)
     endfunction()
