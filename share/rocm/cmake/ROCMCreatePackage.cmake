@@ -167,12 +167,12 @@ macro(rocm_create_package)
     if (ROCM_USE_DEV_COMPONENT)
         list(APPEND PARSE_COMPONENTS devel)
         set(CPACK_DEBIAN_DEVEL_PACKAGE_NAME "${CPACK_PACKAGE_NAME}-dev")
-        rocm_join_if_set(", " CPACK_DEBIAN_RUNTIME_PACKAGE_RECOMMENDS
+        rocm_join_if_set(", " CPACK_DEBIAN_UNSPECIFIED_PACKAGE_RECOMMENDS
             "${CPACK_PACKAGE_NAME}-dev (>=${CPACK_PACKAGE_VERSION})")
         
         rocm_find_program_version(rpmbuild GREATER_EQUAL 4.12.0)
         if(rpmbuild_VERSION_OK)
-            rocm_join_if_set(", " CPACK_RPM_RUNTIME_PACKAGE_SUGGESTS
+            rocm_join_if_set(", " CPACK_RPM_UNSPECIFIED_PACKAGE_SUGGESTS
                 "${CPACK_PACKAGE_NAME}-devel >= ${CPACK_PACKAGE_VERSION}"
             )
         endif()
@@ -315,12 +315,12 @@ macro(rocm_set_comp_cpackvar HEADER_ONLY components)
     # Setting component specific variables
     set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
     if(NOT ${HEADER_ONLY})
-        set(CPACK_RPM_MAIN_COMPONENT "runtime")
-        set(CPACK_RPM_RUNTIME_DISPLAY_NAME "${CPACK_PACKAGE_NAME}")
-        list(APPEND CPACK_COMPONENTS_ALL runtime)
-        set(CPACK_DEBIAN_RUNTIME_FILE_NAME
+        set(CPACK_RPM_MAIN_COMPONENT "Unspecified")
+        set(CPACK_RPM_UNSPECIFIED_DISPLAY_NAME "${CPACK_PACKAGE_NAME}")
+        list(APPEND CPACK_COMPONENTS_ALL Unspecified)
+        set(CPACK_DEBIAN_UNSPECIFIED_FILE_NAME
            "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}-${DEBIAN_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
-        set(CPACK_DEBIAN_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
+        set(CPACK_DEBIAN_UNSPECIFIED_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
     endif()
 
     foreach(COMPONENT ${components})
@@ -367,7 +367,7 @@ macro(rocm_package_setup_component COMPONENT_NAME)
             list(APPEND ROCM_PACKAGE_COMPONENT_DEPENDENCIES "${COMPONENT_NAME}->${DEP_COMP}")
         endforeach()
         if(DEPENDS_RUNTIME)
-            list(APPEND ROCM_PACKAGE_COMPONENT_DEPENDENCIES "${COMPONENT_NAME}->runtime")
+            list(APPEND ROCM_PACKAGE_COMPONENT_DEPENDENCIES "${COMPONENT_NAME}->Unspecified")
         endif()
     endif()
 endmacro()
