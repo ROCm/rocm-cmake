@@ -15,7 +15,13 @@ macro(rocm_package_setup_client_component COMPONENT_NAME)
     if(BUILD_SHARED_LIBS)
         if(DEFINED PARSE_DEPENDS)
             cmake_parse_arguments(DEPENDS "" "" "COMMON;RPM;DEB;COMPONENT" ${PARSE_DEPENDS})
-            set(_DEPENDS_ARG DEPENDS COMMON "${DEPENDS_COMMON}" RPM "${DEPENDS_RPM}" DEB "${DEPENDS_DEB}" COMPONENT "${DEPENDS_COMPONENT}" runtime)
+            set(_DEPENDS_ARG
+                DEPENDS
+                    COMMON "${DEPENDS_COMMON}"
+                    RPM "${DEPENDS_RPM}"
+                    DEB "${DEPENDS_DEB}"
+                    COMPONENT "${DEPENDS_COMPONENT}" runtime
+            )
         else()
             set(_DEPENDS_ARG DEPENDS COMPONENT runtime)
         endif()
