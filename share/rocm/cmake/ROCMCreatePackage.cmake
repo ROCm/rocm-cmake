@@ -6,6 +6,8 @@ set(ROCM_DISABLE_LDCONFIG
     OFF
     CACHE BOOL "")
 
+set(ROCM_DEP_ROCMCORE TRUE CACHE BOOL "Add dependency on rocm-core package, default 'TRUE'")
+
 include(CMakeParseArguments)
 include(GNUInstallDirs)
 include(ROCMSetupVersion)
@@ -35,6 +37,16 @@ else()
         set(${inout_variable} "${accumulator}" PARENT_SCOPE)
     endfunction()
 endif()
+
+macro(add_rocm_core_dependency)
+    # Optionally add depenency on rocm-core
+    # This mainly empty package exists to allow all of rocm
+    # to be removed in one step by removing rocm-core
+    if(ROCM_DEP_ROCMCORE)
+        rocm_join_if_set(", " CPACK_DEBIAN_PACKAGE_DEPENDS "rocm-core")
+        rocm_join_if_set(", " CPACK_RPM_PACKAGE_REQUIRES "rocm-core")
+    endif()
+endmacro()
 
 macro(rocm_create_package)
     set(options LDCONFIG PTH HEADER_ONLY)
@@ -165,6 +177,8 @@ macro(rocm_create_package)
         set(CPACK_DEBIAN_PACKAGE_DEPENDS "${DEPENDS}")
         set(CPACK_RPM_PACKAGE_REQUIRES "${DEPENDS}")
     endif()
+
+    add_rocm_core_dependency()
 
     set(LIB_DIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
     if(PARSE_PREFIX)
