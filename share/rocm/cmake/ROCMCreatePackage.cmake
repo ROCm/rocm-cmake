@@ -38,7 +38,7 @@ else()
     endfunction()
 endif()
 
-macro(add_rocm_core_dependency)
+macro(rocm_package_add_rocm_core_dependency)
     # Optionally add depenency on rocm-core
     # This mainly empty package exists to allow all of rocm
     # to be removed in one step by removing rocm-core
@@ -178,7 +178,7 @@ macro(rocm_create_package)
         set(CPACK_RPM_PACKAGE_REQUIRES "${DEPENDS}")
     endif()
 
-    add_rocm_core_dependency()
+    rocm_package_add_rocm_core_dependency()
 
     set(LIB_DIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
     if(PARSE_PREFIX)
