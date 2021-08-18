@@ -50,7 +50,7 @@ set_property(
 macro(rocm_enable_cppcheck)
     set(options FORCE INCONCLUSIVE)
     set(oneValueArgs RULE_FILE)
-    set(multiValueArgs CHECKS SUPPRESS DEFINE UNDEFINE INCLUDE SOURCES)
+    set(multiValueArgs CHECKS SUPPRESS DEFINE UNDEFINE INCLUDE SOURCES ADDONS)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
     string(REPLACE ";" "," CPPCHECK_CHECKS "${PARSE_CHECKS}")
@@ -99,6 +99,11 @@ macro(rocm_enable_cppcheck)
         set(CPPCHECK_RULE_FILE_ARG "--rule-file=${PARSE_RULE_FILE}")
     endif()
 
+    set(CPPCHECK_ADDONS_ARG)
+    foreach(ADDON ${PARSE_ADDONS})
+        list(APPEND CPPCHECK_ADDONS_ARG "--addon=${ADDON}")
+    endforeach()
+
     set(SOURCES)
     set(GLOBS)
     foreach(SOURCE ${PARSE_SOURCES})
@@ -117,7 +122,7 @@ macro(rocm_enable_cppcheck)
         endif()
     endforeach()
 
-    set(CPPCHECK_TEMPLATE_ARG --template=gcc)
+    set(CPPCHECK_TEMPLATE_ARG)
     if(ROCM_ENABLE_GH_ANNOTATIONS)
         # cmake-lint: disable=C0301
         set(CPPCHECK_TEMPLATE_ARG
@@ -140,6 +145,7 @@ macro(rocm_enable_cppcheck)
             ${CPPCHECK_PLATFORM_FLAG}
             ${CPPCHECK_RULE_FILE_ARG}
             ${CPPCHECK_TEMPLATE_ARG}
+            ${CPPCHECK_ADDONS_ARG}
             --inline-suppr
             --error-exitcode=1
             -j ${CPPCHECK_JOBS}

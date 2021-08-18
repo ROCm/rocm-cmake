@@ -2,6 +2,7 @@
 
 ## [0.6.0]
 ### Added
+- `ADDONS` flag added to `rocm_enable_cppcheck` in order to run with addons
 - The cache variable `ROCM_USE_DEV_COMPONENT` may be set to `OFF` to build with legacy behaviour.
     - On Windows, this variable defaults to `OFF`.
 - `rocm_install_targets` can now install to a specific component using COMPONENT argument.
