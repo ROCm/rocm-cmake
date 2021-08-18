@@ -2,6 +2,8 @@
 # Copyright (C) 2017-2019 Advanced Micro Devices, Inc.
 # ######################################################################################################################
 
+cmake_policy(SET CMP0057 NEW)
+
 set(ROCM_DISABLE_LDCONFIG
     OFF
     CACHE BOOL "")
@@ -82,15 +84,9 @@ function(rocm_package_add_deb_dependencies)
 
     set(CURRENT_DEPENDS "${${REQ_VAR}}")
     foreach(DEP IN LISTS NEW_DEPENDS)
-        string(FIND "${DEP}" " " VERSION_POSITION)
-        if(VERSION_POSITION GREATER "-1")
-            string(SUBSTRING "${DEP}" 0 ${VERSION_POSITION} DEP_NAME)
-            math(EXPR VERSION_POSITION "${VERSION_POSITION}+1")
-            string(SUBSTRING "${DEP}" ${VERSION_POSITION} -1 DEP_VERSION)
-            rocm_join_if_set(", " CURRENT_DEPENDS "${DEP_NAME} (${DEP_VERSION})")
-        else()
-            rocm_join_if_set(", " CURRENT_DEPENDS "${DEP}")
-        endif()
+        string(REGEX REPLACE "^([a-zA-Z0-9][-a-zA-Z0-9+.]+)[ \t\n]+([<>]?=)[ \t\n]+(.*)$" "\\1 (\\2 \\3)" DEP_EQ "${DEP}")
+        string(REGEX REPLACE "^([a-zA-Z0-9][-a-zA-Z0-9+.]+)[ \t\n]+([<>])[ \t\n]+(.*)$" "\\1 (\\2\\2 \\3)" DEP_ALL "${DEP_EQ}")
+        rocm_join_if_set(", " CURRENT_DEPENDS "${DEP_ALL}")
     endforeach()
     set(${REQ_VAR} "${CURRENT_DEPENDS}" PARENT_SCOPE)
 endfunction()
