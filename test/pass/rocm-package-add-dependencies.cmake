@@ -1,7 +1,7 @@
 use_rocm_cmake()
 include(ROCMCreatePackage)
 
-macro(test_rocm_package_add_deb_dependencies EXPECTED INITIAL)
+function(test_rocm_package_add_deb_dependencies EXPECTED INITIAL)
     set(CPACK_DEBIAN_PACKAGE_DEPENDS "${INITIAL}")
     rocm_package_add_deb_dependencies(DEPENDS ${ARGN})
     test_expect_eq("${CPACK_DEBIAN_PACKAGE_DEPENDS}" "${EXPECTED}")
@@ -9,9 +9,9 @@ macro(test_rocm_package_add_deb_dependencies EXPECTED INITIAL)
     set(CPACK_DEBIAN_TEST_PACKAGE_DEPENDS "${INITIAL}")
     rocm_package_add_deb_dependencies(COMPONENT test DEPENDS ${ARGN})
     test_expect_eq("${CPACK_DEBIAN_TEST_PACKAGE_DEPENDS}" "${EXPECTED}")
-endmacro()
+endfunction()
 
-macro(test_rocm_package_add_rpm_dependencies EXPECTED INITIAL)
+function(test_rocm_package_add_rpm_dependencies EXPECTED INITIAL)
     set(CPACK_RPM_PACKAGE_REQUIRES "${INITIAL}")
     rocm_package_add_rpm_dependencies(DEPENDS ${ARGN})
     test_expect_eq("${CPACK_RPM_PACKAGE_REQUIRES}" "${EXPECTED}")
@@ -19,9 +19,9 @@ macro(test_rocm_package_add_rpm_dependencies EXPECTED INITIAL)
     set(CPACK_RPM_TEST_PACKAGE_REQUIRES "${INITIAL}")
     rocm_package_add_rpm_dependencies(COMPONENT test DEPENDS ${ARGN})
     test_expect_eq("${CPACK_RPM_TEST_PACKAGE_REQUIRES}" "${EXPECTED}")
-endmacro()
+endfunction()
 
-macro(test_rocm_package_add_dependencies DEB_EXPECTED RPM_EXPECTED DEB_INITIAL RPM_INITIAL)
+function(test_rocm_package_add_dependencies DEB_EXPECTED RPM_EXPECTED DEB_INITIAL RPM_INITIAL)
     set(CPACK_DEBIAN_PACKAGE_DEPENDS "${DEB_INITIAL}")
     set(CPACK_RPM_PACKAGE_REQUIRES "${RPM_INITIAL}")
     rocm_package_add_dependencies(DEPENDS ${ARGN})
@@ -33,7 +33,7 @@ macro(test_rocm_package_add_dependencies DEB_EXPECTED RPM_EXPECTED DEB_INITIAL R
     rocm_package_add_dependencies(COMPONENT test DEPENDS ${ARGN})
     test_expect_eq("${CPACK_DEBIAN_TEST_PACKAGE_DEPENDS}" "${DEB_EXPECTED}")
     test_expect_eq("${CPACK_RPM_TEST_PACKAGE_REQUIRES}" "${RPM_EXPECTED}")
-endmacro()
+endfunction()
 
 # Debian testing
 # Test basic package adding

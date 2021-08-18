@@ -71,15 +71,15 @@ function(rocm_package_add_deb_dependencies)
 
     set(NEW_DEPENDS "")
     if(DEFINED PARSE_DEPENDS)
-        rocm_join_if_set(";" NEW_DEPENDS "${PARSE_DEPENDS}")
+        list(APPEND NEW_DEPENDS ${PARSE_DEPENDS})
     endif()
 
     if(DEFINED PARSE_SHARED_DEPENDS AND BUILD_SHARED_LIBS)
-        rocm_join_if_set(";" NEW_DEPENDS "${PARSE_SHARED_DEPENDS}")
+        list(APPEND NEW_DEPENDS "${PARSE_SHARED_DEPENDS}")
     endif()
 
     if(DEFINED PARSE_STATIC_DEPENDS AND NOT BUILD_SHARED_LIBS)
-        rocm_join_if_set(";" NEW_DEPENDS "${PARSE_STATIC_DEPENDS}")
+        list(APPEND NEW_DEPENDS "${PARSE_STATIC_DEPENDS}")
     endif()
 
     set(CURRENT_DEPENDS "${${REQ_VAR}}")
