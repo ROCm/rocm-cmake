@@ -41,6 +41,9 @@ rocm_enable_cppcheck(
         simple.cpp
     INCLUDE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ADDONS
+        findcasts
+        threadsafety
 )
 
 rocm_clang_tidy_check(simple)
