@@ -58,17 +58,17 @@ macro(rocm_enable_cppcheck)
     file(WRITE ${CMAKE_BINARY_DIR}/cppcheck-supressions "${CPPCHECK_SUPPRESS}")
     set(CPPCHECK_DEFINES)
     foreach(DEF ${PARSE_DEFINE})
-        set(CPPCHECK_DEFINES "${CPPCHECK_DEFINES} -D${DEF}")
+        list(APPEND CPPCHECK_DEFINES "-D${DEF}")
     endforeach()
 
     set(CPPCHECK_UNDEFINES)
     foreach(DEF ${PARSE_UNDEFINE})
-        set(CPPCHECK_UNDEFINES "${CPPCHECK_UNDEFINES} -U${DEF}")
+        list(APPEND CPPCHECK_UNDEFINES "-U${DEF}")
     endforeach()
 
     set(CPPCHECK_INCLUDES)
     foreach(INC ${PARSE_INCLUDE})
-        set(CPPCHECK_INCLUDES "${CPPCHECK_INCLUDES} -I${INC}")
+        list(APPEND CPPCHECK_INCLUDES "-I${INC}")
     endforeach()
 
     # set(CPPCHECK_FORCE)
@@ -104,74 +104,40 @@ macro(rocm_enable_cppcheck)
         list(APPEND CPPCHECK_ADDONS_ARG "--addon=${ADDON}")
     endforeach()
 
-    set(SOURCES)
-    set(GLOBS)
-    foreach(SOURCE ${PARSE_SOURCES})
-        get_filename_component(ABS_SOURCE ${SOURCE} ABSOLUTE)
-        if(EXISTS ${ABS_SOURCE})
-            if(IS_DIRECTORY ${ABS_SOURCE})
-                # cmake-lint: disable=C0301
-                set(GLOBS
-                    "${GLOBS} ${ABS_SOURCE}/*.cpp ${ABS_SOURCE}/*.hpp ${ABS_SOURCE}/*.cxx ${ABS_SOURCE}/*.c ${ABS_SOURCE}/*.h"
-                )
-            else()
-                set(SOURCES "${SOURCES} ${ABS_SOURCE}")
-            endif()
-        else()
-            set(GLOBS "${GLOBS} ${ABS_SOURCE}")
-        endif()
-    endforeach()
-
     set(CPPCHECK_TEMPLATE_ARG)
     if(ROCM_ENABLE_GH_ANNOTATIONS)
         # cmake-lint: disable=C0301
         set(CPPCHECK_TEMPLATE_ARG
-            "\"--template=::warning file={file},line={line},col={column}::{severity}: {inconclusive:inconclusive: }{message} [{id}]\""
-            "\"--template-location={file}:{line}:{column}: note: {info}\n{code}\"")
+            "--template=::warning file={file},line={line},col={column}::{severity}: {inconclusive:inconclusive: }{message} [{id}]"
+            "--template-location={file}:{line}:{column}: note: {info}\n{code}")
     endif()
 
-    file(
-        WRITE ${CMAKE_BINARY_DIR}/cppcheck.cmake
-        "
-        file(GLOB_RECURSE GSRCS ${GLOBS})
-        set(CPPCHECK_COMMAND
-            ${CPPCHECK_EXE}
-            -q
-            # -v
-            # --report-progress
-            ${CPPCHECK_FORCE}
-            ${CPPCHECK_INCONCLUSIVE}
-            ${CPPCHECK_BUILD_DIR_FLAG}
-            ${CPPCHECK_PLATFORM_FLAG}
-            ${CPPCHECK_RULE_FILE_ARG}
-            ${CPPCHECK_TEMPLATE_ARG}
-            ${CPPCHECK_ADDONS_ARG}
-            --inline-suppr
-            --error-exitcode=1
-            -j ${CPPCHECK_JOBS}
-            ${CPPCHECK_DEFINES}
-            ${CPPCHECK_UNDEFINES}
-            ${CPPCHECK_INCLUDES}
-            \"--relative-paths=${CMAKE_SOURCE_DIR}\"
-            --enable=${CPPCHECK_CHECKS}
-            --suppressions-list=${CMAKE_BINARY_DIR}/cppcheck-supressions
-            ${SOURCES} \${GSRCS}
-        )
-        string(REPLACE \";\" \" \" CPPCHECK_SHOW_COMMAND \"\${CPPCHECK_COMMAND}\")
-        message(\"\${CPPCHECK_SHOW_COMMAND}\")
-        execute_process(
-            COMMAND \${CPPCHECK_COMMAND}
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            RESULT_VARIABLE RESULT
-        )
-        if(NOT RESULT EQUAL 0)
-            message(FATAL_ERROR \"Cppcheck failed\")
-        endif()
-")
+    set(CPPCHECK_COMMAND
+        ${CPPCHECK_EXE}
+        -q
+        # -v
+        # --report-progress
+        ${CPPCHECK_FORCE}
+        ${CPPCHECK_INCONCLUSIVE}
+        ${CPPCHECK_BUILD_DIR_FLAG}
+        ${CPPCHECK_PLATFORM_FLAG}
+        ${CPPCHECK_RULE_FILE_ARG}
+        ${CPPCHECK_TEMPLATE_ARG}
+        ${CPPCHECK_ADDONS_ARG}
+        --inline-suppr
+        --error-exitcode=1
+        -j ${CPPCHECK_JOBS}
+        ${CPPCHECK_DEFINES}
+        ${CPPCHECK_UNDEFINES}
+        ${CPPCHECK_INCLUDES}
+        "--relative-paths=${CMAKE_SOURCE_DIR}"
+        --enable=${CPPCHECK_CHECKS}
+        --suppressions-list=${CMAKE_BINARY_DIR}/cppcheck-supressions
+    )
 
     add_custom_target(
         cppcheck
-        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}/cppcheck.cmake
+        COMMAND ${CPPCHECK_COMMAND} ${PARSE_SOURCES}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "cppcheck: Running cppcheck...")
     if(CPPCHECK_EXE)
