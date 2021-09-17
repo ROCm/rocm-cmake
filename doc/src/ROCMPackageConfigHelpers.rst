@@ -14,5 +14,5 @@ Commands
         [PREFIX <path>]
     )
 
-Configure the the config file used found be ``find_package``.
+Configure the config file used by ``find_package``.
 
