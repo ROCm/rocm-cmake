@@ -11,5 +11,8 @@ function(rocm_mark_as_doc)
 endfunction()
 
 function(rocm_clean_doc_output DIR)
-    set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${DIR})
+    set_property(
+        DIRECTORY
+        APPEND
+        PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${DIR})
 endfunction()
