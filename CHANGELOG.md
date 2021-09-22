@@ -1,5 +1,11 @@
 # Change Log for rocm-cmake
 
+## [0.6.1]
+### Added
+- Modules added to generate documentation:
+    - `ROCMDocs`
+    - `ROCMDoxygenDoc`
+    - `ROCMSphinxDoc`
 ## [0.6.0]
 ### Added
 - `ADDONS` flag added to `rocm_enable_cppcheck` in order to run with addons
