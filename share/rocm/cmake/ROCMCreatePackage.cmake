@@ -7,9 +7,7 @@ set(ROCM_DISABLE_LDCONFIG
     CACHE BOOL "")
 
 get_filename_component(REAL_ROCM "${CMAKE_INSTALL_PREFIX}" REALPATH)
-message("install dir ${REAL_ROCM}")
 get_filename_component(REAL_ROCM_DIR "${ROCM_DIR}" REALPATH)
-message("rocm dir ${REAL_ROCM_DIR}")
 if(REAL_ROCM MATCHES "rocm-([0-9]+(\.[0-9]+)+)")
     set(ROCM_PLATFORM_VERSION "${CMAKE_MATCH_1}" CACHE STRING "The version of the ROCm platform.")
 elseif(REAL_ROCM_DIR MATCHES "rocm-([0-9]+(\.[0-9]+)+)")
