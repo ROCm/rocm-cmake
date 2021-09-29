@@ -6,7 +6,12 @@ set(ROCM_DISABLE_LDCONFIG
     OFF
     CACHE BOOL "")
 
-set(ROCM_DEP_ROCMCORE TRUE CACHE BOOL "Add dependency on rocm-core package, default 'TRUE'")
+get_filename_component(ROCM_CMAKE_DIR ${CURRENT_SOURCE_DIR} REALPATH)
+if(ROCM_CMAKE_DIR MATCHES "rocm-([0-9]+(\.[0-9]+)*)" AND CMAKE_MATCH_0 VERSION_LESS 4.5.0)
+    set(ROCM_DEP_ROCMCORE FALSE CACHE BOOL "Add dependency on rocm-core package")
+else()
+    set(ROCM_DEP_ROCMCORE TRUE CACHE BOOL "Add dependency on rocm-core package")
+endif()
 
 include(CMakeParseArguments)
 include(GNUInstallDirs)
