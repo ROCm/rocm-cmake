@@ -6,8 +6,8 @@ set(ROCM_DISABLE_LDCONFIG
     OFF
     CACHE BOOL "")
 
-get_filename_component(ROCM_CMAKE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" REALPATH)
-if(ROCM_CMAKE_DIR MATCHES "rocm-([0-9]+(\.[0-9]+)*)" AND CMAKE_MATCH_0 VERSION_LESS 4.5.0)
+get_filename_component(ROCM_CMAKE_DIR "${ROCM_DIR}" REALPATH)
+if(ROCM_CMAKE_DIR MATCHES "rocm-([0-9]+(\.[0-9]+)+)" AND CMAKE_MATCH_1 VERSION_LESS 4.5.0)
     set(ROCM_DEP_ROCMCORE FALSE CACHE BOOL "Add dependency on rocm-core package")
 else()
     set(ROCM_DEP_ROCMCORE TRUE CACHE BOOL "Add dependency on rocm-core package")
