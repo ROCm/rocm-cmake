@@ -365,7 +365,7 @@ macro(rocm_package_setup_component COMPONENT_NAME)
     endif()
 
     if(NOT DEFINED PARSE_LIBRARY_NAME)
-        set(PARSE_LIBRARY_NAME "<PACKAGE_NAME>")
+        set(PARSE_LIBRARY_NAME "<PROJECT_NAME>")
     endif()
 
     string(TOUPPER "${COMPONENT_NAME}" COMPONENT_GNAME)
