@@ -21,8 +21,15 @@
 - `rocm_read_os_release` and `rocm_set_os_id` moved to the utilities file. As this file is included in `ROCMCreatePackage.cmake`, this change is backwards compatible.
 - `rocm_install_symlink_subdir` now accepts a `COMPONENT` argument, which controls the component that the symlinks are installed into, and a `NAME_PREFIX`, which adds a prefix to the name of each symlink generated.
 
+## [0.6.1]
+### Added
+- Modules added to generate documentation:
+    - `ROCMDocs`
+    - `ROCMDoxygenDoc`
+    - `ROCMSphinxDoc`
 ## [0.6.0]
 ### Added
+- `ADDONS` flag added to `rocm_enable_cppcheck` in order to run with addons
 - The cache variable `ROCM_USE_DEV_COMPONENT` may be set to `OFF` to build with legacy behaviour.
     - On Windows, this variable defaults to `OFF`.
 - `rocm_install_targets` can now install to a specific component using COMPONENT argument.
