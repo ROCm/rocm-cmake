@@ -86,8 +86,12 @@ function(rocm_package_add_deb_dependencies)
 
     set(CURRENT_DEPENDS "${${REQ_VAR}}")
     foreach(DEP IN LISTS NEW_DEPENDS)
-        string(REGEX REPLACE "^([a-zA-Z0-9][-a-zA-Z0-9+.]+)[ \t\n]+([<>]?=)[ \t\n]+(.*)$" "\\1 (\\2 \\3)" DEP_EQ "${DEP}")
-        string(REGEX REPLACE "^([a-zA-Z0-9][-a-zA-Z0-9+.]+)[ \t\n]+([<>])[ \t\n]+(.*)$" "\\1 (\\2\\2 \\3)" DEP_ALL "${DEP_EQ}")
+        string(REGEX REPLACE 
+            "^([a-zA-Z0-9][-a-zA-Z0-9+.]+)[ \t\n]+([<>]?=)[ \t\n]+(.*)$" 
+            "\\1 (\\2 \\3)" DEP_EQ "${DEP}")
+        string(REGEX REPLACE 
+            "^([a-zA-Z0-9][-a-zA-Z0-9+.]+)[ \t\n]+([<>])[ \t\n]+(.*)$" 
+            "\\1 (\\2\\2 \\3)" DEP_ALL "${DEP_EQ}")
         rocm_join_if_set(", " CURRENT_DEPENDS "${DEP_ALL}")
     endforeach()
     set(${REQ_VAR} "${CURRENT_DEPENDS}" PARENT_SCOPE)
