@@ -48,7 +48,8 @@ test_expect_eq("${CPACK_DEBIAN_CLIENT-A_PACKAGE_NAME}" "<PACKAGE_NAME>-client-a"
 test_expect_eq("${CPACK_RPM_CLIENT-A_PACKAGE_NAME}" "<PACKAGE_NAME>-client-a")
 test_expect_eq("${CPACK_DEBIAN_CLIENT-A_PACKAGE_DEPENDS}" "")
 test_expect_eq("${CPACK_RPM_CLIENT-A_PACKAGE_REQUIRES}" "")
-test_expect_eq("${ROCM_PACKAGE_COMPONENT_DEPENDENCIES}" "comp-a->comp-b;comp-c->comp-a;comp-c->comp-b;clients->client-a;client-a->comp-c;client-a->runtime")
+test_expect_eq("${ROCM_PACKAGE_COMPONENT_DEPENDENCIES}"
+    "comp-a->comp-b;comp-c->comp-a;comp-c->comp-b;clients->client-a;client-a->comp-c;client-a->runtime")
 
 set(CPACK_PACKAGE_NAME "packtest")
 set(CPACK_PACKAGE_VERSION 1.0.0)
@@ -73,8 +74,10 @@ test_expect_eq("${CPACK_RPM_COMP-B_PACKAGE_REQUIRES}" "")
 
 test_expect_eq("${CPACK_DEBIAN_COMP-C_PACKAGE_NAME}" "packaging-comp-c")
 test_expect_eq("${CPACK_RPM_COMP-C_PACKAGE_NAME}" "packaging-comp-c")
-test_expect_eq("${CPACK_DEBIAN_COMP-C_PACKAGE_DEPENDS}" "foo (>> 1.0), bar (<< 2.0), packtest-comp-a (>= 1.0.0), packtest-test-b (>= 1.0.0)")
-test_expect_eq("${CPACK_RPM_COMP-C_PACKAGE_REQUIRES}" "foo > 1.0, baz = 3.0, packtest-comp-a >= 1.0.0, packtest-test-b >= 1.0.0")
+test_expect_eq("${CPACK_DEBIAN_COMP-C_PACKAGE_DEPENDS}"
+    "foo (>> 1.0), bar (<< 2.0), packtest-comp-a (>= 1.0.0), packtest-test-b (>= 1.0.0)")
+test_expect_eq("${CPACK_RPM_COMP-C_PACKAGE_REQUIRES}"
+    "foo > 1.0, baz = 3.0, packtest-comp-a >= 1.0.0, packtest-test-b >= 1.0.0")
 
 test_expect_eq("${CPACK_DEBIAN_CLIENT-A_PACKAGE_NAME}" "packtest-client-a")
 test_expect_eq("${CPACK_RPM_CLIENT-A_PACKAGE_NAME}" "packtest-client-a")
