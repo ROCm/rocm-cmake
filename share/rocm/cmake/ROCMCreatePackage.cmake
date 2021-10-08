@@ -8,7 +8,18 @@ set(ROCM_DISABLE_LDCONFIG
     OFF
     CACHE BOOL "")
 
-set(ROCM_DEP_ROCMCORE TRUE CACHE BOOL "Add dependency on rocm-core package, default 'TRUE'")
+get_filename_component(REAL_ROCM "${CMAKE_INSTALL_PREFIX}" REALPATH)
+get_filename_component(REAL_ROCM_DIR "${ROCM_DIR}" REALPATH)
+if(REAL_ROCM MATCHES "rocm-([0-9]+(\.[0-9]+)+)")
+    set(ROCM_PLATFORM_VERSION "${CMAKE_MATCH_1}" CACHE STRING "The version of the ROCm platform.")
+elseif(REAL_ROCM_DIR MATCHES "rocm-([0-9]+(\.[0-9]+)+)")
+    set(ROCM_PLATFORM_VERSION "${CMAKE_MATCH_1}" CACHE STRING "The version of the ROCm platform.")
+endif()
+if(DEFINED ROCM_PLATFORM_VERSION AND ROCM_PLATFORM_VERSION VERSION_LESS 4.5.0)
+    set(ROCM_DEP_ROCMCORE FALSE CACHE BOOL "Add dependency on rocm-core package")
+else()
+    set(ROCM_DEP_ROCMCORE TRUE CACHE BOOL "Add dependency on rocm-core package")
+endif()
 
 include(CMakeParseArguments)
 include(GNUInstallDirs)

@@ -19,7 +19,16 @@
 ### Changed
 - If `ROCM_PACKAGE_COMPONENTS` is set (either manually or by `rocm_package_setup_component`), then the components listed in `ROCM_PACKAGE_COMPONENTS` will be built as separate packages.
 - `rocm_read_os_release` and `rocm_set_os_id` moved to the utilities file. As this file is included in `ROCMCreatePackage.cmake`, this change is backwards compatible.
-- `rocm_install_symlink_subdir` now accepts a `COMPONENT` argument, which controls the component that the symlinks are installed into, and a `NAME_PREFIX`, which adds a prefix to the name of each symlink generated.
+- `rocm_install_symlink_subdir` now accepts a `COMPONENT` argument, which controls the component that the symlinks are installed into.
+
+## [0.6.2]
+### Changed
+- If the ROCm platform version that is being built for is less than version 4.5.0, `ROCM_DEP_ROCMCORE` is automatically disabled.
+  - The ROCm platform version is determined by:
+    - the user-set CMake variable `ROCM_PLATFORM_VERSION`; otherwise
+    - if the install prefix resolves to a path containing `rocm-<version>`, that version is used; otherwise
+    - if the real path to the version of `rocm-cmake` used contains `rocm-<version>`, that version is used.
+  - If the ROCm platform version is not set, then it is assumed to be greater than 4.5.0.
 
 ## [0.6.1]
 ### Added
