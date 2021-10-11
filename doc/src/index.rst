@@ -19,12 +19,18 @@ rocm-cmake
    + :any:`CLANG_TIDY_CACHE`
    + :any:`CLANG_TIDY_CACHE_SIZE`
    + :any:`CLANG_TIDY_DEPEND_ON_TARGET`
+- :any:`ROCMClients`
+   + :any:`rocm_package_setup_client_component`
 - :any:`ROCMCppCheck`
    + :any:`rocm_enable_cppcheck`
    + :any:`CPPCHECK_EXE`
    + :any:`CPPCHECK_BUILD_DIR`
 - :any:`ROCMCreatePackage`
    + :any:`rocm_create_package`
+   + :any:`rocm_package_add_rpm_dependencies`
+   + :any:`rocm_package_add_deb_dependencies`
+   + :any:`rocm_package_add_dependencies`
+   + :any:`rocm_package_setup_component`
 - :any:`ROCMDocs`
    + :any:`rocm_mark_as_doc`
    + :any:`rocm_clean_doc_output`
@@ -47,6 +53,9 @@ rocm-cmake
    + :any:`rocm_add_doxygen_doc`
    + :any:`SPHINX_EXECUTABLE`
    + :any:`SPHINX_${BUILDER}_DIR`
+- :any:`ROCMUtilities`
+   + :any:`rocm_join_if_set`
+   + :any:`rocm_find_program_version`
 
 Indices and tables
 ==================

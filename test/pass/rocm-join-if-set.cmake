@@ -1,5 +1,5 @@
 use_rocm_cmake()
-include(ROCMCreatePackage)
+include(ROCMUtilities)
 
 function(test_rocm_join_if_set EXPECTED INITIAL GLUE)
     set(me ${INITIAL})
