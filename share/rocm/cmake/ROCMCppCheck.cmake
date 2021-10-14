@@ -109,7 +109,7 @@ macro(rocm_enable_cppcheck)
         # cmake-lint: disable=C0301
         set(CPPCHECK_TEMPLATE_ARG
             "--template=::warning file={file},line={line},col={column}::{severity}: {inconclusive:inconclusive: }{message} [{id}]"
-            "--template-location={file}:{line}:{column}: note: {info}\n{code}")
+            "--template-location={file}:{line}:{column}: note: {info}\\\n{code}")
     endif()
 
     set(CPPCHECK_COMMAND

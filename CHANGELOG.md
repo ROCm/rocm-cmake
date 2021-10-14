@@ -1,5 +1,9 @@
 # Change Log for rocm-cmake
 
+## [0.7.1]
+### Added
+- `CLANG_TIDY_USE_COLOR` variable added to control the color output from `clang-tidy`, by default this is `On`.
+
 ## [0.7.0]
 ### Added
 - Component packaging functionality:
