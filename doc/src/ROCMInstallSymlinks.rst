@@ -8,7 +8,7 @@ Commands
 
 .. code-block:: cmake
 
-    rocm_install_symlink_subdir(<subdir> [<component>])
+    rocm_install_symlink_subdir(subdir)
 
-Install symlinks which point into the ``subdir`` directory to the component `component`, or to the runtime and development components otherwise.
+Install symlinks which point into the ``subdir`` directory.
 
