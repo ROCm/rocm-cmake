@@ -109,31 +109,17 @@ macro(rocm_enable_cppcheck)
         # cmake-lint: disable=C0301
         set(CPPCHECK_TEMPLATE_ARG
             "--template=::warning file={file},line={line},col={column}::{severity}: {inconclusive:inconclusive: }{message} [{id}]"
-            "--template-location={file}:{line}:{column}: note: {info}\n{code}")
+            "--template-location={file}:{line}:{column}: note: {info}\\\n{code}")
     endif()
 
     set(CPPCHECK_COMMAND
-        ${CPPCHECK_EXE}
-        -q
-        # -v
-        # --report-progress
-        ${CPPCHECK_FORCE}
-        ${CPPCHECK_INCONCLUSIVE}
-        ${CPPCHECK_BUILD_DIR_FLAG}
-        ${CPPCHECK_PLATFORM_FLAG}
-        ${CPPCHECK_RULE_FILE_ARG}
-        ${CPPCHECK_TEMPLATE_ARG}
-        ${CPPCHECK_ADDONS_ARG}
-        --inline-suppr
-        --error-exitcode=1
-        -j ${CPPCHECK_JOBS}
-        ${CPPCHECK_DEFINES}
-        ${CPPCHECK_UNDEFINES}
-        ${CPPCHECK_INCLUDES}
-        "--relative-paths=${CMAKE_SOURCE_DIR}"
-        --enable=${CPPCHECK_CHECKS}
-        --suppressions-list=${CMAKE_BINARY_DIR}/cppcheck-supressions
-    )
+        ${CPPCHECK_EXE} -q
+        # -v --report-progress
+        ${CPPCHECK_FORCE} ${CPPCHECK_INCONCLUSIVE} ${CPPCHECK_BUILD_DIR_FLAG} ${CPPCHECK_PLATFORM_FLAG}
+        ${CPPCHECK_RULE_FILE_ARG} ${CPPCHECK_TEMPLATE_ARG} ${CPPCHECK_ADDONS_ARG} --inline-suppr --error-exitcode=1 -j
+        ${CPPCHECK_JOBS} ${CPPCHECK_DEFINES} ${CPPCHECK_UNDEFINES} ${CPPCHECK_INCLUDES}
+        "--relative-paths=${CMAKE_SOURCE_DIR}" --enable=${CPPCHECK_CHECKS}
+        --suppressions-list=${CMAKE_BINARY_DIR}/cppcheck-supressions)
 
     add_custom_target(
         cppcheck

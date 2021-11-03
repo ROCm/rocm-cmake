@@ -2,41 +2,125 @@
 # Copyright (C) 2017-2019 Advanced Micro Devices, Inc.
 # ######################################################################################################################
 
+cmake_policy(SET CMP0057 NEW)
+
 set(ROCM_DISABLE_LDCONFIG
     OFF
     CACHE BOOL "")
 
-set(ROCM_DEP_ROCMCORE TRUE CACHE BOOL "Add dependency on rocm-core package, default 'TRUE'")
+get_filename_component(REAL_ROCM "${CMAKE_INSTALL_PREFIX}" REALPATH)
+get_filename_component(REAL_ROCM_DIR "${ROCM_DIR}" REALPATH)
+if(REAL_ROCM MATCHES "rocm-([0-9]+(\.[0-9]+)+)")
+    set(ROCM_PLATFORM_VERSION "${CMAKE_MATCH_1}" CACHE STRING "The version of the ROCm platform.")
+elseif(REAL_ROCM_DIR MATCHES "rocm-([0-9]+(\.[0-9]+)+)")
+    set(ROCM_PLATFORM_VERSION "${CMAKE_MATCH_1}" CACHE STRING "The version of the ROCm platform.")
+endif()
+if(DEFINED ROCM_PLATFORM_VERSION AND ROCM_PLATFORM_VERSION VERSION_LESS 4.5.0)
+    set(ROCM_DEP_ROCMCORE FALSE CACHE BOOL "Add dependency on rocm-core package")
+else()
+    set(ROCM_DEP_ROCMCORE TRUE CACHE BOOL "Add dependency on rocm-core package")
+endif()
 
 include(CMakeParseArguments)
 include(GNUInstallDirs)
 include(ROCMSetupVersion)
+include(ROCMUtilities)
 
 find_program(MAKE_NSIS_EXE makensis)
 find_program(RPMBUILD_EXE rpmbuild)
 find_program(DPKG_EXE dpkg)
 
-if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
-    # pretty much just a wrapper around string JOIN
-    function(rocm_join_if_set glue inout_variable)
-        string(JOIN "${glue}" to_set_parent ${${inout_variable}} ${ARGN})
-        set(${inout_variable} "${to_set_parent}" PARENT_SCOPE)
-    endfunction()
-else()
-    # cmake < 3.12 doesn't have string JOIN
-    function(rocm_join_if_set glue inout_variable)
-        set(accumulator "${${inout_variable}}")
-        set(tglue ${glue})
-        if(accumulator STREQUAL "")
-            set(tglue "")       # No glue needed if initially unset
+set(CMAKE_INSTALL_DEFAULT_COMPONENT_NAME runtime)
+set(ROCM_PACKAGE_CREATED FALSE CACHE INTERNAL "Track whether rocm_create_package has been called.")
+
+function(rocm_package_add_rpm_dependencies)
+    set(options QUIET)
+    set(oneValueArgs COMPONENT)
+    set(multiValueArgs DEPENDS SHARED_DEPENDS STATIC_DEPENDS)
+    cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    if(${ROCM_PACKAGE_CREATED} AND NOT PARSE_QUIET)
+        message(AUTHOR_WARNING "rocm_package_add_rpm_dependencies called after rocm_create_package!")
+    endif()
+
+    if(DEFINED PARSE_COMPONENT)
+        string(TOUPPER "${PARSE_COMPONENT}" COMPONENT_VAR)
+        set(REQ_VAR "CPACK_RPM_${COMPONENT_VAR}_PACKAGE_REQUIRES")
+    else()
+        set(REQ_VAR "CPACK_RPM_PACKAGE_REQUIRES")
+    endif()
+
+    set(CURRENT_DEPENDS "${${REQ_VAR}}")
+
+    if (DEFINED PARSE_DEPENDS)
+        rocm_join_if_set(", " CURRENT_DEPENDS ${PARSE_DEPENDS})
+    endif()
+
+    if(DEFINED PARSE_SHARED_DEPENDS AND BUILD_SHARED_LIBS)
+        rocm_join_if_set(", " CURRENT_DEPENDS ${PARSE_SHARED_DEPENDS})
+    endif()
+
+    if(DEFINED PARSE_STATIC_DEPENDS AND NOT BUILD_SHARED_LIBS)
+        rocm_join_if_set(", " CURRENT_DEPENDS ${PARSE_STATIC_DEPENDS})
+    endif()
+    set(${REQ_VAR} "${CURRENT_DEPENDS}" PARENT_SCOPE)
+endfunction()
+
+function(rocm_package_add_deb_dependencies)
+    set(options QUIET)
+    set(oneValueArgs COMPONENT)
+    set(multiValueArgs DEPENDS SHARED_DEPENDS STATIC_DEPENDS)
+    cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    if(${ROCM_PACKAGE_CREATED} AND NOT PARSE_QUIET)
+        message(AUTHOR_WARNING "rocm_package_add_deb_dependencies called after rocm_create_package!")
+    endif()
+
+    if(DEFINED PARSE_COMPONENT)
+        string(TOUPPER "CPACK_DEBIAN_${PARSE_COMPONENT}_PACKAGE_DEPENDS" REQ_VAR)
+    else()
+        set(REQ_VAR "CPACK_DEBIAN_PACKAGE_DEPENDS")
+    endif()
+
+    set(NEW_DEPENDS "")
+    if(DEFINED PARSE_DEPENDS)
+        list(APPEND NEW_DEPENDS ${PARSE_DEPENDS})
+    endif()
+
+    if(DEFINED PARSE_SHARED_DEPENDS AND BUILD_SHARED_LIBS)
+        list(APPEND NEW_DEPENDS "${PARSE_SHARED_DEPENDS}")
+    endif()
+
+    if(DEFINED PARSE_STATIC_DEPENDS AND NOT BUILD_SHARED_LIBS)
+        list(APPEND NEW_DEPENDS "${PARSE_STATIC_DEPENDS}")
+    endif()
+
+    set(CURRENT_DEPENDS "${${REQ_VAR}}")
+    foreach(DEP IN LISTS NEW_DEPENDS)
+        string(REGEX REPLACE
+            "^([a-zA-Z0-9][-a-zA-Z0-9+.]+)[ \t\n]+([<>]?=)[ \t\n]+(.*)$"
+            "\\1 (\\2 \\3)" DEP_EQ "${DEP}")
+        string(REGEX REPLACE
+            "^([a-zA-Z0-9][-a-zA-Z0-9+.]+)[ \t\n]+([<>])[ \t\n]+(.*)$"
+            "\\1 (\\2\\2 \\3)" DEP_ALL "${DEP_EQ}")
+        rocm_join_if_set(", " CURRENT_DEPENDS "${DEP_ALL}")
+    endforeach()
+    set(${REQ_VAR} "${CURRENT_DEPENDS}" PARENT_SCOPE)
+endfunction()
+
+macro(rocm_package_add_dependencies)
+    set(_list_var "${ARGN}")
+    if ("QUIET" IN_LIST _list_var)
+        rocm_package_add_deb_dependencies(${ARGN})
+        rocm_package_add_rpm_dependencies(${ARGN})
+    else()
+        if(${ROCM_PACKAGE_CREATED})
+            message(AUTHOR_WARNING "rocm_package_add_dependencies called after rocm_create_package!")
         endif()
-        foreach(ITEM IN LISTS ARGN)
-            string(CONCAT accumulator "${accumulator}" "${tglue}" "${ITEM}")
-            set(tglue ${glue})  # Always need glue after the first concatenate
-        endforeach()
-        set(${inout_variable} "${accumulator}" PARENT_SCOPE)
-    endfunction()
-endif()
+        rocm_package_add_deb_dependencies(QUIET ${ARGN})
+        rocm_package_add_rpm_dependencies(QUIET ${ARGN})
+    endif()
+endmacro()
 
 macro(rocm_package_add_rocm_core_dependency)
     # Optionally add depenency on rocm-core
@@ -107,30 +191,25 @@ macro(rocm_create_package)
     if (ROCM_USE_DEV_COMPONENT)
         list(APPEND PARSE_COMPONENTS devel)
         set(CPACK_DEBIAN_DEVEL_PACKAGE_NAME "${CPACK_PACKAGE_NAME}-dev")
-        rocm_join_if_set(", " CPACK_DEBIAN_UNSPECIFIED_PACKAGE_RECOMMENDS
+        rocm_join_if_set(", " CPACK_DEBIAN_RUNTIME_PACKAGE_RECOMMENDS
             "${CPACK_PACKAGE_NAME}-dev (>=${CPACK_PACKAGE_VERSION})")
-        execute_process(
-            COMMAND rpmbuild --version
-            RESULT_VARIABLE PROC_RESULT
-            OUTPUT_VARIABLE EVAL_RESULT
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-        if(PROC_RESULT EQUAL "0" AND NOT EVAL_RESULT STREQUAL "")
-            string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+$" RPMBUILD_VERSION "${EVAL_RESULT}")
-            if (RPMBUILD_VERSION VERSION_GREATER_EQUAL "4.12.0")
-                rocm_join_if_set(", " CPACK_RPM_UNSPECIFIED_PACKAGE_SUGGESTS
-                    "${CPACK_PACKAGE_NAME}-devel >= ${CPACK_PACKAGE_VERSION}")
-            endif()
+
+        rocm_find_program_version(rpmbuild GREATER_EQUAL 4.12.0)
+        if(rpmbuild_VERSION_OK)
+            rocm_join_if_set(", " CPACK_RPM_RUNTIME_PACKAGE_SUGGESTS
+                "${CPACK_PACKAGE_NAME}-devel >= ${CPACK_PACKAGE_VERSION}"
+            )
         endif()
         if(PARSE_HEADER_ONLY)
             set(CPACK_DEBIAN_DEVEL_PACKAGE_PROVIDES "${CPACK_PACKAGE_NAME} (= ${CPACK_PACKAGE_VERSION})")
             set(CPACK_RPM_DEVEL_PACKAGE_PROVIDES "${CPACK_PACKAGE_NAME} = ${CPACK_PACKAGE_VERSION}")
         else()
-            rocm_join_if_set(", " CPACK_DEBIAN_DEVEL_PACKAGE_DEPENDS
-                "${CPACK_PACKAGE_NAME} (>=${CPACK_PACKAGE_VERSION})")
-            rocm_join_if_set(", " CPACK_RPM_DEVEL_PACKAGE_REQUIRES
-                "${CPACK_PACKAGE_NAME} >= ${CPACK_PACKAGE_VERSION}")
+            rocm_package_add_dependencies(COMPONENT devel DEPENDS "${CPACK_PACKAGE_NAME} >= ${CPACK_PACKAGE_VERSION}")
         endif()
+    endif()
+
+    if(ROCM_PACKAGE_COMPONENTS)
+        list(APPEND PARSE_COMPONENTS ${ROCM_PACKAGE_COMPONENTS})
     endif()
 
     # '%{?dist}' breaks manual builds on debian systems due to empty Provides
@@ -173,9 +252,7 @@ macro(rocm_create_package)
     endif()
 
     if(PARSE_DEPENDS)
-        string(REPLACE ";" ", " DEPENDS "${PARSE_DEPENDS}")
-        set(CPACK_DEBIAN_PACKAGE_DEPENDS "${DEPENDS}")
-        set(CPACK_RPM_PACKAGE_REQUIRES "${DEPENDS}")
+        rocm_package_add_dependencies(DEPENDS ${PARSE_DEPENDS})
     endif()
 
     rocm_package_add_rocm_core_dependency()
@@ -234,53 +311,95 @@ macro(rocm_create_package)
         rocm_set_comp_cpackvar(PARSE_HEADER_ONLY "${PARSE_COMPONENTS}")
     endif()
     include(CPack)
+    set(ROCM_PACKAGE_CREATED TRUE CACHE INTERNAL "Track whether rocm_create_package has been called.")
 endmacro()
-
-function(rocm_set_os_id OS_ID)
-    set(_os_id "unknown")
-    if(EXISTS "/etc/os-release")
-        rocm_read_os_release(_os_id "ID")
-    endif()
-    set(${OS_ID}
-        ${_os_id}
-        PARENT_SCOPE)
-    set(os_id_out ${OS_ID}_${_os_id})
-    set(${os_id_out}
-        TRUE
-        PARENT_SCOPE)
-endfunction()
-
-function(rocm_read_os_release OUTPUT KEYVALUE)
-    # finds the line with the keyvalue
-    if(EXISTS "/etc/os-release")
-        file(STRINGS /etc/os-release _keyvalue_line REGEX "^${KEYVALUE}=")
-    endif()
-
-    # remove keyvalue=
-    string(REGEX REPLACE "^${KEYVALUE}=\"?(.*)" "\\1" _output "${_keyvalue_line}")
-
-    # remove trailing quote
-    string(REGEX REPLACE "\"$" "" _output "${_output}")
-    set(${OUTPUT}
-        ${_output}
-        PARENT_SCOPE)
-endfunction()
 
 macro(rocm_set_comp_cpackvar HEADER_ONLY components)
     # Setting component specific variables
     set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
     if(NOT ${HEADER_ONLY})
-        set(CPACK_RPM_MAIN_COMPONENT "Unspecified")
-        set(CPACK_RPM_UNSPECIFIED_DISPLAY_NAME "${CPACK_PACKAGE_NAME}")
-        list(APPEND CPACK_COMPONENTS_ALL Unspecified)
-        set(CPACK_DEBIAN_UNSPECIFIED_FILE_NAME
+        set(CPACK_RPM_MAIN_COMPONENT "runtime")
+        set(CPACK_RPM_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
+        list(APPEND CPACK_COMPONENTS_ALL runtime)
+        set(CPACK_DEBIAN_RUNTIME_FILE_NAME
            "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}-${DEBIAN_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
-        set(CPACK_DEBIAN_UNSPECIFIED_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
+        set(CPACK_DEBIAN_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
     endif()
 
     foreach(COMPONENT ${components})
         list(APPEND CPACK_COMPONENTS_ALL "${COMPONENT}")
-        set(CPACK_RPM_${COMPONENT}_FILE_NAME "RPM-DEFAULT")
-        set(CPACK_DEBIAN_${COMPONENT}_FILE_NAME "DEB-DEFAULT")
+        string(TOUPPER "${COMPONENT}" COMPONENT_UC)
+        set(CPACK_RPM_${COMPONENT_UC}_FILE_NAME "RPM-DEFAULT")
+        set(CPACK_DEBIAN_${COMPONENT_UC}_FILE_NAME "DEB-DEFAULT")
+        if(NOT DEFINED CPACK_DEBIAN_${COMPONENT_UC}_PACKAGE_NAME
+            OR CPACK_DEBIAN_${COMPONENT_UC}_PACKAGE_NAME STREQUAL "")
+            if(NOT DEFINED CPACK_DEBIAN_PACKAGE_NAME OR CPACK_DEBIAN_PACKAGE_NAME STREQUAL "")
+                set(CPACK_DEBIAN_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
+            endif()
+            string(TOLOWER "${CPACK_DEBIAN_PACKAGE_NAME}-${COMPONENT}" CPACK_DEBIAN_${COMPONENT_UC}_PACKAGE_NAME)
+        else()
+            string(REGEX REPLACE "<PACKAGE_NAME>" "${CPACK_PACKAGE_NAME}"
+                CPACK_DEBIAN_${COMPONENT_UC}_PACKAGE_NAME "${CPACK_DEBIAN_${COMPONENT_UC}_PACKAGE_NAME}")
+        endif()
+        if(NOT DEFINED CPACK_RPM_${COMPONENT_UC}_PACKAGE_NAME
+            OR CPACK_RPM_${COMPONENT_UC}_PACKAGE_NAME STREQUAL "")
+            if(NOT DEFINED CPACK_RPM_PACKAGE_NAME OR CPACK_RPM_PACKAGE_NAME STREQUAL "")
+                set(CPACK_RPM_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
+            endif()
+            string(TOLOWER "${CPACK_RPM_PACKAGE_NAME}-${COMPONENT}" CPACK_RPM_${COMPONENT_UC}_PACKAGE_NAME)
+        else()
+            string(REGEX REPLACE "<PACKAGE_NAME>" "${CPACK_PACKAGE_NAME}"
+                CPACK_RPM_${COMPONENT_UC}_PACKAGE_NAME "${CPACK_RPM_${COMPONENT_UC}_PACKAGE_NAME}")
+        endif()
     endforeach()
+    if(ROCM_PACKAGE_COMPONENT_DEPENDENCIES)
+        foreach(COMP_DEP IN LISTS ROCM_PACKAGE_COMPONENT_DEPENDENCIES)
+            string(REGEX REPLACE "^(.*)->.*$" "\\1" _downstream "${COMP_DEP}")
+            string(REGEX REPLACE "^.*->(.*)$" "\\1" _upstream "${COMP_DEP}")
+            string(TOUPPER "${_upstream}" _upstream_uc)
+            rocm_package_add_rpm_dependencies(COMPONENT "${_downstream}"
+                DEPENDS "${CPACK_RPM_${_upstream_uc}_PACKAGE_NAME} >= ${CPACK_PACKAGE_VERSION}")
+            rocm_package_add_deb_dependencies(COMPONENT "${_downstream}"
+                DEPENDS "${CPACK_DEBIAN_${_upstream_uc}_PACKAGE_NAME} >= ${CPACK_PACKAGE_VERSION}")
+        endforeach()
+    endif()
+endmacro()
+
+macro(rocm_package_setup_component COMPONENT_NAME)
+    set(options)
+    set(oneValueArgs PACKAGE_NAME LIBRARY_NAME PARENT)
+    set(multiValueArgs DEPENDS)
+
+    cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    list(APPEND ROCM_PACKAGE_COMPONENTS ${COMPONENT_NAME})
+
+    if(NOT DEFINED PARSE_PACKAGE_NAME)
+        string(TOLOWER "${COMPONENT_NAME}" PARSE_PACKAGE_NAME)
+        if(NOT BUILD_SHARED_LIBS)
+            set(PARSE_PACKAGE_NAME "${PARSE_PACKAGE_NAME}-static")
+        endif()
+    endif()
+
+    if(NOT DEFINED PARSE_LIBRARY_NAME)
+        set(PARSE_LIBRARY_NAME "<PACKAGE_NAME>")
+    endif()
+
+    string(TOUPPER "${COMPONENT_NAME}" COMPONENT_GNAME)
+
+    set(CPACK_DEBIAN_${COMPONENT_GNAME}_PACKAGE_NAME "${PARSE_LIBRARY_NAME}-${PARSE_PACKAGE_NAME}")
+    set(CPACK_RPM_${COMPONENT_GNAME}_PACKAGE_NAME "${PARSE_LIBRARY_NAME}-${PARSE_PACKAGE_NAME}")
+
+    if(DEFINED PARSE_PARENT)
+        list(APPEND ROCM_PACKAGE_COMPONENT_DEPENDENCIES "${PARSE_PARENT}->${COMPONENT_NAME}")
+    endif()
+
+    if(DEFINED PARSE_DEPENDS)
+        cmake_parse_arguments(DEPENDS "" "" "COMMON;DEB;RPM;COMPONENT" ${PARSE_DEPENDS})
+        rocm_package_add_deb_dependencies(COMPONENT ${COMPONENT_NAME} DEPENDS ${DEPENDS_COMMON} ${DEPENDS_DEB})
+        rocm_package_add_rpm_dependencies(COMPONENT ${COMPONENT_NAME} DEPENDS ${DEPENDS_COMMON} ${DEPENDS_RPM})
+        foreach(DEP_COMP IN LISTS DEPENDS_COMPONENT)
+            list(APPEND ROCM_PACKAGE_COMPONENT_DEPENDENCIES "${COMPONENT_NAME}->${DEP_COMP}")
+        endforeach()
+    endif()
 endmacro()
