@@ -317,6 +317,34 @@ endmacro()
 macro(rocm_set_comp_cpackvar HEADER_ONLY components)
     # Setting component specific variables
     set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+    if(NOT CPACK_RESOURCE_FILE_LICENSE)
+        file(GLOB _license_files LIST_DIRECTORIES FALSE "${CMAKE_SOURCE_DIR}/LICENSE.*")
+        list(LENGTH _license_files _num_licenses)
+        if(_num_licenses GREATER 1)
+            message(AUTHOR_WARNING "rocm-cmake warning: Multiple license files found, please specify one using CPACK_RESOURCE_FILE_LICENSE.")
+        endif()
+        if(_num_licenses GREATER 0)
+            list(GET _license_files 0 _license_file)
+            set(CPACK_RESOURCE_FILE_LICENSE "${_license_file}")
+        endif()
+    endif()
+
+    if(CPACK_RESOURCE_FILE_LICENSE)
+        if(NOT ${HEADER_ONLY})
+            install(
+                FILES ${CPACK_RESOURCE_FILE_LICENSE}
+                DESTINATION share/doc/${_rocm_cpack_package_name}
+                COMPONENT runtime
+            )
+        else()
+            install(
+                FILES ${CPACK_RESOURCE_FILE_LICENSE}
+                DESTINATION share/doc/${_rocm_cpack_package_name}
+                COMPONENT devel
+            )
+        endif()
+    endif()
+
     if(NOT ${HEADER_ONLY})
         set(CPACK_RPM_MAIN_COMPONENT "runtime")
         set(CPACK_RPM_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
