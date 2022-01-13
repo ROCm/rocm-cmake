@@ -321,7 +321,10 @@ macro(rocm_set_comp_cpackvar HEADER_ONLY components)
         file(GLOB _license_files LIST_DIRECTORIES FALSE "${CMAKE_SOURCE_DIR}/LICENSE*")
         list(LENGTH _license_files _num_licenses)
         if(_num_licenses GREATER 1)
-            message(AUTHOR_WARNING "rocm-cmake warning: Multiple license files found, please specify one using CPACK_RESOURCE_FILE_LICENSE.")
+            message(AUTHOR_WARNING
+                "rocm-cmake warning: Multiple license files found, "
+                "please specify one using CPACK_RESOURCE_FILE_LICENSE."
+            )
         endif()
         if(_num_licenses GREATER 0)
             list(GET _license_files 0 _license_file)
