@@ -314,21 +314,28 @@ macro(rocm_create_package)
     set(ROCM_PACKAGE_CREATED TRUE CACHE INTERNAL "Track whether rocm_create_package has been called.")
 endmacro()
 
-macro(rocm_set_comp_cpackvar HEADER_ONLY components)
-    # Setting component specific variables
-    set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+macro(rocm_setup_license HEADER_ONLY)
     if(NOT CPACK_RESOURCE_FILE_LICENSE)
         file(GLOB _license_files LIST_DIRECTORIES FALSE "${CMAKE_SOURCE_DIR}/LICENSE*")
-        list(LENGTH _license_files _num_licenses)
+        set(_detected_license_files)
+        foreach(_license_file IN LISTS _license_files)
+            if(_license_file MATCHES "LICENSE(\\.(md|txt))?$")
+                list(APPEND _detected_license_files "${_license_file}")
+            endif()
+        endforeach()
+        list(LENGTH _detected_license_files _num_licenses)
         if(_num_licenses GREATER 1)
             message(AUTHOR_WARNING
                 "rocm-cmake warning: Multiple license files found, "
                 "please specify one using CPACK_RESOURCE_FILE_LICENSE."
             )
-        endif()
-        if(_num_licenses GREATER 0)
-            list(GET _license_files 0 _license_file)
-            set(CPACK_RESOURCE_FILE_LICENSE "${_license_file}")
+        elseif(_num_licenses EQUAL 0)
+            message(AUTHOR_WARNING
+                "rocm-cmake warning: Could not find a license file, "
+                "please specify one using CPACK_RESOURCE_FILE_LICENSE."
+            )
+        else()
+            list(GET _detected_license_files 0 CPACK_RESOURCE_FILE_LICENSE)
         endif()
     endif()
 
@@ -347,6 +354,13 @@ macro(rocm_set_comp_cpackvar HEADER_ONLY components)
             )
         endif()
     endif()
+endmacro()
+
+macro(rocm_set_comp_cpackvar HEADER_ONLY components)
+    # Setting component specific variables
+    set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+
+    rocm_setup_license(${HEADER_ONLY})
 
     if(NOT ${HEADER_ONLY})
         set(CPACK_RPM_MAIN_COMPONENT "runtime")
