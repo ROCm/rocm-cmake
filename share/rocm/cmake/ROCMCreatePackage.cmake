@@ -236,39 +236,55 @@ macro(rocm_create_package)
     include(CPack)
 endmacro()
 
-function(rocm_set_os_id OS_ID)
-    set(_os_id "unknown")
-    if(EXISTS "/etc/os-release")
-        rocm_read_os_release(_os_id "ID")
+macro(rocm_setup_license HEADER_ONLY)
+    if(NOT CPACK_RESOURCE_FILE_LICENSE)
+        file(GLOB _license_files LIST_DIRECTORIES FALSE "${CMAKE_SOURCE_DIR}/LICENSE*")
+        set(_detected_license_files)
+        foreach(_license_file IN LISTS _license_files)
+            if(_license_file MATCHES "LICENSE(\\.(md|txt))?$")
+                list(APPEND _detected_license_files "${_license_file}")
+            endif()
+        endforeach()
+        list(LENGTH _detected_license_files _num_licenses)
+        if(_num_licenses GREATER 1)
+            message(AUTHOR_WARNING
+                "rocm-cmake warning: Multiple license files found, "
+                "please specify one using CPACK_RESOURCE_FILE_LICENSE."
+            )
+        elseif(_num_licenses EQUAL 0)
+            message(AUTHOR_WARNING
+                "rocm-cmake warning: Could not find a license file, "
+                "please specify one using CPACK_RESOURCE_FILE_LICENSE."
+            )
+        else()
+            message(STATUS "rocm-cmake: Set license file to ${CPACK_RESOURCE_FILE_LICENSE}.")
+            list(GET _detected_license_files 0 CPACK_RESOURCE_FILE_LICENSE)
+        endif()
     endif()
-    set(${OS_ID}
-        ${_os_id}
-        PARENT_SCOPE)
-    set(os_id_out ${OS_ID}_${_os_id})
-    set(${os_id_out}
-        TRUE
-        PARENT_SCOPE)
-endfunction()
 
-function(rocm_read_os_release OUTPUT KEYVALUE)
-    # finds the line with the keyvalue
-    if(EXISTS "/etc/os-release")
-        file(STRINGS /etc/os-release _keyvalue_line REGEX "^${KEYVALUE}=")
+    if(CPACK_RESOURCE_FILE_LICENSE)
+        if(NOT ${HEADER_ONLY})
+            install(
+                FILES ${CPACK_RESOURCE_FILE_LICENSE}
+                DESTINATION share/doc/${_rocm_cpack_package_name}
+                COMPONENT runtime
+            )
+        else()
+            install(
+                FILES ${CPACK_RESOURCE_FILE_LICENSE}
+                DESTINATION share/doc/${_rocm_cpack_package_name}
+                COMPONENT devel
+            )
+        endif()
     endif()
-
-    # remove keyvalue=
-    string(REGEX REPLACE "^${KEYVALUE}=\"?(.*)" "\\1" _output "${_keyvalue_line}")
-
-    # remove trailing quote
-    string(REGEX REPLACE "\"$" "" _output "${_output}")
-    set(${OUTPUT}
-        ${_output}
-        PARENT_SCOPE)
-endfunction()
+endmacro()
 
 macro(rocm_set_comp_cpackvar HEADER_ONLY components)
     # Setting component specific variables
     set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+
+    rocm_setup_license(${HEADER_ONLY})
+
     if(NOT ${HEADER_ONLY})
         set(CPACK_RPM_MAIN_COMPONENT "Unspecified")
         set(CPACK_RPM_UNSPECIFIED_DISPLAY_NAME "${CPACK_PACKAGE_NAME}")
