@@ -314,9 +314,55 @@ macro(rocm_create_package)
     set(ROCM_PACKAGE_CREATED TRUE CACHE INTERNAL "Track whether rocm_create_package has been called.")
 endmacro()
 
+macro(rocm_setup_license HEADER_ONLY)
+    if(NOT CPACK_RESOURCE_FILE_LICENSE)
+        file(GLOB _license_files LIST_DIRECTORIES FALSE "${CMAKE_SOURCE_DIR}/LICENSE*")
+        set(_detected_license_files)
+        foreach(_license_file IN LISTS _license_files)
+            if(_license_file MATCHES "LICENSE(\\.(md|txt))?$")
+                list(APPEND _detected_license_files "${_license_file}")
+            endif()
+        endforeach()
+        list(LENGTH _detected_license_files _num_licenses)
+        if(_num_licenses GREATER 1)
+            message(AUTHOR_WARNING
+                "rocm-cmake warning: Multiple license files found, "
+                "please specify one using CPACK_RESOURCE_FILE_LICENSE."
+            )
+        elseif(_num_licenses EQUAL 0)
+            message(AUTHOR_WARNING
+                "rocm-cmake warning: Could not find a license file, "
+                "please specify one using CPACK_RESOURCE_FILE_LICENSE."
+            )
+        else()
+            message(STATUS "rocm-cmake: Set license file to ${CPACK_RESOURCE_FILE_LICENSE}.")
+            list(GET _detected_license_files 0 CPACK_RESOURCE_FILE_LICENSE)
+        endif()
+    endif()
+
+    if(CPACK_RESOURCE_FILE_LICENSE)
+        if(NOT ${HEADER_ONLY})
+            install(
+                FILES ${CPACK_RESOURCE_FILE_LICENSE}
+                DESTINATION share/doc/${_rocm_cpack_package_name}
+                COMPONENT runtime
+            )
+        else()
+            install(
+                FILES ${CPACK_RESOURCE_FILE_LICENSE}
+                DESTINATION share/doc/${_rocm_cpack_package_name}
+                COMPONENT devel
+            )
+        endif()
+    endif()
+endmacro()
+
 macro(rocm_set_comp_cpackvar HEADER_ONLY components)
     # Setting component specific variables
     set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+
+    rocm_setup_license(${HEADER_ONLY})
+
     if(NOT ${HEADER_ONLY})
         set(CPACK_RPM_MAIN_COMPONENT "runtime")
         set(CPACK_RPM_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
