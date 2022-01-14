@@ -329,8 +329,12 @@ macro(rocm_setup_license HEADER_ONLY)
                 "rocm-cmake warning: Multiple license files found, "
                 "please specify one using CPACK_RESOURCE_FILE_LICENSE."
             )
-        elseif(_num_licenses GREATER 0)
-            message(STATUS "rocm-cmake: Set license file to ${CPACK_RESOURCE_FILE_LICENSE}.")
+        elseif(_num_licenses EQUAL 0)
+            message(AUTHOR_WARNING
+                "rocm-cmake warning: Could not find a license file, "
+                "please specify one using CPACK_RESOURCE_FILE_LICENSE."
+            )
+        else()
             list(GET _detected_license_files 0 CPACK_RESOURCE_FILE_LICENSE)
         endif()
     endif()
