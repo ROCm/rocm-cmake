@@ -164,10 +164,10 @@ macro(rocm_create_package)
     if(PARSE_LICENSE)
         set( CPACK_RPM_PACKAGE_LICENSE "${PARSE_LICENSE}" )
     endif()
-    # Copy the license file to /opt/rocm/share/doc/<component_name>
+    # Setting the CPACK_RESOURCE_FILE_LICENSE variable.
+    # Installing license file to /opt/rocm/share/doc/<component_name> will happen in rocm_setup_license macro
     if(PARSE_LICENSE_PATH)
         set(CPACK_RESOURCE_FILE_LICENSE "${PARSE_LICENSE_PATH}")
-        install(FILES ${CPACK_RESOURCE_FILE_LICENSE} DESTINATION share/doc/${CPACK_PACKAGE_NAME})
     endif()
 
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER ${PARSE_MAINTAINER})
