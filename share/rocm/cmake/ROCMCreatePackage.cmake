@@ -354,6 +354,11 @@ macro(rocm_setup_license HEADER_ONLY)
                 COMPONENT devel
             )
         endif()
+        file(READ ${CPACK_RESOURCE_FILE_LICENSE} LICENSEFILE)
+        string(FIND "${LICENSEFILE}" "MIT" MITCHECK)
+        if(NOT CPACK_RPM_PACKAGE_LICENSE AND ${MITCHECK} NOT EQUAL -1)
+                set(CPACK_RPM_PACKAGE_LICENSE "MIT")
+        endif()
     endif()
 endmacro()
 
