@@ -167,7 +167,7 @@ macro(rocm_create_package)
     # Copy the license file to /opt/rocm/share/doc/<component_name>
     if(PARSE_LICENSE_PATH)
         set(CPACK_RESOURCE_FILE_LICENSE "${PARSE_LICENSE_PATH}")
-        install(FILES ${CPACK_RESOURCE_FILE_LICENSE} DESTINATION share/doc/${PARSE_COMPONENT})
+        install(FILES ${CPACK_RESOURCE_FILE_LICENSE} DESTINATION share/doc/${CPACK_PACKAGE_NAME})
     endif()
 
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER ${PARSE_MAINTAINER})
