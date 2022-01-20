@@ -342,17 +342,16 @@ macro(rocm_setup_license HEADER_ONLY)
     endif()
 
     if(CPACK_RESOURCE_FILE_LICENSE)
-        if(NOT ${HEADER_ONLY})
+        if(ROCM_USE_DEV_COMPONENT AND ${HEADER_ONLY})
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
                 DESTINATION share/doc/${_rocm_cpack_package_name}
-                COMPONENT runtime
+                COMPONENT devel
             )
         else()
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
                 DESTINATION share/doc/${_rocm_cpack_package_name}
-                COMPONENT devel
             )
         endif()
     endif()
