@@ -307,6 +307,7 @@ macro(rocm_create_package)
             ")
         endforeach()
     endif()
+    rocm_setup_license(${PARSE_HEADER_ONLY})
     if(PARSE_COMPONENTS)
         rocm_set_comp_cpackvar(PARSE_HEADER_ONLY "${PARSE_COMPONENTS}")
     endif()
@@ -360,8 +361,6 @@ endmacro()
 macro(rocm_set_comp_cpackvar HEADER_ONLY components)
     # Setting component specific variables
     set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
-
-    rocm_setup_license(${HEADER_ONLY})
 
     if(NOT ${HEADER_ONLY})
         set(CPACK_RPM_MAIN_COMPONENT "runtime")
