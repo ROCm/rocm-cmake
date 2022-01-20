@@ -114,6 +114,7 @@ endfunction()
 
 function(write_version_cmake DIR VERSION CONTENT)
     configure_file(${TEST_DIR}/version/CMakeLists.txt ${DIR}/CMakeLists.txt @ONLY)
+    file(COPY ${TEST_DIR}/version/LICENSE DESTINATION ${DIR})
 endfunction()
 
 function(test_check_package)
