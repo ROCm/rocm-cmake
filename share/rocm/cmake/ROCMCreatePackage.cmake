@@ -336,8 +336,8 @@ macro(rocm_setup_license HEADER_ONLY)
                 "please specify one using CPACK_RESOURCE_FILE_LICENSE."
             )
         else()
-            message(STATUS "rocm-cmake: Set license file to ${CPACK_RESOURCE_FILE_LICENSE}.")
             list(GET _detected_license_files 0 CPACK_RESOURCE_FILE_LICENSE)
+            message(STATUS "rocm-cmake: Set license file to ${CPACK_RESOURCE_FILE_LICENSE}.")
         endif()
     endif()
 
