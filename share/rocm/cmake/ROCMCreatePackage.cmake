@@ -292,30 +292,39 @@ macro(rocm_create_package)
         set(PYTHON_SITE_PACKAGES
             "/usr/lib/python3/dist-packages;/usr/lib/python2.7/dist-packages"
             CACHE STRING "The site packages used for packaging")
-        list(GET PYTHON_SITE_PACKAGES 0 PYTHON_SITE_0)
-        list(GET PYTHON_SITE_PACKAGES 1 PYTHON_SITE_1)
-        file(
-            APPEND ${PROJECT_BINARY_DIR}/debian/postinst
+        #Group the statements to function
+        file(APPEND ${PROJECT_BINARY_DIR}/debian/postinst
             "
             set_libdir(){
-                mkdir -p ${PYTHON_SITE_0}
-                echo \"${LIB_DIR}\" > ${PYTHON_SITE_0}/${PARSE_NAME}.pth
+        ")
+        file(APPEND ${PROJECT_BINARY_DIR}/debian/prerm
+            "
+            rm_libdir(){
+        ")
+        foreach(PYTHON_SITE ${PYTHON_SITE_PACKAGES})
+            file(
+                APPEND ${PROJECT_BINARY_DIR}/debian/postinst
+                "
+                mkdir -p ${PYTHON_SITE}
+                echo \"${LIB_DIR}\" > ${PYTHON_SITE}/${PARSE_NAME}.pth
+            ")
 
-                mkdir -p ${PYTHON_SITE_1}
-                echo \"${LIB_DIR}\" > ${PYTHON_SITE_1}/${PARSE_NAME}.pth
+            file(
+                APPEND ${PROJECT_BINARY_DIR}/debian/prerm
+                "
+                rm ${PYTHON_SITE}/${PARSE_NAME}.pth
+            ")
+        endforeach()
+        #end function and invoke the function
+        file(APPEND ${PROJECT_BINARY_DIR}/debian/postinst
+            "
             }
             set_libdir
         ")
-
-        file(
-            APPEND ${PROJECT_BINARY_DIR}/debian/prerm
+        file(APPEND ${PROJECT_BINARY_DIR}/debian/prerm
             "
-            rm_libdir(){
-                rm ${PYTHON_SITE_0}/${PARSE_NAME}.pth
-
-                rm ${PYTHON_SITE_1}/${PARSE_NAME}.pth
             }
-            rm_libdir
+	    rm_libdir
         ")
     endif()
     if(PARSE_COMPONENTS)
