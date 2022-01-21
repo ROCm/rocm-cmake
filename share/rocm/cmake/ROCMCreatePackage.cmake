@@ -324,7 +324,7 @@ macro(rocm_create_package)
         file(APPEND ${PROJECT_BINARY_DIR}/debian/prerm
             "
             }
-	    rm_libdir
+            rm_libdir
         ")
     endif()
     if(PARSE_COMPONENTS)
