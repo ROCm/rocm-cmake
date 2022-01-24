@@ -132,7 +132,7 @@ macro(rocm_package_add_rocm_core_dependency)
     endif()
 endmacro()
 
-function(parse_python_syspath)
+function(rocm_parse_python_syspath)
     set(PYTHON_SITE_PACKAGES
         "/usr/lib/python3/dist-packages;/usr/lib/python2.7/dist-packages"
         CACHE STRING "The site packages used for packaging")
@@ -329,7 +329,7 @@ macro(rocm_create_package)
     endif()
 
     if(PARSE_PTH)
-        parse_python_syspath()
+        rocm_parse_python_syspath()
     endif()
     if(PARSE_COMPONENTS)
         rocm_set_comp_cpackvar(PARSE_HEADER_ONLY "${PARSE_COMPONENTS}")
