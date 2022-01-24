@@ -230,6 +230,7 @@ macro(rocm_create_package)
             ")
         endforeach()
     endif()
+    rocm_setup_license(${PARSE_HEADER_ONLY})
     if(PARSE_COMPONENTS)
         rocm_set_comp_cpackvar(PARSE_HEADER_ONLY "${PARSE_COMPONENTS}")
     endif()
@@ -257,23 +258,22 @@ macro(rocm_setup_license HEADER_ONLY)
                 "please specify one using CPACK_RESOURCE_FILE_LICENSE."
             )
         else()
-            message(STATUS "rocm-cmake: Set license file to ${CPACK_RESOURCE_FILE_LICENSE}.")
             list(GET _detected_license_files 0 CPACK_RESOURCE_FILE_LICENSE)
+            message(STATUS "rocm-cmake: Set license file to ${CPACK_RESOURCE_FILE_LICENSE}.")
         endif()
     endif()
 
     if(CPACK_RESOURCE_FILE_LICENSE)
-        if(NOT ${HEADER_ONLY})
+        if(ROCM_USE_DEV_COMPONENT AND ${HEADER_ONLY})
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
                 DESTINATION share/doc/${_rocm_cpack_package_name}
-                COMPONENT runtime
+                COMPONENT devel
             )
         else()
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
                 DESTINATION share/doc/${_rocm_cpack_package_name}
-                COMPONENT devel
             )
         endif()
     endif()
@@ -282,8 +282,6 @@ endmacro()
 macro(rocm_set_comp_cpackvar HEADER_ONLY components)
     # Setting component specific variables
     set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
-
-    rocm_setup_license(${HEADER_ONLY})
 
     if(NOT ${HEADER_ONLY})
         set(CPACK_RPM_MAIN_COMPONENT "Unspecified")

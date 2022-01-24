@@ -1,5 +1,40 @@
 # Change Log for rocm-cmake
 
+## [0.7.1]
+### Added
+- `CLANG_TIDY_USE_COLOR` variable added to control the color output from `clang-tidy`, by default this is `On`.
+- If `CPACK_RESOURCE_FILE_LICENSE` is not set, `rocm_create_package` will now automatically attempt to find a LICENSE, LICENSE.txt, or LICENSE.md file in the top-level CMake source directory. If one is found, it is set up as the license file for the package. 
+
+## [0.7.0]
+### Added
+- Component packaging functionality:
+    - `rocm_package_setup_component` sets up a component for packaging, with the given name and values for the component and associated package.
+
+        - The variable `ROCM_PACKAGE_COMPONENTS` stores a list of the components which have been set up with `rocm_package_setup_component`.
+    - `rocm_package_add_rpm_dependencies` adds any number of dependencies to the RPM package for an optional specified component, including version checks (e.g. `foo >= 1.0`)
+    - `rocm_package_add_deb_dependencies` adds any number of dependencies to the DEB package for an optional specified component, including version checks (e.g. `foo >= 1.0`)
+        - Note that this version format matches RPM, it is reformatted to the Debian package format. This is to reduce code duplication.
+    - `rocm_package_add_dependencies` is a convenience wrapper which calls both `rocm_add_rpm_dependencies` and `rocm_add_deb_dependencies` to add any number of dependencies to both packages for an optional specified component.
+- Client packaging functions:
+    - `rocm_package_setup_client_component` is a convenience wrapper which adds the library as a runtime dependency if shared libraries were built, and sets the parent of the client package to `clients`.
+- Utility functions:
+    - `rocm_join_if_set` joins any number of non-empty strings to the end of a given variable interspersed with a specified glue string, setting that variable if it was previously empty
+    - `rocm_find_program_version` checks to see if the given command is available, and if it is available that the version matches some criteria. The detected version is returned in `<output_variable>`, and whether it matches all given criteria in `<output_variable>_OK`.
+        - `<output_variable>` defaults to `<program>_VERSION` if not specified.
+### Changed
+- If `ROCM_PACKAGE_COMPONENTS` is set (either manually or by `rocm_package_setup_component`), then the components listed in `ROCM_PACKAGE_COMPONENTS` will be built as separate packages.
+- `rocm_read_os_release` and `rocm_set_os_id` moved to the utilities file. As this file is included in `ROCMCreatePackage.cmake`, this change is backwards compatible.
+- `rocm_install_symlink_subdir` now accepts a `COMPONENT` argument, which controls the component that the symlinks are installed into.
+
+## [0.6.2]
+### Changed
+- If the ROCm platform version that is being built for is less than version 4.5.0, `ROCM_DEP_ROCMCORE` is automatically disabled.
+  - The ROCm platform version is determined by:
+    - the user-set CMake variable `ROCM_PLATFORM_VERSION`; otherwise
+    - if the install prefix resolves to a path containing `rocm-<version>`, that version is used; otherwise
+    - if the real path to the version of `rocm-cmake` used contains `rocm-<version>`, that version is used.
+  - If the ROCm platform version is not set, then it is assumed to be greater than 4.5.0.
+
 ## [0.6.1]
 ### Added
 - Modules added to generate documentation:
