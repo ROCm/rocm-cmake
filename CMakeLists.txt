@@ -14,12 +14,15 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ROCMConfigVersion.cmake DESTINATION sh
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/share/rocm/cmake)
 include(ROCMCreatePackage)
 include(ROCMSetupVersion)
+include(ROCMPolicy)
+rocm_cmake_policy(VERSION 0.7.1)
 
 rocm_setup_version(VERSION 0.7.1)
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/ROCMConfigVersion.cmake
     COMPATIBILITY SameMajorVersion)
+file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/ROCMConfigVersion.cmake "include(\${CMAKE_CURRENT_LIST_DIR}/ROCMPolicy.cmake)\n")
 
 rocm_create_package(
     NAME rocm-cmake
