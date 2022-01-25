@@ -19,7 +19,8 @@ Commands
         [HEADER_ONLY]
     )
 
-Sets up CPack packaging.
+Sets up CPack packaging, including installing the license file to the correct location and component.
+If the license file is not specified, also attempts to locate a LICENSE, LICENSE.md, or LICENSE.txt file in `CMAKE_SOURCE_DIR`.
 
 .. cmake:command:: rocm_package_add_rpm_dependencies
 
