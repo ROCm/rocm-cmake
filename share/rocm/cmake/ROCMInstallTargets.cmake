@@ -7,19 +7,26 @@ cmake_policy(SET CMP0057 NEW)
 include(CMakeParseArguments)
 include(GNUInstallDirs)
 include(ROCMPackageConfigHelpers)
+include(ROCMPolicy)
 
 set(ROCM_INSTALL_LIBDIR lib)
-if(WIN32)
-    set(ROCM_USE_DEV_COMPONENT OFF CACHE BOOL "Generate a devel package?")
-else()
-    set(ROCM_USE_DEV_COMPONENT ON CACHE BOOL "Generate a devel package?")
+rocm_cmake_policy(GET RCP0000 SETUP_DEV_COMPONENT)
+rocm_cmake_policy(GET RCP0004 USE_POLICIES)
+if(NOT USE_POLICIES STREQUAL "NEW")
+    if(ROCM_USE_DEV_COMPONENT AND NOT WIN32)
+        rocm_cmake_policy(SET RCP0000 NEW)
+    else()
+        rocm_cmake_policy(SET RCP0000 OLD)
+    endif()
 endif()
 
 function(rocm_install)
+    rocm_cmake_policy(GET RCP0000 USE_DEV_COMPONENT)
+    rocm_cmake_policy(GET RCP0004 USE_POLICIES)
     if(ARGV0 STREQUAL "TARGETS")
         # rocm_install_targets deals with the component in its own fashion.
         rocm_install_targets("${ARGN}")
-    elseif(NOT ROCM_USE_DEV_COMPONENT)
+    elseif(NOT USE_DEV_COMPONENT STREQUAL "NEW")
         # If we want legacy behaviour, directly call install with no meddling.
         install(${ARGN})
     else()
@@ -38,6 +45,13 @@ function(rocm_install)
             install(${ARGN})
             return()
         endif()
+        rocm_cmake_policy(GET RCP0002 USE_DEFAULT_RUNTIME)
+        rocm_cmake_policy(GET RCP0005 MODIFY_INSTALL_COMPONENT)
+        if(USE_DEFAULT_RUNTIME STREQUAL "NEW")
+            set(_runtime_install_component "runtime")
+        else()
+            set(_runtime_install_component "Unspecified")
+        endif()
         set(INSTALL_ARGS "${ARGV0};"
             "${PARSE_FILES}"
             "${PARSE_PROGRAMS}"
@@ -47,10 +61,10 @@ function(rocm_install)
             "${PARSE_EXPORT}")
 
         set(RUNTIME_MODES "PROGRAMS")
-        if(PARSE_COMPONENT)
-            list(APPEND INSTALL_ARGS COMPONENT "${PARSE_COMPONENT}")
-        elseif(NOT ARGV0 IN_LIST RUNTIME_MODES)
+        if(NOT ARGV0 IN_LIST RUNTIME_MODES)
             list(APPEND INSTALL_ARGS COMPONENT devel)
+        elseif(MODIFY_INSTALL_COMPONENT STREQUAL "NEW")
+            list(APPEND INSTALL_ARGS COMPONENT "${_runtime_install_component}")
         endif()
 
         if(PARSE_RENAME)
@@ -105,20 +119,37 @@ function(rocm_install_targets)
         target_include_directories(${TARGET} INTERFACE $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>)
     endforeach()
 
-    set(runtime "runtime")
-    set(development "runtime")
+    rocm_cmake_policy(GET RCP0002 USE_DEFAULT_RUNTIME)
+    if(USE_DEFAULT_RUNTIME STREQUAL "NEW")
+        set(runtime_component "runtime")
+    else()
+        set(runtime_component "Unspecified")
+    endif()
+
+    rocm_cmake_policy(GET RCP0000 SETUP_DEVEL)
+    rocm_cmake_policy(GET RCP0004 USE_POLICIES)
+    if(
+        (NOT USE_POLICIES STREQUAL "NEW" AND ROCM_USE_DEV_COMPONENT) OR
+        (USE_POLICIES STREQUAL "NEW" AND SETUP_DEVEL STREQUAL "NEW")
+    )
+        set(devel_component_arg "COMPONENT;devel")
+    else()
+        set(devel_component_arg "COMPONENT;${runtime_component}")
+    endif()
+
+    rocm_cmake_policy(GET RCP0005 MODIFY_INSTALL_COMPONENT)
     if(PARSE_COMPONENT)
-        set(runtime "${PARSE_COMPONENT}")
-        set(development "${PARSE_COMPONENT}")
-    elseif(ROCM_USE_DEV_COMPONENT)
-        set(development "devel")
+        set(runtime_component_arg "COMPONENT;${PARSE_COMPONENT}")
+        set(devel_component_arg "COMPONENT;${PARSE_COMPONENT}")
+    elseif(MODIFY_INSTALL_COMPONENT STREQUAL "NEW")
+        set(runtime_component_arg "COMPONENT;${runtime_component}")
     endif()
 
     foreach(INCLUDE ${PARSE_INCLUDE})
         install(
             DIRECTORY ${INCLUDE}/
             DESTINATION ${INCLUDE_INSTALL_DIR}
-            COMPONENT ${development}
+            ${devel_component_arg}
             FILES_MATCHING
             PATTERN "*.h"
             PATTERN "*.hpp"
@@ -132,14 +163,14 @@ function(rocm_install_targets)
         EXPORT ${EXPORT_FILE}
         RUNTIME
             DESTINATION ${BIN_INSTALL_DIR}
-            COMPONENT ${runtime}
+            ${runtime_component_arg}
         LIBRARY
             DESTINATION ${LIB_INSTALL_DIR}
-            COMPONENT ${runtime}
+            ${runtime_component_arg}
             NAMELINK_SKIP
         ARCHIVE
             DESTINATION ${LIB_INSTALL_DIR}
-            COMPONENT ${development}
+            ${devel_component_arg}
     )
     foreach(TARGET IN LISTS PARSE_TARGETS)
         get_target_property(T_TYPE ${TARGET} TYPE)
@@ -149,7 +180,7 @@ function(rocm_install_targets)
                     EXPORT ${EXPORT_FILE}
                     LIBRARY
                         DESTINATION ${LIB_INSTALL_DIR}
-                        COMPONENT ${development}
+                        ${devel_component_arg}
                         NAMELINK_ONLY
             )
         endif()

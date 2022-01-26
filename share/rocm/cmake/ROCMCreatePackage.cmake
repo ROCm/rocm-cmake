@@ -8,17 +8,25 @@ set(ROCM_DISABLE_LDCONFIG
     OFF
     CACHE BOOL "")
 
-get_filename_component(REAL_ROCM "${CMAKE_INSTALL_PREFIX}" REALPATH)
-get_filename_component(REAL_ROCM_DIR "${ROCM_DIR}" REALPATH)
-if(REAL_ROCM MATCHES "rocm-([0-9]+(\\.[0-9]+)+)")
-    set(ROCM_PLATFORM_VERSION "${CMAKE_MATCH_1}" CACHE STRING "The version of the ROCm platform.")
-elseif(REAL_ROCM_DIR MATCHES "rocm-([0-9]+(\\.[0-9]+)+)")
-    set(ROCM_PLATFORM_VERSION "${CMAKE_MATCH_1}" CACHE STRING "The version of the ROCm platform.")
-endif()
-if(DEFINED ROCM_PLATFORM_VERSION AND ROCM_PLATFORM_VERSION VERSION_LESS 4.5.0)
-    set(ROCM_DEP_ROCMCORE FALSE CACHE BOOL "Add dependency on rocm-core package")
-else()
-    set(ROCM_DEP_ROCMCORE TRUE CACHE BOOL "Add dependency on rocm-core package")
+include(ROCMPolicy)
+rocm_cmake_policy(GET RCP0004 USE_POLICIES)
+rocm_cmake_policy(GET RCP0006 DETECT_ROCM_CORE)
+if(NOT USE_POLICIES STREQUAL "NEW" AND ROCM_DEP_ROCMCORE)
+    rocm_cmake_policy(SET RCP0001 NEW)
+elseif(NOT DETECT_ROCM_CORE STREQUAL "NEW" AND NOT DEFINED ROCM_DEP_ROCMCORE)
+    get_filename_component(REAL_ROCM "${CMAKE_INSTALL_PREFIX}" REALPATH)
+    get_filename_component(REAL_ROCM_DIR "${ROCM_DIR}" REALPATH)
+    if(REAL_ROCM MATCHES "rocm-([0-9]+(\\.[0-9]+)+)")
+        set(ROCM_PLATFORM_VERSION "${CMAKE_MATCH_1}" CACHE STRING "The version of the ROCm platform.")
+    elseif(REAL_ROCM_DIR MATCHES "rocm-([0-9]+(\\.[0-9]+)+)")
+        set(ROCM_PLATFORM_VERSION "${CMAKE_MATCH_1}" CACHE STRING "The version of the ROCm platform.")
+    endif()
+
+    if(DEFINED ROCM_PLATFORM_VERSION AND ROCM_PLATFORM_VERSION VERSION_LESS 4.5.0)
+        rocm_cmake_policy(SET RCP0001 OLD)
+    else()
+        rocm_cmake_policy(SET RCP0001 NEW)
+    endif()
 endif()
 
 include(CMakeParseArguments)
@@ -126,9 +134,38 @@ macro(rocm_package_add_rocm_core_dependency)
     # Optionally add depenency on rocm-core
     # This mainly empty package exists to allow all of rocm
     # to be removed in one step by removing rocm-core
-    if(ROCM_DEP_ROCMCORE)
+    rocm_cmake_policy(GET RCP0001 DEPEND_ROCM_CORE)
+    if (DEPEND_ROCM_CORE STREQUAL "NEW")
         rocm_join_if_set(", " CPACK_DEBIAN_PACKAGE_DEPENDS "rocm-core")
         rocm_join_if_set(", " CPACK_RPM_PACKAGE_REQUIRES "rocm-core")
+    endif()
+endmacro()
+
+macro(rocm_package_setup_devel COMPONENT_LIST HEADER_ONLY)
+    rocm_cmake_policy(GET RCP0001 SETUP_DEVEL)
+    rocm_cmake_policy(GET RCP0005 USE_POLICIES)
+
+    if (
+        (NOT USE_POLICIES STREQUAL "NEW" AND ROCM_USE_DEV_COMPONENT) OR
+        (USE_POLICIES STREQUAL "NEW" AND SETUP_DEVEL STREQUAL "NEW")
+    )
+        list(APPEND ${COMPONENT_LIST} devel)
+        set(CPACK_DEBIAN_DEVEL_PACKAGE_NAME "${CPACK_PACKAGE_NAME}-dev")
+        rocm_join_if_set(", " CPACK_DEBIAN_RUNTIME_PACKAGE_RECOMMENDS
+            "${CPACK_PACKAGE_NAME}-dev (>=${CPACK_PACKAGE_VERSION})")
+
+        rocm_find_program_version(rpmbuild GREATER_EQUAL 4.12.0)
+        if(rpmbuild_VERSION_OK)
+            rocm_join_if_set(", " CPACK_RPM_RUNTIME_PACKAGE_SUGGESTS
+                "${CPACK_PACKAGE_NAME}-devel >= ${CPACK_PACKAGE_VERSION}"
+            )
+        endif()
+        if(${HEADER_ONLY})
+            set(CPACK_DEBIAN_DEVEL_PACKAGE_PROVIDES "${CPACK_PACKAGE_NAME} (= ${CPACK_PACKAGE_VERSION})")
+            set(CPACK_RPM_DEVEL_PACKAGE_PROVIDES "${CPACK_PACKAGE_NAME} = ${CPACK_PACKAGE_VERSION}")
+        else()
+            rocm_package_add_dependencies(COMPONENT devel DEPENDS "${CPACK_PACKAGE_NAME} >= ${CPACK_PACKAGE_VERSION}")
+        endif()
     endif()
 endmacro()
 
@@ -188,25 +225,7 @@ macro(rocm_create_package)
         string(REPLACE "-" "_" RPM_RELEASE ${PROJECT_VERSION_TWEAK})
     endif()
 
-    if (ROCM_USE_DEV_COMPONENT)
-        list(APPEND PARSE_COMPONENTS devel)
-        set(CPACK_DEBIAN_DEVEL_PACKAGE_NAME "${CPACK_PACKAGE_NAME}-dev")
-        rocm_join_if_set(", " CPACK_DEBIAN_RUNTIME_PACKAGE_RECOMMENDS
-            "${CPACK_PACKAGE_NAME}-dev (>=${CPACK_PACKAGE_VERSION})")
-
-        rocm_find_program_version(rpmbuild GREATER_EQUAL 4.12.0)
-        if(rpmbuild_VERSION_OK)
-            rocm_join_if_set(", " CPACK_RPM_RUNTIME_PACKAGE_SUGGESTS
-                "${CPACK_PACKAGE_NAME}-devel >= ${CPACK_PACKAGE_VERSION}"
-            )
-        endif()
-        if(PARSE_HEADER_ONLY)
-            set(CPACK_DEBIAN_DEVEL_PACKAGE_PROVIDES "${CPACK_PACKAGE_NAME} (= ${CPACK_PACKAGE_VERSION})")
-            set(CPACK_RPM_DEVEL_PACKAGE_PROVIDES "${CPACK_PACKAGE_NAME} = ${CPACK_PACKAGE_VERSION}")
-        else()
-            rocm_package_add_dependencies(COMPONENT devel DEPENDS "${CPACK_PACKAGE_NAME} >= ${CPACK_PACKAGE_VERSION}")
-        endif()
-    endif()
+    rocm_package_setup_devel(PARSE_COMPONENTS PARSE_HEADER_ONLY)
 
     if(ROCM_PACKAGE_COMPONENTS)
         list(APPEND PARSE_COMPONENTS ${ROCM_PACKAGE_COMPONENTS})
@@ -361,13 +380,20 @@ macro(rocm_set_comp_cpackvar HEADER_ONLY components)
     # Setting component specific variables
     set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
 
+    rocm_cmake_policy(GET RCP0002 USE_RUNTIME)
+    if(USE_RUNTIME STREQUAL "NEW")
+        set(runtime_component "runtime")
+    else()
+        set(runtime_component "Unspecified")
+    endif()
+    string(TOUPPER "${runtime_component}" runtime_component_upper)
     if(NOT ${HEADER_ONLY})
-        set(CPACK_RPM_MAIN_COMPONENT "runtime")
-        set(CPACK_RPM_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
-        list(APPEND CPACK_COMPONENTS_ALL runtime)
-        set(CPACK_DEBIAN_RUNTIME_FILE_NAME
+        set(CPACK_RPM_MAIN_COMPONENT "${runtime_component}")
+        set(CPACK_RPM_${runtime_component_upper}_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
+        list(APPEND CPACK_COMPONENTS_ALL ${runtime_component})
+        set(CPACK_DEBIAN_${runtime_component_upper}_FILE_NAME
            "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}-${DEBIAN_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
-        set(CPACK_DEBIAN_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
+        set(CPACK_DEBIAN_${runtime_component_upper}_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
     endif()
 
     foreach(COMPONENT ${components})
@@ -399,7 +425,13 @@ macro(rocm_set_comp_cpackvar HEADER_ONLY components)
     if(ROCM_PACKAGE_COMPONENT_DEPENDENCIES)
         foreach(COMP_DEP IN LISTS ROCM_PACKAGE_COMPONENT_DEPENDENCIES)
             string(REGEX REPLACE "^(.*)->.*$" "\\1" _downstream "${COMP_DEP}")
+            if(_downstream STREQUAL "runtime")
+                set(_downstream "${runtime_component}")
+            endif()
             string(REGEX REPLACE "^.*->(.*)$" "\\1" _upstream "${COMP_DEP}")
+            if(_upstream STREQUAL "runtime")
+                set(_upstream "${runtime_component}")
+            endif()
             string(TOUPPER "${_upstream}" _upstream_uc)
             rocm_package_add_rpm_dependencies(COMPONENT "${_downstream}"
                 DEPENDS "${CPACK_RPM_${_upstream_uc}_PACKAGE_NAME} >= ${CPACK_PACKAGE_VERSION}")

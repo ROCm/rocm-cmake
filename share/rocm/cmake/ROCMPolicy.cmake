@@ -3,25 +3,28 @@
 # ######################################################################################################################
 
 set(
-    _rocm_cmake_policies
+    ROCM_CMAKE_POLICIES
     "RCP0000" "Policy to automatically set up devel component." "0.6.0"
     "RCP0001" "Policy to automatically add dependency on rocm-core package." "0.6.0"
     "RCP0002" "Policy to set default component to runtime instead of unspecified." "0.7.0"
     "RCP0003" "Policy to automatically detect, setup, and install license files." "0.7.1"
+    "RCP0004" "Policy to use policies instead of setting variables." "0.8.0"
+    "RCP0005" "Policy to modify components in rocm_install rather than the default." "0.8.0"
+    "RCP0006" "Policy to stop trying to auto-detect rocm-core dependency." "0.8.0"
     CACHE INTERNAL "Policies to control rocm-cmake."
 )
-set(_rocm_cmake_policy_stack_index -1 CACHE INTERNAL  "")
+set(ROCM_CMAKE_POLICY_STACK_INDEX -1 CACHE INTERNAL  "")
 
-list(LENGTH _rocm_cmake_policies pol_max)
+list(LENGTH ROCM_CMAKE_POLICIES pol_max)
 math(EXPR pol_max "${pol_max} - 1")
-set(_rocm_cmake_policy_max "${pol_max}" CACHE INTERNAL "")
+set(ROCM_CMAKE_POLICY_MAX "${pol_max}" CACHE INTERNAL "")
 
 foreach(_polname_ind RANGE 0 ${pol_max} 3)
     math(EXPR _poldocs_ind "${_polname_ind} + 1")
     math(EXPR _polvers_ind "${_polname_ind} + 2")
-    list(GET _rocm_cmake_policies ${_polname_ind} _polname)
-    list(GET _rocm_cmake_policies ${_poldocs_ind} _poldocs)
-    list(GET _rocm_cmake_policies ${_polvers_ind} _polvers)
+    list(GET ROCM_CMAKE_POLICIES ${_polname_ind} _polname)
+    list(GET ROCM_CMAKE_POLICIES ${_poldocs_ind} _poldocs)
+    list(GET ROCM_CMAKE_POLICIES ${_polvers_ind} _polvers)
     define_property(
         GLOBAL PROPERTY _rocm_policy_${_polname}
         BRIEF_DOCS "${_poldocs}"
@@ -30,10 +33,10 @@ foreach(_polname_ind RANGE 0 ${pol_max} 3)
 endforeach()
 
 function(_rocm_set_policies_by_version VERSION)
-    foreach(_polname_ind RANGE 1 $CACHE{_rocm_cmake_policy_max} 3)
+    foreach(_polname_ind RANGE 1 $CACHE{ROCM_CMAKE_POLICY_MAX} 3)
         math(EXPR _polvers_ind "${_polname_ind} + 2")
-        list(GET CACHE{_rocm_cmake_policies} ${_polname_ind} _polname)
-        list(GET CACHE{_rocm_cmake_policies} ${_polvers_ind} _polvers)
+        list(GET CACHE{ROCM_CMAKE_POLICIES} ${_polname_ind} _polname)
+        list(GET CACHE{ROCM_CMAKE_POLICIES} ${_polvers_ind} _polvers)
         if(VERSION VERSION_GREATER_EQUAL _polvers)
             set_property(GLOBAL PROPERTY _rocm_policy_${_polname} NEW)
         else()
@@ -53,7 +56,7 @@ function(rocm_cmake_policy)
     elseif(PARSE_SET)
         list(GET PARSE_SET 0 POLICY_TO_SET)
         list(GET PARSE_SET 1 POLICY_VALUE)
-        if(POLICY_VALUE STREQUAL "NEW" AND NOT POLICY_TO_SET IN_LIST CACHE{_rocm_cmake_policies})
+        if(POLICY_VALUE STREQUAL "NEW" AND NOT POLICY_TO_SET IN_LIST ROCM_CMAKE_POLICIES)
             message(AUTHOR_WARNING "This version of rocm-cmake does not know about policy ${POLICY_TO_SET}.")
         else()
             set_property(GLOBAL PROPERTY _rocm_policy_${POLICY_TO_SET} ${POLICY_VALUE})
@@ -61,31 +64,31 @@ function(rocm_cmake_policy)
     elseif(PARSE_GET)
         list(GET PARSE_GET 0 POLICY_TO_GET)
         list(GET PARSE_GET 1 OUTPUT_VAR)
-        
+
         set(${OUTPUT_VAR} $CACHE{_rocm_policy_${POLICY_TO_GET}} PARENT_SCOPE)
     elseif(PARSE_PUSH)
-        math(EXPR stack_ind "$CACHE{_rocm_cmake_policy_stack_index} + 1")
-        foreach(_polname_ind 0 $CACHE{_rocm_cmake_policy_max} 3)
-            list(GET CACHE{_rocm_cmake_policies} _polname_ind _polname)
+        math(EXPR stack_ind "$CACHE{ROCM_CMAKE_POLICY_STACK_INDEX} + 1")
+        foreach(_polname_ind 0 $CACHE{ROCM_CMAKE_POLICY_MAX} 3)
+            list(GET CACHE{ROCM_CMAKE_POLICIES} _polname_ind _polname)
             get_property(_polval GLOBAL PROPERTY _rocm_policy_${_polname})
             list(APPEND stack_val "${_polval}")
         endforeach()
-        set(_rocm_cmake_policy_stack_${stack_ind} "${stack_val}" CACHE INTERNAL "")
-        set(_rocm_cmake_policy_stack_index "${stack_ind}" CACHE INTERNAL "")
+        set(ROCM_CMAKE_POLICY_STACK_${stack_ind} "${stack_val}" CACHE INTERNAL "")
+        set(ROCM_CMAKE_POLICY_STACK_INDEX "${stack_ind}" CACHE INTERNAL "")
     elseif(PARSE_POP)
-        if(CACHE{_rocm_cmake_policy_stack_index} LESS 0)
+        if(CACHE{ROCM_CMAKE_POLICY_STACK_INDEX} LESS 0)
             message(SEND_ERROR "Tried to pop from an empty rocm-cmake policy stack.")
         else()
-            set(stack_item _rocm_cmake_policy_stack_$CACHE{_rocm_cmake_policy_stack_index})
-            foreach(_polname_ind 0 $CACHE{_rocm_cmake_policy_max} 3)
+            set(stack_item ROCM_CMAKE_POLICY_STACK_$CACHE{ROCM_CMAKE_POLICY_STACK_INDEX})
+            foreach(_polname_ind 0 $CACHE{ROCM_CMAKE_POLICY_MAX} 3)
                 math(EXPR _polval_ind "${polname_ind} / 3")
-                list(GET CACHE{_rocm_cmake_policies} _polname_ind _polname)
+                list(GET CACHE{ROCM_CMAKE_POLICIES} _polname_ind _polname)
                 list(GET CACHE{${stack_item}} _polval_ind _polval)
                 set_property(GLOBAL PROPERTY _rocm_policy_${_polname} ${_polval})
             endforeach()
             unset(${stack_item} CACHE)
-            math(EXPR stack_ind "$CACHE{_rocm_cmake_policy_stack_index} - 1")
-            set(_rocm_cmake_policy_stack_index "${stack_ind}" CACHE INTERNAL "")
+            math(EXPR stack_ind "$CACHE{ROCM_CMAKE_POLICY_STACK_INDEX} - 1")
+            set(ROCM_CMAKE_POLICY_STACK_INDEX "${stack_ind}" CACHE INTERNAL "")
         endif()
     endif()
 endfunction()
