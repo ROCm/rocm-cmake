@@ -132,7 +132,7 @@ macro(rocm_package_add_rocm_core_dependency)
     endif()
 endmacro()
 
-function(rocm_parse_python_syspath)
+function(rocm_parse_python_syspath DIR_PATH PKG_NAME)
     set(PYTHON_SITE_PACKAGES
         "/usr/lib/python3/dist-packages;/usr/lib/python2.7/dist-packages"
         CACHE STRING "The site packages used for packaging")
@@ -150,13 +150,13 @@ function(rocm_parse_python_syspath)
             APPEND ${PROJECT_BINARY_DIR}/debian/postinst
             "
             mkdir -p ${PYTHON_SITE}
-            echo \"${LIB_DIR}\" > ${PYTHON_SITE}/${PARSE_NAME}.pth
+            echo \"${DIR_PATH}\" > ${PYTHON_SITE}/${PKG_NAME}.pth
         ")
 
         file(
             APPEND ${PROJECT_BINARY_DIR}/debian/prerm
             "
-            rm ${PYTHON_SITE}/${PARSE_NAME}.pth
+            rm ${PYTHON_SITE}/${PKG_NAME}.pth
         ")
     endforeach()
     #end function and invoke the function
@@ -329,7 +329,7 @@ macro(rocm_create_package)
     endif()
 
     if(PARSE_PTH)
-        rocm_parse_python_syspath()
+        rocm_parse_python_syspath(${LIB_DIR} ${PARSE_NAME})
     endif()
     if(PARSE_COMPONENTS)
         rocm_set_comp_cpackvar(PARSE_HEADER_ONLY "${PARSE_COMPONENTS}")
