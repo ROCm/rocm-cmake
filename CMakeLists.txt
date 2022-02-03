@@ -11,6 +11,8 @@ project(rocm-cmake)
 install(DIRECTORY share DESTINATION .)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ROCMConfigVersion.cmake DESTINATION share/rocm/cmake)
 
+set(CPACK_RPM_PACKAGE_LICENSE "MIT")
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/share/rocm/cmake)
 include(ROCMCreatePackage)
 include(ROCMSetupVersion)
