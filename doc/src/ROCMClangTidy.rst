@@ -48,6 +48,10 @@ This sets the size of the cache. If set to ``0`` it will disable the cache. By d
 
 When set to ``On`` it will build the target first before running ``clang-tidy``. By default, this is set to ``On``.
 
+.. cmake:variable:: CLANG_TIDY_USE_COLOR
+
+When set to ``On`` then ``clang-tidy`` will output diagnostics in color. By default, this is set to ``On``. It is disabled if ``ROCM_ENABLE_GH_ANNOTATIONS`` is enabled.
+
 Fixits
 ------
 
