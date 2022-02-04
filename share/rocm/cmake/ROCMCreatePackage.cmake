@@ -132,6 +132,46 @@ macro(rocm_package_add_rocm_core_dependency)
     endif()
 endmacro()
 
+function(rocm_parse_python_syspath DIR_PATH PKG_NAME)
+    set(PYTHON_SITE_PACKAGES
+        "/usr/lib/python3/dist-packages;/usr/lib/python2.7/dist-packages"
+        CACHE STRING "The site packages used for packaging")
+    #Group the statements to function
+    file(APPEND ${PROJECT_BINARY_DIR}/debian/postinst
+        "
+        set_libdir(){
+    ")
+    file(APPEND ${PROJECT_BINARY_DIR}/debian/prerm
+        "
+        rm_libdir(){
+    ")
+    foreach(PYTHON_SITE ${PYTHON_SITE_PACKAGES})
+        file(
+            APPEND ${PROJECT_BINARY_DIR}/debian/postinst
+            "
+            mkdir -p ${PYTHON_SITE}
+            echo \"${DIR_PATH}\" > ${PYTHON_SITE}/${PKG_NAME}.pth
+        ")
+
+        file(
+            APPEND ${PROJECT_BINARY_DIR}/debian/prerm
+            "
+            rm ${PYTHON_SITE}/${PKG_NAME}.pth
+        ")
+    endforeach()
+    #end function and invoke the function
+    file(APPEND ${PROJECT_BINARY_DIR}/debian/postinst
+        "
+        }
+        set_libdir
+    ")
+    file(APPEND ${PROJECT_BINARY_DIR}/debian/prerm
+        "
+        }
+        rm_libdir
+    ")
+endfunction()
+
 macro(rocm_create_package)
     set(options LDCONFIG PTH HEADER_ONLY)
     set(oneValueArgs NAME DESCRIPTION SECTION MAINTAINER LDCONFIG_DIR PREFIX)
@@ -289,23 +329,7 @@ macro(rocm_create_package)
     endif()
 
     if(PARSE_PTH)
-        set(PYTHON_SITE_PACKAGES
-            "/usr/lib/python3/dist-packages;/usr/lib/python2.7/dist-packages"
-            CACHE STRING "The site packages used for packaging")
-        foreach(PYTHON_SITE ${PYTHON_SITE_PACKAGES})
-            file(
-                APPEND ${PROJECT_BINARY_DIR}/debian/postinst
-                "
-                mkdir -p ${PYTHON_SITE}
-                echo \"${LIB_DIR}\" > ${PYTHON_SITE}/${PARSE_NAME}.pth
-            ")
-
-            file(
-                APPEND ${PROJECT_BINARY_DIR}/debian/prerm
-                "
-                rm ${PYTHON_SITE}/${PARSE_NAME}.pth
-            ")
-        endforeach()
+        rocm_parse_python_syspath(${LIB_DIR} ${PARSE_NAME})
     endif()
     rocm_setup_license(${PARSE_HEADER_ONLY})
     if(PARSE_COMPONENTS)
