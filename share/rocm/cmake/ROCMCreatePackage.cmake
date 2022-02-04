@@ -176,9 +176,9 @@ macro(rocm_set_cpack_gen)
     # If CPACK_GENERATOR value has been given, then just use it
     if(NOT CPACK_GENERATOR)
         # If there is a PKGTYPE, use that as the desired type
-        if(DEFINED ENV{PKGTYPE})
+        if(DEFINED ENV{ROCM_PKGTYPE})
             set(CPACK_GENERATOR "" ) # Create the variable if needed
-            string(TOUPPER $ENV{PKGTYPE} CPACK_GENERATOR) # PKGTYPE is typically lower case
+            string(TOUPPER $ENV{ROCM_PKGTYPE} CPACK_GENERATOR) # PKGTYPE is typically lower case
         else()
             # Otherwise see what we can find
             message(INFO "rcom_set_cpack_gen didn't find PKGTYPE in environment")

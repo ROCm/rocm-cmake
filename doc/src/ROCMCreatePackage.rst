@@ -22,7 +22,7 @@ Commands
 Sets up CPack packaging, including installing the license file to the correct location and component.
 If the license file is not specified, also attempts to locate a LICENSE, LICENSE.md, or LICENSE.txt file in `CMAKE_SOURCE_DIR`.
 
-If the CPACK_GENERATOR has not been specified then if PKGTYPE is set
+If the CPACK_GENERATOR has not been specified then if ROCM_PKGTYPE is set
 then use that to set it, otherwise probe the system to see what
 programs are available.
 
