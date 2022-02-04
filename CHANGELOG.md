@@ -3,6 +3,7 @@
 ## [0.7.1]
 ### Added
 - `CLANG_TIDY_USE_COLOR` variable added to control the color output from `clang-tidy`, by default this is `On`.
+- If `CPACK_RESOURCE_FILE_LICENSE` is not set, `rocm_create_package` will now automatically attempt to find a LICENSE, LICENSE.txt, or LICENSE.md file in the top-level CMake source directory. If one is found, it is set up as the license file for the package. 
 
 ## [0.7.0]
 ### Added

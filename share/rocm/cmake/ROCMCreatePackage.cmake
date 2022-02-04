@@ -10,9 +10,9 @@ set(ROCM_DISABLE_LDCONFIG
 
 get_filename_component(REAL_ROCM "${CMAKE_INSTALL_PREFIX}" REALPATH)
 get_filename_component(REAL_ROCM_DIR "${ROCM_DIR}" REALPATH)
-if(REAL_ROCM MATCHES "rocm-([0-9]+(\.[0-9]+)+)")
+if(REAL_ROCM MATCHES "rocm-([0-9]+(\\.[0-9]+)+)")
     set(ROCM_PLATFORM_VERSION "${CMAKE_MATCH_1}" CACHE STRING "The version of the ROCm platform.")
-elseif(REAL_ROCM_DIR MATCHES "rocm-([0-9]+(\.[0-9]+)+)")
+elseif(REAL_ROCM_DIR MATCHES "rocm-([0-9]+(\\.[0-9]+)+)")
     set(ROCM_PLATFORM_VERSION "${CMAKE_MATCH_1}" CACHE STRING "The version of the ROCm platform.")
 endif()
 if(DEFINED ROCM_PLATFORM_VERSION AND ROCM_PLATFORM_VERSION VERSION_LESS 4.5.0)
@@ -331,6 +331,7 @@ macro(rocm_create_package)
     if(PARSE_PTH)
         rocm_parse_python_syspath(${LIB_DIR} ${PARSE_NAME})
     endif()
+    rocm_setup_license(${PARSE_HEADER_ONLY})
     if(PARSE_COMPONENTS)
         rocm_set_comp_cpackvar(PARSE_HEADER_ONLY "${PARSE_COMPONENTS}")
     endif()
@@ -359,23 +360,22 @@ macro(rocm_setup_license HEADER_ONLY)
                 "please specify one using CPACK_RESOURCE_FILE_LICENSE."
             )
         else()
-            message(STATUS "rocm-cmake: Set license file to ${CPACK_RESOURCE_FILE_LICENSE}.")
             list(GET _detected_license_files 0 CPACK_RESOURCE_FILE_LICENSE)
+            message(STATUS "rocm-cmake: Set license file to ${CPACK_RESOURCE_FILE_LICENSE}.")
         endif()
     endif()
 
     if(CPACK_RESOURCE_FILE_LICENSE)
-        if(NOT ${HEADER_ONLY})
+        if(ROCM_USE_DEV_COMPONENT AND ${HEADER_ONLY})
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
                 DESTINATION share/doc/${_rocm_cpack_package_name}
-                COMPONENT runtime
+                COMPONENT devel
             )
         else()
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
                 DESTINATION share/doc/${_rocm_cpack_package_name}
-                COMPONENT devel
             )
         endif()
     endif()
@@ -384,8 +384,6 @@ endmacro()
 macro(rocm_set_comp_cpackvar HEADER_ONLY components)
     # Setting component specific variables
     set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
-
-    rocm_setup_license(${HEADER_ONLY})
 
     if(NOT ${HEADER_ONLY})
         set(CPACK_RPM_MAIN_COMPONENT "runtime")
