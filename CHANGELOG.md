@@ -1,5 +1,8 @@
 # Change Log for rocm-cmake
 
+## [0.7.2]
+- `rocm_create_package` now will attempt to set a default `CPACK_GENERATOR` based on the `ROCM_PKGTYPE` environment variable if one is not already set.
+
 ## [0.7.1]
 ### Added
 - `CLANG_TIDY_USE_COLOR` variable added to control the color output from `clang-tidy`, by default this is `On`.

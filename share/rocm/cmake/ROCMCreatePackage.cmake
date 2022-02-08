@@ -172,6 +172,53 @@ function(rocm_parse_python_syspath DIR_PATH PKG_NAME)
     ")
 endfunction()
 
+macro(rocm_set_cpack_gen)
+    # If CPACK_GENERATOR value has been given, then just use it
+    if(NOT CPACK_GENERATOR)
+        # If there is a PKGTYPE, use that as the desired type
+        if(DEFINED ENV{ROCM_PKGTYPE})
+            set(CPACK_GENERATOR "" ) # Create the variable if needed
+            string(TOUPPER $ENV{ROCM_PKGTYPE} CPACK_GENERATOR) # PKGTYPE is typically lower case
+        else()
+            # Otherwise see what we can find
+            message(INFO "rcom_set_cpack_gen didn't find PKGTYPE in environment")
+            set(CPACK_GENERATOR "TGZ;ZIP")
+            if(EXISTS ${MAKE_NSIS_EXE})
+                list(APPEND CPACK_GENERATOR "NSIS")
+            endif()
+
+            if(EXISTS ${RPMBUILD_EXE})
+                list(APPEND CPACK_GENERATOR "RPM")
+            endif()
+
+            if(EXISTS ${DPKG_EXE})
+                list(APPEND CPACK_GENERATOR "DEB")
+            endif()
+        endif()
+    endif()
+    # Set up some additional variables depending on which generator we are going to use
+    if (CPACK_GENERATOR MATCHES ".*RPM.*")
+        if(PARSE_COMPONENTS)
+            set(CPACK_RPM_COMPONENT_INSTALL ON)
+        endif()
+    endif()
+    if (CPACK_GENERATOR MATCHES ".*DEB.*")
+        if(EXISTS ${DPKG_EXE})
+            if(PARSE_COMPONENTS)
+                set(CPACK_DEB_COMPONENT_INSTALL ON)
+                execute_process(
+                    COMMAND dpkg --print-architecture
+                    RESULT_VARIABLE PROC_RESULT
+                    OUTPUT_VARIABLE COMMAND_OUTPUT
+                    OUTPUT_STRIP_TRAILING_WHITESPACE)
+                if(PROC_RESULT EQUAL "0" AND NOT COMMAND_OUTPUT STREQUAL "")
+                    set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "${COMMAND_OUTPUT}")
+                endif()
+            endif()
+        endif()
+    endif()
+endmacro()
+
 macro(rocm_create_package)
     set(options LDCONFIG PTH HEADER_ONLY)
     set(oneValueArgs NAME DESCRIPTION SECTION MAINTAINER LDCONFIG_DIR PREFIX)
@@ -187,6 +234,7 @@ macro(rocm_create_package)
     set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
     set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
     set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+    rocm_set_cpack_gen()      # Set CPACK_GENERATOR if not already set
     if(NOT CMAKE_HOST_WIN32)
         set(CPACK_SET_DESTDIR
             ON
@@ -252,44 +300,19 @@ macro(rocm_create_package)
         list(APPEND PARSE_COMPONENTS ${ROCM_PACKAGE_COMPONENTS})
     endif()
 
-    # '%{?dist}' breaks manual builds on debian systems due to empty Provides
-    execute_process(
-        COMMAND rpm --eval %{?dist}
-        RESULT_VARIABLE PROC_RESULT
-        OUTPUT_VARIABLE EVAL_RESULT
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
-    if(PROC_RESULT EQUAL "0" AND NOT EVAL_RESULT STREQUAL "")
-        string(APPEND RPM_RELEASE "%{?dist}")
+    if(CPACK_GENERATOR MATCHES ".*RPM.*")
+        # '%{?dist}' breaks manual builds on debian systems due to empty Provides
+        execute_process(
+            COMMAND rpm --eval %{?dist}
+            RESULT_VARIABLE PROC_RESULT
+            OUTPUT_VARIABLE EVAL_RESULT
+            OUTPUT_STRIP_TRAILING_WHITESPACE)
+        if(PROC_RESULT EQUAL "0" AND NOT EVAL_RESULT STREQUAL "")
+            string(APPEND RPM_RELEASE "%{?dist}")
+        endif()
     endif()
     set(CPACK_DEBIAN_PACKAGE_RELEASE ${DEBIAN_VERSION})
     set(CPACK_RPM_PACKAGE_RELEASE ${RPM_RELEASE})
-
-    set(CPACK_GENERATOR "TGZ;ZIP")
-    if(EXISTS ${MAKE_NSIS_EXE})
-        list(APPEND CPACK_GENERATOR "NSIS")
-    endif()
-
-    if(EXISTS ${RPMBUILD_EXE})
-        list(APPEND CPACK_GENERATOR "RPM")
-        if(PARSE_COMPONENTS)
-            set(CPACK_RPM_COMPONENT_INSTALL ON)
-        endif()
-    endif()
-
-    if(EXISTS ${DPKG_EXE})
-        list(APPEND CPACK_GENERATOR "DEB")
-        if(PARSE_COMPONENTS)
-            set(CPACK_DEB_COMPONENT_INSTALL ON)
-            execute_process(
-                COMMAND dpkg --print-architecture
-                RESULT_VARIABLE PROC_RESULT
-                OUTPUT_VARIABLE COMMAND_OUTPUT
-                OUTPUT_STRIP_TRAILING_WHITESPACE)
-            if(PROC_RESULT EQUAL "0" AND NOT COMMAND_OUTPUT STREQUAL "")
-                set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "${COMMAND_OUTPUT}")
-            endif()
-        endif()
-    endif()
 
     if(PARSE_DEPENDS)
         rocm_package_add_dependencies(DEPENDS ${PARSE_DEPENDS})
