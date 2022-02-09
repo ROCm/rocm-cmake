@@ -234,7 +234,6 @@ macro(rocm_create_package)
     set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
     set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
     set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
-    rocm_set_cpack_gen()      # Set CPACK_GENERATOR if not already set
     if(NOT CMAKE_HOST_WIN32)
         set(CPACK_SET_DESTDIR
             ON
@@ -300,6 +299,7 @@ macro(rocm_create_package)
         list(APPEND PARSE_COMPONENTS ${ROCM_PACKAGE_COMPONENTS})
     endif()
 
+    rocm_set_cpack_gen()      # Set CPACK_GENERATOR if not already set
     if(CPACK_GENERATOR MATCHES ".*RPM.*")
         # '%{?dist}' breaks manual builds on debian systems due to empty Provides
         execute_process(
