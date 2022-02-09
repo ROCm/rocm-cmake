@@ -181,7 +181,7 @@ macro(rocm_set_cpack_gen)
             string(TOUPPER $ENV{ROCM_PKGTYPE} CPACK_GENERATOR) # PKGTYPE is typically lower case
         else()
             # Otherwise see what we can find
-            message(INFO "rcom_set_cpack_gen didn't find PKGTYPE in environment")
+            message(INFO "rocm_set_cpack_gen didn't find PKGTYPE in environment")
             set(CPACK_GENERATOR "TGZ;ZIP")
             if(EXISTS ${MAKE_NSIS_EXE})
                 list(APPEND CPACK_GENERATOR "NSIS")
