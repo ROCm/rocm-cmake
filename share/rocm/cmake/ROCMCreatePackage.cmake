@@ -181,7 +181,7 @@ macro(rocm_set_cpack_gen)
             string(TOUPPER $ENV{ROCM_PKGTYPE} CPACK_GENERATOR) # PKGTYPE is typically lower case
         else()
             # Otherwise see what we can find
-            message(INFO "rcom_set_cpack_gen didn't find PKGTYPE in environment")
+            message(INFO "rocm_set_cpack_gen didn't find ROCM_PKGTYPE in environment")
             set(CPACK_GENERATOR "TGZ;ZIP")
             if(EXISTS ${MAKE_NSIS_EXE})
                 list(APPEND CPACK_GENERATOR "NSIS")
@@ -234,7 +234,6 @@ macro(rocm_create_package)
     set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
     set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
     set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
-    rocm_set_cpack_gen()      # Set CPACK_GENERATOR if not already set
     if(NOT CMAKE_HOST_WIN32)
         set(CPACK_SET_DESTDIR
             ON
@@ -300,6 +299,7 @@ macro(rocm_create_package)
         list(APPEND PARSE_COMPONENTS ${ROCM_PACKAGE_COMPONENTS})
     endif()
 
+    rocm_set_cpack_gen()      # Set CPACK_GENERATOR if not already set
     if(CPACK_GENERATOR MATCHES ".*RPM.*")
         # '%{?dist}' breaks manual builds on debian systems due to empty Provides
         execute_process(
