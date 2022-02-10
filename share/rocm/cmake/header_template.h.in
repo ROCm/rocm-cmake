@@ -2,8 +2,8 @@
     Copyright 2015-2022 Advanced Micro Devices, Inc. All rights reserved.
 */
 
-#ifndef @include_guard @
-#define @include_guard @
+#ifndef @include_guard@
+#define @include_guard@
 
 #warning This file is deprecated. Use file from include path /opt/rocm-ver/include and prefix with @CMAKE_PROJECT_NAME@/
 #include "@include_statements@"
