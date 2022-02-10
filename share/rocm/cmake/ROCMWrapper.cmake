@@ -4,7 +4,11 @@
 
 function(rocm_wrap_header_dir)
     message(STATUS "rocm_wrap_header_dir args: ${ARGN}")
-    cmake_parse_arguments(PARSE "" "DIRECTORY;GUARD;LOCATION" "PATTERNS" ${ARGN})
+    cmake_parse_arguments(PARSE "" "DIRECTORY;GUARD;LOCATION;OUTPUT_LOCATION" "PATTERNS" ${ARGN})
+    if(NOT PARSE_OUTPUT_LOCATION)
+        set(PARSE_OUTPUT_LOCATION "${PROJECT_BINARY_DIR}/${PARSE_LOCATION}")
+    endif()
+    get_filename_component(PARSE_OUTPUT_LOCATION "${PARSE_OUTPUT_LOCATION}" ABSOLUTE BASE_DIR "${PROJECT_BINARY_DIR}")
     file (GLOB_RECURSE include_files RELATIVE "${PARSE_DIRECTORY}" ${PARSE_PATTERNS})
     foreach (include_file ${include_files})
         if (NOT "${include_file}" MATCHES "^../")
@@ -12,16 +16,21 @@ function(rocm_wrap_header_dir)
                 INCLUDE_FILE "${include_file}"
                 GUARD ${PARSE_GUARD}
                 LOCATION ${PARSE_LOCATION}
+                OUTPUT_LOCATION ${PARSE_OUTPUT_LOCATION}
             )
         endif()
     endforeach()
 endfunction()
 
 function(rocm_wrap_header_file)
-    cmake_parse_arguments(PARSE "" "INCLUDE_FILE;GUARD;LOCATION;INSTALL_LOCATION" "" ${ARGN})
+    cmake_parse_arguments(PARSE "" "INCLUDE_FILE;GUARD;LOCATION;INSTALL_LOCATION;OUTPUT_LOCATION" "" ${ARGN})
     if(NOT PARSE_INSTALL_LOCATION)
         set(PARSE_INSTALL_LOCATION "${PROJECT_BINARY_DIR}/include/${CMAKE_PROJECT_NAME}")
     endif()
+    if(NOT PARSE_OUTPUT_LOCATION)
+        set(PARSE_OUTPUT_LOCATION "${PROJECT_BINARY_DIR}/${PARSE_LOCATION}")
+    endif()
+    get_filename_component(PARSE_OUTPUT_LOCATION "${PARSE_OUTPUT_LOCATION}" ABSOLUTE BASE_DIR "${PROJECT_BINARY_DIR}")
     get_filename_component(file_name ${PARSE_INCLUDE_FILE} NAME)
     get_filename_component(file_path ${PARSE_INCLUDE_FILE} DIRECTORY)
     string(REPLACE "/" ";" path_dirs "${file_path}")
@@ -43,6 +52,6 @@ function(rocm_wrap_header_file)
     )
     configure_file(
         "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/header_template.h.in"
-        "${PROJECT_BINARY_DIR}/${PARSE_LOCATION}/${PARSE_INCLUDE_FILE}"
+        "${PARSE_OUTPUT_LOCATION}/${PARSE_INCLUDE_FILE}"
     )
 endfunction()
