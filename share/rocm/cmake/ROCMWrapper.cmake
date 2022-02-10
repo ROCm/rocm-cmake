@@ -35,6 +35,12 @@ function(rocm_wrap_header_file)
     string(TOUPPER ${file_name} file_name)
     string(REGEX REPLACE "[-.]" "_" file_name "${file_name}")
     set(include_guard "ROCM_${PARSE_GUARD}${guard}_${file_name}")
-    file(RELATIVE_PATH include_statements "${PROJECT_BINARY_DIR}/${PARSE_LOCATION}" "${PARSE_INSTALL_LOCATION}/${include_file}")
-    configure_file ("${CMAKE_CURRENT_FUNCTION_LIST_DIR}/header_template.h.in" "${PARSE_INSTALL_LOCATION}/${PARSE_LOCATION}")
+    file(RELATIVE_PATH include_statements 
+        "${PROJECT_BINARY_DIR}/${PARSE_LOCATION}"
+        "${PARSE_INSTALL_LOCATION}/${include_file}"
+    )
+    configure_file(
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/header_template.h.in"
+        "${PARSE_INSTALL_LOCATION}/${PARSE_LOCATION}"
+    )
 endfunction()
