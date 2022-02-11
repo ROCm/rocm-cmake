@@ -6,6 +6,6 @@
 #define @include_guard@
 
 #warning This file is deprecated. Use file from include path /opt/rocm-ver/include and prefix with @CMAKE_PROJECT_NAME@/
-#include "@include_statements@"
+#include "@file_rel_path@"
 
 #endif

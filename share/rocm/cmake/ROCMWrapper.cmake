@@ -57,7 +57,7 @@ function(rocm_wrap_header_file INCLUDE_FILE)
     string(REGEX REPLACE "[-.]" "_" file_name "${file_name}")
     set(include_guard "ROCM_${PARSE_GUARD}${guard}_${file_name}")
     set(wrapper_location "${PROJECT_BINARY_DIR}/${PARSE_LOCATION}/${file_path}")
-    file(RELATIVE_PATH include_statements
+    file(RELATIVE_PATH file_rel_path
         "${wrapper_location}"
         "${PARSE_INSTALL_LOCATION}/${include_file}"
     )
