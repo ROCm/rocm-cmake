@@ -45,7 +45,6 @@ function(rocm_wrap_header_file INCLUDE_FILE)
 
     # do-while
     set(first_time true)
-    message(STATUS "Creating wrapper for ${INCLUDE_FILE}")
     while(first_time OR PARSE_GUARDS OR PARSE_WRAPPER_LOCATIONS OR PARSE_OUTPUT_LOCATIONS)
         rocm_wrap_header_get_info(ITEM PARSE_GUARDS PARSE_WRAPPER_LOCATIONS PARSE_OUTPUT_LOCATIONS)
         set(include_guard "ROCM_${ITEM_GUARD}${guard_common}")
