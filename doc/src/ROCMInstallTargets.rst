@@ -23,7 +23,7 @@ Wraps installers to install to the correct component (devel or runtime) unless C
 
     rocm_install_targets(
         TARGETS <target>...
-        [PREFIX <path>]
+        [PREFIX|POSTFIX <path>]
         [EXPORT <export-file>]
         [INCLUDE <directory>...]
         [COMPONENT <component>]
