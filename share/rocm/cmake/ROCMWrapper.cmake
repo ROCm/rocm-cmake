@@ -35,7 +35,7 @@ function(rocm_wrap_header_file)
     if(NOT PARSE_HEADER_LOCATION)
         set(PARSE_HEADER_LOCATION "include/${CMAKE_PROJECT_NAME}")
     endif()
-    foreach(INCLUDE_FILE in PARSE_HEADERS)
+    foreach(INCLUDE_FILE IN LISTS PARSE_HEADERS)
         get_filename_component(header_location "${PARSE_HEADER_LOCATION}/${INCLUDE_FILE}"
             ABSOLUTE BASE_DIR "${CMAKE_BINARY_DIR}")
         get_filename_component(file_name ${INCLUDE_FILE} NAME)
