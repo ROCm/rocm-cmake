@@ -2,7 +2,7 @@
 # Copyright (C) 2022 Advanced Micro Devices, Inc.
 # ######################################################################################################################
 
-set(_ROCM_WRAPPER_DIR "${CMAKE_CURRENT_LIST_DIR}" CACHE INTERNAL "Path to rocm-cmake files.")
+set(ROCM_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}" CACHE INTERNAL "Path to rocm-cmake files.")
 
 function(rocm_wrap_header_dir DIRECTORY)
     cmake_parse_arguments(PARSE "" "HEADER_LOCATION" "PATTERNS;GUARDS;WRAPPER_LOCATIONS;OUTPUT_LOCATIONS" ${ARGN})
@@ -13,7 +13,7 @@ function(rocm_wrap_header_dir DIRECTORY)
         set(PARSE_PATTERNS "*.h;*.hpp;*.hh;*.hxx;*.inl")
     endif()
     foreach(PATTERN IN LISTS PARSE_PATTERNS)
-        list(APPEND QUALIFIED_PATTERNS "${DIRECTORY}/${PATTERN}")        
+        list(APPEND QUALIFIED_PATTERNS "${DIRECTORY}/${PATTERN}")       
     endforeach()
     file (GLOB_RECURSE include_files RELATIVE "${DIRECTORY}" ${QUALIFIED_PATTERNS})
     foreach (include_file ${include_files})
@@ -61,7 +61,7 @@ function(rocm_wrap_header_file)
             set(wrapper_location "${ITEM_WRAPPER_LOCATION}/${file_path}")
             file(RELATIVE_PATH file_rel_path "${wrapper_location}" "${header_location}")
             configure_file(
-                "${_ROCM_WRAPPER_DIR}/header_template.h.in"
+                "${ROCM_SOURCE_DIR}/header_template.h.in"
                 "${ITEM_OUTPUT_LOCATION}/${INCLUDE_FILE}"
             )
             set(first_time false)
