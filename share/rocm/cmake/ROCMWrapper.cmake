@@ -40,7 +40,7 @@ function(rocm_wrap_header_file)
         set(WRAPPER_LOC_LIST ${PARSE_WRAPPER_LOCATIONS})
         set(OUTPUT_LOC_LIST ${PARSE_OUTPUT_LOCATIONS})
         get_filename_component(header_location "${PARSE_HEADER_LOCATION}/${INCLUDE_FILE}"
-            ABSOLUTE BASE_DIR "${CMAKE_BINARY_DIR}")
+            ABSOLUTE BASE_DIR "${CMAKE_INSTALL_PREFIX}")
         get_filename_component(file_name ${INCLUDE_FILE} NAME)
         get_filename_component(file_path ${INCLUDE_FILE} DIRECTORY)
         string(REPLACE "/" ";" path_dirs "${file_path}")
@@ -97,7 +97,7 @@ macro(rocm_wrap_header_get_info OUTPUT_PREFIX GUARDS_LIST WRAPPER_LOC_LIST OUTPU
         set(${OUTPUT_PREFIX}_OUTPUT_LOCATION ${CMAKE_BINARY_DIR}/${${OUTPUT_PREFIX}_WRAPPER_LOCATION})
     endif()
     get_filename_component(${OUTPUT_PREFIX}_WRAPPER_LOCATION "${${OUTPUT_PREFIX}_WRAPPER_LOCATION}"
-        ABSOLUTE BASE_DIR "${PROJECT_BINARY_DIR}")
+        ABSOLUTE BASE_DIR "${CMAKE_INSTALL_PREFIX}")
     get_filename_component(${OUTPUT_PREFIX}_OUTPUT_LOCATION "${${OUTPUT_PREFIX}_OUTPUT_LOCATION}"
         ABSOLUTE BASE_DIR "${PROJECT_BINARY_DIR}")
 endmacro()
