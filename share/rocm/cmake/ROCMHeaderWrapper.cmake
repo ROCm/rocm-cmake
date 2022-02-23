@@ -2,7 +2,7 @@
 # Copyright (C) 2022 Advanced Micro Devices, Inc.
 # ######################################################################################################################
 
-set(ROCM_SOURCE_DIR "${CMAKE_CURRENT_LIST_DIR}" CACHE INTERNAL "Path to rocm-cmake files.")
+set(ROCM_WRAPPER_TEMPLATE_HEADER "${CMAKE_CURRENT_LIST_DIR}/header_template.h.in" CACHE INTERNAL "Path to wrapper header file template.")
 
 function(rocm_wrap_header_dir DIRECTORY)
     cmake_parse_arguments(PARSE "" "HEADER_LOCATION" "PATTERNS;GUARDS;WRAPPER_LOCATIONS;OUTPUT_LOCATIONS" ${ARGN})
@@ -63,7 +63,7 @@ function(rocm_wrap_header_file)
             set(wrapper_location "${ITEM_WRAPPER_LOCATION}/${file_path}")
             file(RELATIVE_PATH file_rel_path "${wrapper_location}" "${header_location}")
             configure_file(
-                "${ROCM_SOURCE_DIR}/header_template.h.in"
+                "${ROCM_WRAPPER_TEMPLATE_HEADER}"
                 "${ITEM_OUTPUT_LOCATION}/${INCLUDE_FILE}"
             )
             set(first_time false)
