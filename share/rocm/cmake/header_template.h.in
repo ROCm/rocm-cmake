@@ -8,7 +8,7 @@
 #ifndef ROCM_WRAPPER_GAVE_WARNING
 #define ROCM_WRAPPER_GAVE_WARNING
 
-#warning This file is deprecated. Use file from include path /opt/rocm-ver/include and prefix with @CMAKE_PROJECT_NAME@/
+#warning This file is deprecated. Use the header file from @header_location@ by using #include <@CMAKE_PROJECT_NAME@/@file_name@>
 #include "@file_rel_path@"
 
 #undef ROCM_WRAPPER_GAVE_WARNING
