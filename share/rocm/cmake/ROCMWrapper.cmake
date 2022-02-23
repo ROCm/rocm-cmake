@@ -53,7 +53,7 @@ function(rocm_wrap_header_file)
             endif()
         endforeach()
         string(TOUPPER ${file_name} file_name)
-        string(REGEX REPLACE "[-.]" "_" file_name "${file_name}")
+        string(REGEX REPLACE "[^A-Za-z0-9_]" "_" file_name "${file_name}")
         set(guard_common "${guard_common}_${file_name}")
 
         # do-while
