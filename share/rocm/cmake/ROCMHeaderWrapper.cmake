@@ -52,9 +52,8 @@ function(rocm_wrap_header_file)
                 set(guard_common "${guard_common}_${subdir_uc}")
             endif()
         endforeach()
-        string(TOUPPER ${file_name} file_name)
-        string(REGEX REPLACE "[^A-Za-z0-9_]" "_" file_name "${file_name}")
-        set(guard_common "${guard_common}_${file_name}")
+        string(REGEX REPLACE "[^A-Za-z0-9_]" "_" guard_common "${guard_common}_${file_name}")
+        string(TOUPPER ${guard_common} guard_common)
 
         # do-while
         set(first_time true)

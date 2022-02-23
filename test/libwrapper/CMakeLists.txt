@@ -1,5 +1,5 @@
 ################################################################################
-# Copyright (C) 2017 Advanced Micro Devices, Inc.
+# Copyright (C) 2022 Advanced Micro Devices, Inc.
 ################################################################################
 
 
@@ -13,7 +13,7 @@ include(ROCMPackageConfigHelpers)
 include(ROCMSetupVersion)
 include(ROCMInstallSymlinks)
 include(ROCMCreatePackage)
-include(ROCMWrapper)
+include(ROCMHeaderWrapper)
 
 rocm_setup_version(VERSION 1.0.0)
 
