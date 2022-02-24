@@ -1,5 +1,5 @@
-ROCMUtilities
-=============
+ROCMHeaderWrapper
+=================
 
 Commands
 --------
@@ -11,6 +11,7 @@ Commands
     rocm_wrap_header_file(
         [HEADERS] <header-file> [<header-file>...]
         [HEADER_LOCATION <header-location>]
+        [INCLUDE_LOCATION <include-location>]
         [GUARDS <guard>...]
         [WRAPPER_LOCATIONS <wrapper-location>...]
         [OUTPUT_LOCATIONS <output-location>...]
@@ -18,11 +19,14 @@ Commands
 
 Create a C/C++ wrapper file for each specified header file.
 
-Any relative header or wrapper locations are relative to ``${CMAKE_INSTALL_PREFIX}`` (i.e. the install directory).
+Any relative header or wrapper locations are relative to ``${CPACK_PACKAGING_INSTALL_PREFIX}`` if it is set,
+or to ``${CMAKE_INSTALL_PREFIX}`` otherwise (i.e. the install directory).
 Any relative output locations are relative to ``${PROJECT_BINARY_DIR}`` (i.e. the build directory)
 
 Each ``<header-file>`` is presumed to be installed to ``${CMAKE_INSTALL_PREFIX}/<header-location>/<header-file>``.
 If it is not specified, ``<header-location>`` defaults to ``include/${CMAKE_PROJECT_NAME}`` (e.g. ``include/rocblas``).
+
+The ``<include-location>`` parameter specifies the presumed compiler include directory, to correctly calculate suggested include directives.
 
 Guards
 ^^^^^^^^^^
@@ -64,7 +68,7 @@ Its include guard will be ``ROCM_EXAMPLE_INC_FOO_BAR_H``, and it will include th
 (which is the correct file when this wrapper is installed at ``${CMAKE_INSTALL_PREFIX}/rocexample/include/foo/bar.h``)
 
 
-.. cmake::command:: rocm_wrap_header_file
+.. cmake::command:: rocm_wrap_header_dir
 
 .. code-block:: cmake
 
@@ -77,7 +81,7 @@ Its include guard will be ``ROCM_EXAMPLE_INC_FOO_BAR_H``, and it will include th
         [PATTERNS <pattern>...]
     )
 
-Create a C/C++ wrapper file for each header file in the given directory matching at least one pattern.
+Create a C/C++ wrapper file for each header file in the given directory (or any subdirectory) matching at least one pattern.
 
 Each file in the specified directory which matches a pattern will have a wrapper file created for it.
 The ``<header-file>`` used in each call to ``rocm_wrap_header_file`` is the path to the header file relative to ``<include-directory>``.
