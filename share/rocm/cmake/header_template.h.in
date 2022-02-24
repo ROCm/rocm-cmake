@@ -8,7 +8,7 @@
 #ifndef ROCM_@ITEM_GUARD@_GAVE_WARNING
 #define ROCM_@ITEM_GUARD@_GAVE_WARNING
 
-#warning This file is deprecated. Use the header file from @header_location@ by using #include <@CMAKE_PROJECT_NAME@/@file_name@>
+#warning This file is deprecated. Use the header file from @header_location@ by using #include <@correct_include@>
 
 #undef ROCM_@ITEM_GUARD@_GAVE_WARNING
 #endif

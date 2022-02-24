@@ -6,9 +6,15 @@ set(ROCM_WRAPPER_TEMPLATE_HEADER "${CMAKE_CURRENT_LIST_DIR}/header_template.h.in
     CACHE INTERNAL "Path to wrapper header file template.")
 
 function(rocm_wrap_header_dir DIRECTORY)
-    cmake_parse_arguments(PARSE "" "HEADER_LOCATION" "PATTERNS;GUARDS;WRAPPER_LOCATIONS;OUTPUT_LOCATIONS" ${ARGN})
+    set(options )
+    set(oneValueArgs HEADER_LOCATION INCLUDE_LOCATION)
+    set(multiValueArgs PATTERNS GUARDS WRAPPER_LOCATIONS OUTPUT_LOCATIONS)
+    cmake_parse_arguments(PARSE "${options}" "${oneValueArg}s" "${multiValueArgs}" ${ARGN})
     if(NOT PARSE_HEADER_LOCATION)
         set(PARSE_HEADER_LOCATION "include/${CMAKE_PROJECT_NAME}")
+    endif()
+    if(NOT PARSE_INCLUDE_LOCATION)
+        set(PARSE_INCLUDE_LOCATION "include")
     endif()
     if(NOT PARSE_PATTERNS)
         set(PARSE_PATTERNS "*.h;*.hpp;*.hh;*.hxx;*.inl")
@@ -23,6 +29,7 @@ function(rocm_wrap_header_dir DIRECTORY)
                 ${include_file}
                 GUARDS ${PARSE_GUARDS}
                 HEADER_LOCATION ${PARSE_HEADER_LOCATION}
+                INCLUDE_LOCATION ${PARSE_INCLUDE_LOCATION}
                 WRAPPER_LOCATIONS ${PARSE_WRAPPER_LOCATIONS}
                 OUTPUT_LOCATIONS ${PARSE_OUTPUT_LOCATIONS}
             )
@@ -31,10 +38,16 @@ function(rocm_wrap_header_dir DIRECTORY)
 endfunction()
 
 function(rocm_wrap_header_file)
-    cmake_parse_arguments(PARSE "" "HEADER_LOCATION" "GUARDS;WRAPPER_LOCATIONS;OUTPUT_LOCATIONS;HEADERS" ${ARGN})
+    set(options )
+    set(oneValueArgs HEADER_LOCATION INCLUDE_LOCATION)
+    set(multiValueArgs GUARDS WRAPPER_LOCATIONS OUTPUT_LOCATIONS HEADERS)
+    cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
     set(PARSE_HEADERS ${PARSE_HEADERS} ${PARSE_UNPARSED_ARGUMENTS})
     if(NOT PARSE_HEADER_LOCATION)
         set(PARSE_HEADER_LOCATION "include/${CMAKE_PROJECT_NAME}")
+    endif()
+    if(NOT PARSE_INCLUDE_LOCATION)
+        set(PARSE_INCLUDE_LOCATION "include")
     endif()
     foreach(INCLUDE_FILE IN LISTS PARSE_HEADERS)
         set(GUARD_LIST ${PARSE_GUARDS})
@@ -49,6 +62,7 @@ function(rocm_wrap_header_file)
             ABSOLUTE BASE_DIR "${HEADER_INSTALL_PREFIX}")
         get_filename_component(file_name ${INCLUDE_FILE} NAME)
         get_filename_component(file_path ${INCLUDE_FILE} DIRECTORY)
+        file(RELATIVE_PATH correct_include "${HEADER_INSTALL_PREFIX}/${PARSE_INCLUDE_LOCATION}" "${header_location}")
         string(REPLACE "/" ";" path_dirs "${file_path}")
 
         set(guard_common "")
