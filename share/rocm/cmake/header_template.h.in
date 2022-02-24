@@ -5,13 +5,13 @@
 #ifndef @include_guard@
 #define @include_guard@
 
-#ifndef ROCM_WRAPPER_GAVE_WARNING
-#define ROCM_WRAPPER_GAVE_WARNING
+#ifndef ROCM_@ITEM_GUARD@_GAVE_WARNING
+#define ROCM_@ITEM_GUARD@_GAVE_WARNING
 
 #warning This file is deprecated. Use the header file from @header_location@ by using #include <@CMAKE_PROJECT_NAME@/@file_name@>
 #include "@file_rel_path@"
 
-#undef ROCM_WRAPPER_GAVE_WARNING
+#undef ROCM_@ITEM_GUARD@_GAVE_WARNING
 #endif
 
 #endif
