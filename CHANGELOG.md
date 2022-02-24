@@ -1,5 +1,9 @@
 # Change Log for rocm-cmake
 
+## [0.7.3]
+### Added
+- Header wrapper functionality included. This is to support the change in header file locations in ROCm 5.2, while providing backwards compatibility via header file wrappers.
+
 ## [0.7.2]
 - `rocm_create_package` now will attempt to set a default `CPACK_GENERATOR` based on the `ROCM_PKGTYPE` environment variable if one is not already set.
 
