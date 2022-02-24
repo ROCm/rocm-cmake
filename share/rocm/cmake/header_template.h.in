@@ -9,9 +9,10 @@
 #define ROCM_@ITEM_GUARD@_GAVE_WARNING
 
 #warning This file is deprecated. Use the header file from @header_location@ by using #include <@CMAKE_PROJECT_NAME@/@file_name@>
-#include "@file_rel_path@"
 
 #undef ROCM_@ITEM_GUARD@_GAVE_WARNING
 #endif
+
+#include "@file_rel_path@"
 
 #endif
