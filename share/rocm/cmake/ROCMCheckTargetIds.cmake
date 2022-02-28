@@ -1,5 +1,5 @@
 # ######################################################################################################################
-# Copyright (C) 2022 Advanced Micro Devices, Inc.
+# Copyright (C) 2021-2022 Advanced Micro Devices, Inc.
 # ######################################################################################################################
 
 include(CheckCXXCompilerFlag)
@@ -26,7 +26,7 @@ function(rocm_check_target_ids VARIABLE)
             list(APPEND _supported_target_ids "${_target_id}")
         endif()
     endforeach()
-    set("${VARIABLE}" "${_supported_target_ids}" PARENT_SCOPE)
+    set(${VARIABLE} "${_supported_target_ids}" PARENT_SCOPE)
 endfunction()
 
 function(_rocm_sanitize_target_id TARGET_ID VARIABLE)
@@ -37,5 +37,5 @@ function(_rocm_sanitize_target_id TARGET_ID VARIABLE)
     string(REPLACE "+" "_ON"  TARGET_ID "${TARGET_ID}")
     string(REPLACE "-" "_OFF" TARGET_ID "${TARGET_ID}")
     string(MAKE_C_IDENTIFIER "${TARGET_ID}" TARGET_ID)
-    set("${VARIABLE}" "${TARGET_ID}" PARENT_SCOPE)
+    set(${VARIABLE} "${TARGET_ID}" PARENT_SCOPE)
 endfunction()
