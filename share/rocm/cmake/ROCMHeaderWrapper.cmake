@@ -24,7 +24,7 @@ function(rocm_wrap_header_dir DIRECTORY)
     endforeach()
     file (GLOB_RECURSE include_files RELATIVE "${DIRECTORY}" ${QUALIFIED_PATTERNS})
     foreach (include_file ${include_files})
-        if (NOT "${include_file}" MATCHES "^../")
+        if (NOT "${include_file}" MATCHES "^\.\./")
             rocm_wrap_header_file(
                 ${include_file}
                 GUARDS ${PARSE_GUARDS}
