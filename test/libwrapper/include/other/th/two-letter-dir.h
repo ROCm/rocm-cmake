@@ -3,11 +3,10 @@
  ******************************************************************************/
 
 
-void wrapper()
-{}
+#ifndef GUARD_TWO_LETTER_DIR_H
+#define GUARD_TWO_LETTER_DIR_H
 
-void other()
-{}
+void tld();
 
-void tld()
-{}
+
+#endif

@@ -3,11 +3,12 @@
  ******************************************************************************/
 
 
-void wrapper()
-{}
+#ifndef GUARD_OTHER_H
+#define GUARD_OTHER_H
 
-void other()
-{}
+#include "th/two-letter-dir.h"
 
-void tld()
-{}
+void other();
+
+
+#endif
