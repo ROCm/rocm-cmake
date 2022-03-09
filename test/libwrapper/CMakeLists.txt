@@ -4,7 +4,7 @@
 
 
 cmake_minimum_required (VERSION 3.5)
-project(wrapper)
+project(test-wrapper)
 
 find_package(ROCM)
 
@@ -48,6 +48,13 @@ target_link_libraries(wrapper-use-original wrapper)
 rocm_wrap_header_file(
     wrapper.h
     HEADER_LOCATION include/wrapper
+    GUARDS TESTWRAPPER
+    WRAPPER_LOCATIONS include
+)
+
+rocm_wrap_header_dir(
+    "${CMAKE_CURRENT_LIST_DIR}/include/other"
+    HEADER_LOCATION include/other
     GUARDS TESTWRAPPER
     WRAPPER_LOCATIONS include
 )
