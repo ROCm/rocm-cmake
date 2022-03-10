@@ -9,7 +9,7 @@ function(rocm_wrap_header_dir DIRECTORY)
     set(options )
     set(oneValueArgs HEADER_LOCATION INCLUDE_LOCATION)
     set(multiValueArgs PATTERNS GUARDS WRAPPER_LOCATIONS OUTPUT_LOCATIONS)
-    cmake_parse_arguments(PARSE "${options}" "${oneValueArg}s" "${multiValueArgs}" ${ARGN})
+    cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
     if(NOT PARSE_HEADER_LOCATION)
         set(PARSE_HEADER_LOCATION "include/${CMAKE_PROJECT_NAME}")
     endif()
@@ -24,16 +24,14 @@ function(rocm_wrap_header_dir DIRECTORY)
     endforeach()
     file (GLOB_RECURSE include_files RELATIVE "${DIRECTORY}" ${QUALIFIED_PATTERNS})
     foreach (include_file ${include_files})
-        if (NOT "${include_file}" MATCHES "^../")
-            rocm_wrap_header_file(
-                ${include_file}
-                GUARDS ${PARSE_GUARDS}
-                HEADER_LOCATION ${PARSE_HEADER_LOCATION}
-                INCLUDE_LOCATION ${PARSE_INCLUDE_LOCATION}
-                WRAPPER_LOCATIONS ${PARSE_WRAPPER_LOCATIONS}
-                OUTPUT_LOCATIONS ${PARSE_OUTPUT_LOCATIONS}
-            )
-        endif()
+        rocm_wrap_header_file(
+            ${include_file}
+            GUARDS ${PARSE_GUARDS}
+            HEADER_LOCATION ${PARSE_HEADER_LOCATION}
+            INCLUDE_LOCATION ${PARSE_INCLUDE_LOCATION}
+            WRAPPER_LOCATIONS ${PARSE_WRAPPER_LOCATIONS}
+            OUTPUT_LOCATIONS ${PARSE_OUTPUT_LOCATIONS}
+        )
     endforeach()
 endfunction()
 
