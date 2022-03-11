@@ -20,7 +20,7 @@ function(rocm_check_target_ids VARIABLE)
 
     foreach(_target_id ${PARSE_TARGETS})
         _rocm_sanitize_target_id("${_target_id}" _result_var)
-        set(_result_var "HAVE_${_result_var}")
+        set(_result_var "COMPILER_HAS_TARGET_ID_${_result_var}")
         check_cxx_compiler_flag("-xhip --offload-arch=${_target_id}" "${_result_var}")
         if(${_result_var})
             list(APPEND _supported_target_ids "${_target_id}")
