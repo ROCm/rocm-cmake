@@ -30,12 +30,12 @@ function(rocm_check_target_ids VARIABLE)
 endfunction()
 
 function(_rocm_sanitize_target_id TARGET_ID VARIABLE)
-    # Cmake defines a preprocessor macro with this value, so it must be a valid C identifier
+    # CMake defines a preprocessor macro with this value, so it must be a valid C identifier
     # Handle + and - for xnack and sramecc so that e.g. xnack+ and xnack- doesn't get folded to
     # the same string by MAKE_C_IDENTIFIER
     string(REPLACE "_" "__"   TARGET_ID "${TARGET_ID}")
-    string(REPLACE "+" "_ON"  TARGET_ID "${TARGET_ID}")
-    string(REPLACE "-" "_OFF" TARGET_ID "${TARGET_ID}")
+    string(REPLACE "+" "_on"  TARGET_ID "${TARGET_ID}")
+    string(REPLACE "-" "_off" TARGET_ID "${TARGET_ID}")
     string(MAKE_C_IDENTIFIER "${TARGET_ID}" TARGET_ID)
     set(${VARIABLE} "${TARGET_ID}" PARENT_SCOPE)
 endfunction()
