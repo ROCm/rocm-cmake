@@ -78,6 +78,9 @@ function(rocm_install_targets)
 
     string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
     set(EXPORT_FILE ${PROJECT_NAME_LOWER}-targets)
+    if(PARSE_COMPONENT AND NOT PARSE_COMPONENT STREQUAL CMAKE_INSTALL_DEFAULT_COMPONENT_NAME)
+        string(TOLOWER "${PROJECT_NAME}-${PARSE_COMPONENT}-targets" EXPORT_FILE)
+    endif()
     if(PARSE_EXPORT)
         set(EXPORT_FILE ${PARSE_EXPORT})
     endif()
@@ -199,7 +202,7 @@ endfunction()
 
 function(rocm_export_targets)
     set(options)
-    set(oneValueArgs NAMESPACE EXPORT NAME COMPATIBILITY PREFIX)
+    set(oneValueArgs NAMESPACE EXPORT NAME COMPATIBILITY PREFIX COMPONENT)
     set(multiValueArgs TARGETS DEPENDS INCLUDE STATIC_DEPENDS)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -213,6 +216,13 @@ function(rocm_export_targets)
     string(TOLOWER ${PACKAGE_NAME} PACKAGE_NAME_LOWER)
 
     set(TARGET_FILE ${PACKAGE_NAME_LOWER}-targets)
+    if(PARSE_COMPONENT AND NOT PARSE_COMPONENT STREQUAL CMAKE_INSTALL_DEFAULT_COMPONENT_NAME)
+        set(IS_BASE_EXPORT FALSE)
+        string(TOLOWER "${PROJECT_NAME}-${PARSE_COMPONENT}-targets" TARGET_FILE)
+        set(COMPONENT_ARG COMPONENT ${PARSE_COMPONENT})
+    else()
+        set(IS_BASE_EXPORT TRUE)
+    endif()
     if(PARSE_EXPORT)
         set(TARGET_FILE ${PARSE_EXPORT})
     endif()
@@ -233,42 +243,53 @@ function(rocm_export_targets)
     set(CONFIG_PACKAGE_INSTALL_DIR ${LIB_INSTALL_DIR}/cmake/${PACKAGE_NAME_LOWER})
 
     set(CONFIG_TEMPLATE "${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_NAME_LOWER}-config.cmake.in")
-
-    file(
-        WRITE ${CONFIG_TEMPLATE}
-        "
+    if(IS_BASE_EXPORT)
+        file(
+            WRITE ${CONFIG_TEMPLATE}
+            "
 @PACKAGE_INIT@
-    ")
+        ")
 
-    foreach(NAME ${PACKAGE_NAME} ${PACKAGE_NAME_UPPER} ${PACKAGE_NAME_LOWER})
-        rocm_write_package_template_function(${CONFIG_TEMPLATE} set_and_check ${NAME}_INCLUDE_DIR
-                                             "@PACKAGE_INCLUDE_INSTALL_DIR@")
-        rocm_write_package_template_function(${CONFIG_TEMPLATE} set_and_check ${NAME}_INCLUDE_DIRS
-                                             "@PACKAGE_INCLUDE_INSTALL_DIR@")
-    endforeach()
-    rocm_write_package_template_function(${CONFIG_TEMPLATE} set_and_check ${PACKAGE_NAME}_TARGET_FILE
+        foreach(NAME ${PACKAGE_NAME} ${PACKAGE_NAME_UPPER} ${PACKAGE_NAME_LOWER})
+            rocm_write_package_template_function(${CONFIG_TEMPLATE} set_and_check ${NAME}_INCLUDE_DIR
+                                                "@PACKAGE_INCLUDE_INSTALL_DIR@")
+            rocm_write_package_template_function(${CONFIG_TEMPLATE} set_and_check ${NAME}_INCLUDE_DIRS
+                                                "@PACKAGE_INCLUDE_INSTALL_DIR@")
+        endforeach()
+        set(TARGET_FILE_VAR ${PACKAGE_NAME}_TARGET_FILE)
+
+        if(PARSE_DEPENDS)
+            rocm_write_package_deps(${CONFIG_TEMPLATE} ${PARSE_DEPENDS})
+        endif()
+
+        if(PARSE_STATIC_DEPENDS AND NOT BUILD_SHARED_LIBS)
+            rocm_write_package_deps(${CONFIG_TEMPLATE} ${PARSE_STATIC_DEPENDS})
+        endif()
+    else()
+        set(TARGET_FILE_VAR ${PACKAGE_NAME}_${PARSE_COMPONENT}_TARGET_FILE)
+
+        rocm_write_package_template_function(${CONFIG_TEMPLATE} if EXISTS
+                                            "@PACKAGE_CONFIG_PACKAGE_INSTALL_DIR@/${TARGET_FILE}.cmake")
+    endif()
+
+    rocm_write_package_template_function(${CONFIG_TEMPLATE} set_and_check ${TARGET_FILE_VAR}
                                          "@PACKAGE_CONFIG_PACKAGE_INSTALL_DIR@/${TARGET_FILE}.cmake")
 
-    if(PARSE_DEPENDS)
-        rocm_write_package_deps(${CONFIG_TEMPLATE} ${PARSE_DEPENDS})
-    endif()
-
-    if(PARSE_STATIC_DEPENDS AND NOT BUILD_SHARED_LIBS)
-        rocm_write_package_deps(${CONFIG_TEMPLATE} ${PARSE_STATIC_DEPENDS})
-    endif()
-
     foreach(INCLUDE ${PARSE_INCLUDE})
-        rocm_install(FILES ${INCLUDE} DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR})
+        rocm_install(FILES ${INCLUDE} DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR} ${COMPONENT_ARG})
         get_filename_component(INCLUDE_BASE ${INCLUDE} NAME)
         rocm_write_package_template_function(${CONFIG_TEMPLATE} include "\${CMAKE_CURRENT_LIST_DIR}/${INCLUDE_BASE}")
     endforeach()
 
     if(PARSE_TARGETS)
-        rocm_write_package_template_function(${CONFIG_TEMPLATE} include "\${${PACKAGE_NAME}_TARGET_FILE}")
+        rocm_write_package_template_function(${CONFIG_TEMPLATE} include "\${${TARGET_FILE_VAR}}")
         foreach(NAME ${PACKAGE_NAME} ${PACKAGE_NAME_UPPER} ${PACKAGE_NAME_LOWER})
-            rocm_write_package_template_function(${CONFIG_TEMPLATE} set ${NAME}_LIBRARIES ${PARSE_TARGETS})
-            rocm_write_package_template_function(${CONFIG_TEMPLATE} set ${NAME}_LIBRARY ${PARSE_TARGETS})
+            rocm_write_package_template_function(${CONFIG_TEMPLATE} list APPEND ${NAME}_LIBRARIES ${PARSE_TARGETS})
+            rocm_write_package_template_function(${CONFIG_TEMPLATE} list APPEND ${NAME}_LIBRARY ${PARSE_TARGETS})
         endforeach()
+    endif()
+    if(NOT IS_BASE_EXPORT)
+        rocm_write_package_template_function(${CONFIG_TEMPLATE} endif)
     endif()
 
     rocm_configure_package_config_file(
@@ -291,7 +312,9 @@ function(rocm_export_targets)
     rocm_install(
         EXPORT ${TARGET_FILE}
         DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR}
-        ${NAMESPACE_ARG})
+        ${NAMESPACE_ARG}
+        ${COMPONENT_ARG}
+    )
 
     rocm_install(
         FILES
