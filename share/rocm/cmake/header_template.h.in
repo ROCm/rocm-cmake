@@ -8,7 +8,7 @@
 #ifndef ROCM_@ITEM_GUARD@_GAVE_WARNING
 #define ROCM_@ITEM_GUARD@_GAVE_WARNING
 
-#warning This file is deprecated. Use the header file from @header_location@ by using #include <@correct_include@>
+#pragma message("This file is deprecated. Use the header file from @header_location@ by using #include <@correct_include@>")
 #include "@file_rel_path@"
 
 #undef ROCM_@ITEM_GUARD@_GAVE_WARNING
