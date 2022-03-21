@@ -36,6 +36,15 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
+option(ERR_ON_WARN "Treat all warnings as errors." OFF)
+if(ERR_ON_WARN)
+    if(MSVC)
+        add_compile_options(/W4 /WX)
+    else()
+        add_compile_options(-Wall -Wextra -pedantic -Werror)
+    endif()
+endif()
+
 add_library(wrapper wrapper.cpp)
 rocm_set_soversion(wrapper 1.1.2)
 
