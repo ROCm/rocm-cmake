@@ -408,7 +408,7 @@ macro(rocm_set_comp_cpackvar HEADER_ONLY components)
     # Setting component specific variables
     set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
 
-    if(NOT ${HEADER_ONLY})
+    if(NOT ROCM_USE_DEV_COMPONENT OR NOT ${HEADER_ONLY})
         set(CPACK_RPM_MAIN_COMPONENT "runtime")
         set(CPACK_RPM_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
         list(APPEND CPACK_COMPONENTS_ALL runtime)
