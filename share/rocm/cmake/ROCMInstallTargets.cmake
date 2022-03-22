@@ -127,22 +127,26 @@ function(rocm_install_targets)
             PATTERN "*.inl")
     endforeach()
 
-    install(
-        TARGETS ${PARSE_TARGETS}
-        EXPORT ${EXPORT_FILE}
-        RUNTIME
-            DESTINATION ${BIN_INSTALL_DIR}
-            COMPONENT ${runtime}
-        LIBRARY
-            DESTINATION ${LIB_INSTALL_DIR}
-            COMPONENT ${runtime}
-            NAMELINK_SKIP
-        ARCHIVE
-            DESTINATION ${LIB_INSTALL_DIR}
-            COMPONENT ${development}
-    )
     foreach(TARGET IN LISTS PARSE_TARGETS)
         get_target_property(T_TYPE ${TARGET} TYPE)
+        set(export_arg EXPORT ${EXPORT_FILE})
+        if(T_TYPE STREQUAL "EXECUTABLE")
+            unset(export_arg)
+        endif()
+        install(
+            TARGETS ${TARGET}
+            ${export_arg}
+            RUNTIME
+                DESTINATION ${BIN_INSTALL_DIR}
+                COMPONENT ${runtime}
+            LIBRARY
+                DESTINATION ${LIB_INSTALL_DIR}
+                COMPONENT ${runtime}
+                NAMELINK_SKIP
+            ARCHIVE
+                DESTINATION ${LIB_INSTALL_DIR}
+                COMPONENT ${development}
+        )
         if(T_TYPE STREQUAL "SHARED_LIBRARY")
             install(
                     TARGETS ${TARGET}
