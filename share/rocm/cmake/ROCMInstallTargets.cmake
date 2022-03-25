@@ -159,21 +159,16 @@ function(rocm_install_targets)
                         NAMELINK_ONLY
             )
         endif()
-        if(T_TYPE MATCHES ".*_LIBRARY" AND ROCM_SYMLINK_LIBS AND NOT ROCM_CREATED_${PROJECT_NAME}_SYMLINK)
+        if(T_TYPE MATCHES ".*_LIBRARY" AND ROCM_SYMLINK_LIBS AND NOT ROCM_CREATED_${PROJECT_NAME}_SYMLINK
+            AND NOT CMAKE_HOST_WIN32)
+            
             set(ROCM_CREATED_${PROJECT_NAME}_SYMLINK TRUE CACHE INTERNAL "Record symlink created.")
             string(TOLOWER "${PROJECT_NAME}" LINK_SUBDIR)
-            if(CMAKE_HOST_WIN32)
-                set(SYMLINK_CMD "file(COPY \${LINK_TGT} DESTINATION \${LINK_NAME})")
-            else()
-                set(SYMLINK_CMD "execute_process(COMMAND ln -sf ../lib \${LINK_NAME})")
-            endif()
 
             set(INSTALL_CMD "
                 set(LINK_DIR \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${LINK_SUBDIR})
-                set(LINK_NAME \${LINK_DIR}/${ROCM_INSTALL_LIBDIR})
-                set(LINK_TGT \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${ROCM_INSTALL_LIBDIR})
                 file(MAKE_DIRECTORY \${LINK_DIR})
-                ${SYMLINK_CMD}
+                execute_process(COMMAND ln -sf ../lib \${LINK_DIR}/${ROCM_INSTALL_LIBDIR})
             ")
             rocm_install(CODE "${INSTALL_CMD}")
         endif()
