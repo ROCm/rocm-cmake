@@ -161,7 +161,7 @@ function(rocm_install_targets)
         endif()
         if(T_TYPE MATCHES ".*_LIBRARY" AND ROCM_SYMLINK_LIBS AND NOT ROCM_CREATED_${PROJECT_NAME}_SYMLINK
             AND NOT CMAKE_HOST_WIN32)
-            
+
             set(ROCM_CREATED_${PROJECT_NAME}_SYMLINK TRUE CACHE INTERNAL "Record symlink created.")
             string(TOLOWER "${PROJECT_NAME}" LINK_SUBDIR)
 
