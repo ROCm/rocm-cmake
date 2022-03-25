@@ -69,6 +69,9 @@ function(rocm_install)
     endif()
 endfunction()
 
+option(ROCM_SYMLINK_LIBS "Create backwards compatibility symlink for library files." ON)
+set(ROCM_CREATED_LIB_SYMLINK FALSE CACHE INTERNAL "Track whether symlink was created.")
+
 function(rocm_install_targets)
     set(options)
     set(oneValueArgs PREFIX EXPORT COMPONENT)
@@ -156,6 +159,21 @@ function(rocm_install_targets)
                         COMPONENT ${development}
                         NAMELINK_ONLY
             )
+        endif()
+        if(T_TYPE MATCHES "*_LIBRARY" AND ROCM_SYMLINK_LIBS AND NOT ROCM_CREATED_LIB_SYMLINK)
+            string(TOLOWER "${CMAKE_PROJECT_NAME}" LINK_SUBDIR)
+            if(CMAKE_HOST_WIN32)
+                set(SYMLINK_CMD "file(COPY \${LINK_TGT} DESTINATION \${LINK_NAME})")
+            else()
+                set(SYMLINK_CMD "execute_process(COMMAND ln -sf ../lib \${LINK_NAME})")
+            endif()
+
+            set(INSTALL_CMD "
+                set(LINK_NAME \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${LINK_SUBDIR}/${ROCM_INSTALL_LIBDIR})
+                set(LINK_TGT \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${ROCM_INSTALL_LIBDIR})
+                ${SYMLINK_CMD}
+            ")
+            rocm_install(CODE "${INSTALL_CMD}")
         endif()
     endforeach()
 endfunction()
