@@ -160,7 +160,7 @@ function(rocm_install_targets)
                         NAMELINK_ONLY
             )
         endif()
-        if(T_TYPE MATCHES "*_LIBRARY" AND ROCM_SYMLINK_LIBS AND NOT ROCM_CREATED_LIB_SYMLINK)
+        if(T_TYPE MATCHES ".*_LIBRARY" AND ROCM_SYMLINK_LIBS AND NOT ROCM_CREATED_LIB_SYMLINK)
             string(TOLOWER "${CMAKE_PROJECT_NAME}" LINK_SUBDIR)
             if(CMAKE_HOST_WIN32)
                 set(SYMLINK_CMD "file(COPY \${LINK_TGT} DESTINATION \${LINK_NAME})")
