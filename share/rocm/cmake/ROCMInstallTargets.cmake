@@ -160,26 +160,26 @@ function(rocm_install_targets)
             )
         endif()
         if(T_TYPE MATCHES ".*_LIBRARY" AND ROCM_SYMLINK_LIBS AND NOT CMAKE_HOST_WIN32)
-            cmake_policy(SET CMP0087 NEW)
 
             string(TOLOWER "${PROJECT_NAME}" LINK_SUBDIR)
 
-            set(INSTALL_CMD "
+            file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_symlink.cmake
+                    CONTENT "
                 set(SRC_DIR \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX})
                 set(LINK_DIR \${SRC_DIR}/${LINK_SUBDIR})
                 if(NOT EXISTS \${LINK_DIR}/${ROCM_INSTALL_LIBDIR}/cmake)
                     file(MAKE_DIRECTORY \${LINK_DIR}/${ROCM_INSTALL_LIBDIR}/cmake)
                     execute_process(COMMAND
-                        ln -srf ${SRC_DIR}/${ROCM_INSTALL_LIBDIR}/cmake/${LINK_SUBDIR}
+                        ln -srf \${SRC_DIR}/${ROCM_INSTALL_LIBDIR}/cmake/${LINK_SUBDIR}
                         \${LINK_DIR}/${ROCM_INSTALL_LIBDIR}/cmake/${LINK_SUBDIR}
                     )
                 endif()
                 execute_process(COMMAND
-                    ln -srf ${SRC_DIR}/${ROCM_INSTALL_LIBDIR}/$<TARGET_LINKER_FILE_NAME:${TARGET}>
+                    ln -srf \${SRC_DIR}/${ROCM_INSTALL_LIBDIR}/\$<TARGET_LINKER_FILE_NAME:${TARGET}>
                     \${LINK_DIR}/${ROCM_INSTALL_LIBDIR}/$<TARGET_LINKER_FILE_NAME:${TARGET}>
                 )
             ")
-            rocm_install(CODE "${INSTALL_CMD}")
+            rocm_install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_symlink.cmake")
         endif()
     endforeach()
 endfunction()
