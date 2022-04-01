@@ -346,5 +346,4 @@ function(rocm_export_targets)
             ")
         rocm_install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/cmake_symlink.cmake")
     endif()
-    
 endfunction()
