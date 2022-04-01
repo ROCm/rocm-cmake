@@ -159,7 +159,8 @@ function(rocm_install_targets)
                         NAMELINK_ONLY
             )
         endif()
-        if(ROCM_SYMLINK_LIBS AND NOT WIN32 AND T_TYPE MATCHES ".*_LIBRARY")
+        if(ROCM_SYMLINK_LIBS AND NOT WIN32 AND T_TYPE MATCHES ".*_LIBRARY"
+            AND NOT T_TYPE STREQUAL "INTERFACE_LIBRARY")
             string(TOLOWER "${PROJECT_NAME}" LINK_SUBDIR)
             file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_symlink.cmake
                 CONTENT "
