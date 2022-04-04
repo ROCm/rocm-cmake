@@ -33,7 +33,7 @@ jobs:
         platform:
           - ubuntu-18.04
           - macos-10.14
-          - windows-2016
+          - windows-2022
         cmake-version:
           - 3.20.0
           - 3.10.2
