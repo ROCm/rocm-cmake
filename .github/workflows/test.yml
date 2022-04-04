@@ -37,6 +37,9 @@ jobs:
         cmake-version:
           - 3.20.0
           - 3.10.2
+        exclude:
+          - platform: windows-2019
+            cmake-version: 3.10.2
 
     steps:
     - uses: actions/checkout@v1
