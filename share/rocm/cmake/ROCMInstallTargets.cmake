@@ -159,18 +159,26 @@ function(rocm_install_targets)
                         NAMELINK_ONLY
             )
         endif()
-        if(T_TYPE MATCHES ".*_LIBRARY" AND ROCM_SYMLINK_LIBS AND NOT ROCM_CREATED_${PROJECT_NAME}_SYMLINK
-            AND NOT CMAKE_HOST_WIN32)
-
-            set(ROCM_CREATED_${PROJECT_NAME}_SYMLINK TRUE CACHE INTERNAL "Record symlink created.")
+        if(ROCM_SYMLINK_LIBS AND NOT WIN32 AND T_TYPE MATCHES ".*_LIBRARY"
+            AND NOT T_TYPE STREQUAL "INTERFACE_LIBRARY")
             string(TOLOWER "${PROJECT_NAME}" LINK_SUBDIR)
-
-            set(INSTALL_CMD "
-                set(LINK_DIR \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${LINK_SUBDIR})
-                file(MAKE_DIRECTORY \${LINK_DIR})
-                execute_process(COMMAND ln -sf ../lib \${LINK_DIR}/${ROCM_INSTALL_LIBDIR})
+            file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_symlink.cmake
+                CONTENT "
+                set(SRC_DIR \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX})
+                set(LINK_DIR \${SRC_DIR}/${LINK_SUBDIR})
+                if(NOT EXISTS \${LINK_DIR}/${ROCM_INSTALL_LIBDIR})
+                    file(MAKE_DIRECTORY \${LINK_DIR}/${ROCM_INSTALL_LIBDIR})
+                endif()
+                file(RELATIVE_PATH LINK_PATH
+                    \${LINK_DIR}/${ROCM_INSTALL_LIBDIR}
+                    \${SRC_DIR}/${ROCM_INSTALL_LIBDIR})
+                execute_process(COMMAND \${CMAKE_COMMAND} -E create_symlink
+                    \${LINK_PATH}/$<TARGET_LINKER_FILE_NAME:${TARGET}>
+                    \${LINK_DIR}/${ROCM_INSTALL_LIBDIR}/$<TARGET_LINKER_FILE_NAME:${TARGET}>
+                )
             ")
-            rocm_install(CODE "${INSTALL_CMD}")
+
+            rocm_install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_symlink.cmake")
         endif()
     endforeach()
 endfunction()
@@ -319,4 +327,24 @@ function(rocm_export_targets)
         DESTINATION
             ${CONFIG_PACKAGE_INSTALL_DIR})
 
+    if(ROCM_SYMLINK_LIBS AND NOT WIN32)
+        string(TOLOWER "${PROJECT_NAME}" LINK_SUBDIR)
+        file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/cmake_symlink.cmake"
+            CONTENT "
+            set(SRC_DIR \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX})
+            set(LINK_DIR \${SRC_DIR}/${LINK_SUBDIR})
+            if(NOT EXISTS \${LINK_DIR}/${ROCM_INSTALL_LIBDIR}/cmake)
+                file(MAKE_DIRECTORY \${LINK_DIR}/${ROCM_INSTALL_LIBDIR}/cmake)
+            endif()
+            file(RELATIVE_PATH LINK_PATH
+                \${LINK_DIR}/${ROCM_INSTALL_LIBDIR}/cmake
+                \${SRC_DIR}/${CONFIG_PACKAGE_INSTALL_DIR}
+            )
+            execute_process(COMMAND \${CMAKE_COMMAND} -E create_symlink
+                \${LINK_PATH}
+                \${LINK_DIR}/${CONFIG_PACKAGE_INSTALL_DIR}
+            )
+            ")
+        rocm_install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/cmake_symlink.cmake")
+    endif()
 endfunction()
