@@ -220,7 +220,7 @@ endmacro()
 
 macro(rocm_create_package)
     set(options LDCONFIG PTH HEADER_ONLY)
-    set(oneValueArgs NAME DESCRIPTION SECTION MAINTAINER LDCONFIG_DIR PREFIX)
+    set(oneValueArgs NAME DESCRIPTION SECTION MAINTAINER LDCONFIG_DIR PREFIX LICENSE LICENSE_PATH)
     set(multiValueArgs DEPENDS COMPONENTS)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -245,6 +245,15 @@ macro(rocm_create_package)
     rocm_get_patch_version(ROCM_VERSION_NUM)
     if(ROCM_VERSION_NUM)
         set(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION}.${ROCM_VERSION_NUM}")
+    endif()
+    # Set the License to rpm header
+    if(PARSE_LICENSE)
+        set( CPACK_RPM_PACKAGE_LICENSE "${PARSE_LICENSE}" )
+    endif()
+    # Setting the CPACK_RESOURCE_FILE_LICENSE variable.
+    # Installing license file to /opt/rocm/share/doc/<component_name> will happen in rocm_setup_license macro
+    if(PARSE_LICENSE_PATH)
+        set(CPACK_RESOURCE_FILE_LICENSE "${PARSE_LICENSE_PATH}")
     endif()
 
     set(CPACK_DEBIAN_PACKAGE_MAINTAINER ${PARSE_MAINTAINER})
