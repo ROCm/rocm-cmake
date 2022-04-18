@@ -1,8 +1,19 @@
 # Change Log for rocm-cmake
 
+## [0.7.3]
+### Added
+- Header wrapper functionality included. This is to support the change in header file locations in ROCm 5.2, while providing backwards compatibility via header file wrappers.
+### Fixed
+- Fixed spurious failures in `rocm_check_target_ids` for target ids with target features when `-Werror` is enabled.
+  The `HAVE_<target-id>` result variable has been renamed to `COMPILER_HAS_TARGET_ID_<sanitized-target-id>`.
+
+## [0.7.2]
+- `rocm_create_package` now will attempt to set a default `CPACK_GENERATOR` based on the `ROCM_PKGTYPE` environment variable if one is not already set.
+
 ## [0.7.1]
 ### Added
 - `CLANG_TIDY_USE_COLOR` variable added to control the color output from `clang-tidy`, by default this is `On`.
+- If `CPACK_RESOURCE_FILE_LICENSE` is not set, `rocm_create_package` will now automatically attempt to find a LICENSE, LICENSE.txt, or LICENSE.md file in the top-level CMake source directory. If one is found, it is set up as the license file for the package. 
 
 ## [0.7.0]
 ### Added
