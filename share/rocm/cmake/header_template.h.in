@@ -19,6 +19,6 @@
 #define ROCM_@ITEM_GUARD@_GAVE_WARNING
 #include "@file_rel_path@"
 #undef ROCM_@ITEM_GUARD@_GAVE_WARNING
-#endif /* defined(ROCM_@ITEM_GUARD@_NO_WARNING) || defined(ROCM_@ITEM_GUARD@_GAVE_WARNING) */
+#endif /* defined(ROCM_NO_WRAPPER_HEADER_WARNING) || defined(ROCM_@ITEM_GUARD@_GAVE_WARNING) */
 
 #endif /* @include_guard@ */
