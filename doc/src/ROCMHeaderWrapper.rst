@@ -72,7 +72,7 @@ Its include guard will be ``ROCM_EXAMPLE_INC_FOO_BAR_H``, and it will include th
 
 .. code-block:: cmake
 
-    rocm_wrap_header_file(
+    rocm_wrap_header_dir(
         <include-directory>
         [HEADER_LOCATION <header-location>]
         [GUARDS <guard>...]
