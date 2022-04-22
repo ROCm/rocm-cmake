@@ -19,6 +19,9 @@ function(rocm_wrap_header_dir DIRECTORY)
     if(NOT PARSE_PATTERNS)
         set(PARSE_PATTERNS "*.h;*.hpp;*.hh;*.hxx;*.inl")
     endif()
+    if(NOT DEFINED PARSE_ORIGINAL_FILES)
+        set(PARSE_ORIGINAL_FILES)
+    endif()
     foreach(PATTERN IN LISTS PARSE_PATTERNS)
         list(APPEND QUALIFIED_PATTERNS "${DIRECTORY}/${PATTERN}")
     endforeach()
@@ -52,12 +55,20 @@ function(rocm_wrap_header_file)
         set(PARSE_ORIGINAL_FILES)
     endif()
     foreach(INCLUDE_FILE IN LISTS PARSE_HEADERS)
-        file(INCLUDE_FILE_NAME "${INCLUDE_FILE}" NAME)
+        get_filename_component(INCLUDE_FILE_NAME "${INCLUDE_FILE}" NAME)
         set(original_contents "")
         foreach(ORIGINAL_FILE IN LISTS PARSE_ORIGINAL_FILES)
-            file(ORIGINAL_FILE_NAME "${ORIGINAL_FILE}" NAME)
+            get_filename_component(ORIGINAL_FILE_NAME "${ORIGINAL_FILE}" NAME)
             if(INCLUDE_FILE_NAME STREQUAL ORIGINAL_FILE_NAME)
-                file(READ ${ORIGINAL_FILE} original_contents)
+                file(READ ${ORIGINAL_FILE} file_contents)
+                set(original_contents
+"#if 0 // Area to dump file contents
+
+/* The following is a copy of the original file for the benefit of build systems which grep for values
+ * in this file rather than preprocess it. This is just for backward compatibility */
+
+${file_contents}
+#endif")
             endif()
         endforeach()
         set(GUARD_LIST ${PARSE_GUARDS})

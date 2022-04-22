@@ -24,6 +24,4 @@
 
 #endif // @include_guard@
 
-#if 0 // Area to include file contents
 @original_contents@
-#endif // 0
