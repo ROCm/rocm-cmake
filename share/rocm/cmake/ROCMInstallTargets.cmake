@@ -9,11 +9,7 @@ include(GNUInstallDirs)
 include(ROCMPackageConfigHelpers)
 
 set(ROCM_INSTALL_LIBDIR lib)
-if(WIN32)
-    set(ROCM_USE_DEV_COMPONENT OFF CACHE BOOL "Generate a devel package?")
-else()
-    set(ROCM_USE_DEV_COMPONENT ON CACHE BOOL "Generate a devel package?")
-endif()
+set(ROCM_USE_DEV_COMPONENT ON CACHE BOOL "Generate a devel package?")
 
 function(rocm_install)
     if(ARGV0 STREQUAL "TARGETS")
