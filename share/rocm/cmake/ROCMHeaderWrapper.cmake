@@ -61,8 +61,8 @@ function(rocm_wrap_header_file)
             get_filename_component(ORIGINAL_FILE_NAME "${ORIGINAL_FILE}" NAME)
             if(INCLUDE_FILE_NAME STREQUAL ORIGINAL_FILE_NAME)
                 file(READ ${ORIGINAL_FILE} file_contents)
-                set(original_contents
-"#if 0 // Area to dump file contents
+                set(original_contents_section
+"#if 0
 
 /* The following is a copy of the original file for the benefit of build systems which grep for values
  * in this file rather than preprocess it. This is just for backward compatibility */
