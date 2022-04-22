@@ -17,7 +17,9 @@ Commands
         [OUTPUT_LOCATIONS <output-location>...]
     )
 
-Create a C/C++ wrapper file for each specified header file.
+Create a C/C++ wrapper file for each specified header file. The wrapper is simply a C/C++ header
+that emits a deprecation warning before including its corresponding header. The warning can be
+turned off by defining ``ROCM_NO_WRAPPER_HEADER_WARNING``.
 
 Any relative header or wrapper locations are relative to ``${CPACK_PACKAGING_INSTALL_PREFIX}`` if it is set,
 or to ``${CMAKE_INSTALL_PREFIX}`` otherwise (i.e. the install directory).
@@ -72,7 +74,7 @@ Its include guard will be ``ROCM_EXAMPLE_INC_FOO_BAR_H``, and it will include th
 
 .. code-block:: cmake
 
-    rocm_wrap_header_file(
+    rocm_wrap_header_dir(
         <include-directory>
         [HEADER_LOCATION <header-location>]
         [GUARDS <guard>...]

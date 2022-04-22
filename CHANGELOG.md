@@ -3,6 +3,7 @@
 ## [0.7.3]
 ### Added
 - Header wrapper functionality included. This is to support the change in header file locations in ROCm 5.2, while providing backwards compatibility via header file wrappers.
+  The associated deprecation warning can be disabled by defining `ROCM_NO_WRAPPER_HEADER_WARNING` before including the wrapper header.
 ### Changed
 - `ROCM_USE_DEV_COMPONENT` set to on by default for all platforms. This means that Windows will now generate runtime and devel packages by default
 ### Fixed
