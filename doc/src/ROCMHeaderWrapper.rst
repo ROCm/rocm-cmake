@@ -18,7 +18,9 @@ Commands
         [ORIGINAL_FILES <original-file>...]
     )
 
-Create a C/C++ wrapper file for each specified header file.
+Create a C/C++ wrapper file for each specified header file. The wrapper is simply a C/C++ header
+that emits a deprecation warning before including its corresponding header. The warning can be
+turned off by defining ``ROCM_NO_WRAPPER_HEADER_WARNING``.
 
 Any relative header or wrapper locations are relative to ``${CPACK_PACKAGING_INSTALL_PREFIX}`` if it is set,
 or to ``${CMAKE_INSTALL_PREFIX}`` otherwise (i.e. the install directory).
