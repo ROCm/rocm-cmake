@@ -329,6 +329,7 @@ function(rocm_export_targets)
 
     if(ROCM_SYMLINK_LIBS AND NOT WIN32)
         string(TOLOWER "${PROJECT_NAME}" LINK_SUBDIR)
+
         file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/cmake_symlink.cmake"
             CONTENT "
             set(SRC_DIR \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX})
@@ -340,10 +341,14 @@ function(rocm_export_targets)
                 \${LINK_DIR}/${ROCM_INSTALL_LIBDIR}/cmake
                 \${SRC_DIR}/${CONFIG_PACKAGE_INSTALL_DIR}
             )
-            execute_process(COMMAND \${CMAKE_COMMAND} -E create_symlink
-                \${LINK_PATH}
-                \${LINK_DIR}/${CONFIG_PACKAGE_INSTALL_DIR}
-            )
+            foreach(filename in ${CONFIG_NAME}.cmake ${CONFIG_NAME}-version.cmake ${TARGET_FILE}.cmake)
+                if(NOT EXISTS \${LINK_DIR}/${ROCM_INSTALL_LIBDIR}/cmake/\${filename})
+                    execute_process(COMMAND \${CMAKE_COMMAND} -E create_symlink
+                        \${LINK_PATH}/\${filename}
+                        \${LINK_DIR}/${CONFIG_PACKAGE_INSTALL_DIR}/\${filename}
+                    )
+                endif()
+            endforeach()
             ")
         rocm_install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/cmake_symlink.cmake")
     endif()
