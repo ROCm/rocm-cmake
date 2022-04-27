@@ -341,7 +341,7 @@ function(rocm_export_targets)
                 \${LINK_DIR}/${ROCM_INSTALL_LIBDIR}/cmake
                 \${SRC_DIR}/${CONFIG_PACKAGE_INSTALL_DIR}
             )
-            foreach(filename in ${CONFIG_NAME}.cmake ${CONFIG_NAME}-version.cmake ${TARGET_FILE}.cmake)
+            foreach(filename ${CONFIG_NAME}.cmake ${CONFIG_NAME}-version.cmake ${TARGET_FILE}.cmake)
                 if(NOT EXISTS \${LINK_DIR}/${ROCM_INSTALL_LIBDIR}/cmake/\${filename})
                     execute_process(COMMAND \${CMAKE_COMMAND} -E create_symlink
                         \${LINK_PATH}/\${filename}
