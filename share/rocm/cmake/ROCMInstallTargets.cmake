@@ -332,23 +332,17 @@ function(rocm_export_targets)
 
         file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/cmake_symlink.cmake"
             CONTENT "
-            set(SRC_DIR \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX})
-            set(LINK_DIR \${SRC_DIR}/${LINK_SUBDIR})
-            if(NOT EXISTS \${LINK_DIR}/${ROCM_INSTALL_LIBDIR}/cmake)
-                file(MAKE_DIRECTORY \${LINK_DIR}/${ROCM_INSTALL_LIBDIR}/cmake)
-            endif()
-            file(RELATIVE_PATH LINK_PATH
-                \${LINK_DIR}/${ROCM_INSTALL_LIBDIR}/cmake
-                \${SRC_DIR}/${CONFIG_PACKAGE_INSTALL_DIR}
-            )
-            if(NOT EXISTS \${LINK_DIR}/${CONFIG_PACKAGE_INSTALL_DIR})
-                file(MAKE_DIRECTORY \${LINK_DIR}/${CONFIG_PACKAGE_INSTALL_DIR})
+            set(SRC_DIR \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CONFIG_PACKAGE_INSTALL_DIR})
+            set(LINK_DIR \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${LINK_SUBDIR}/${CONFIG_PACKAGE_INSTALL_DIR})
+            if(NOT EXISTS \${LINK_DIR})
+                file(MAKE_DIRECTORY \${LINK_DIR})
             endif()
             foreach(filename ${CONFIG_NAME}.cmake ${CONFIG_NAME}-version.cmake ${TARGET_FILE}.cmake)
-                if(NOT EXISTS \${LINK_DIR}/${ROCM_INSTALL_LIBDIR}/cmake/\${filename})
+                file(RELATIVE_PATH LINK_PATH \${LINK_DIR} \${SRC_DIR}/${filename})
+                if(NOT EXISTS \${LINK_DIR}/\${filename})
                     execute_process(COMMAND \${CMAKE_COMMAND} -E create_symlink
-                        \${LINK_PATH}/\${filename}
-                        \${LINK_DIR}/${CONFIG_PACKAGE_INSTALL_DIR}/\${filename}
+                        \${LINK_PATH}
+                        \${LINK_DIR}/\${filename}
                     )
                 endif()
             endforeach()
