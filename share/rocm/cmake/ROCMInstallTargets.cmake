@@ -172,10 +172,12 @@ function(rocm_install_targets)
                 file(RELATIVE_PATH LINK_PATH
                     \${LINK_DIR}/${ROCM_INSTALL_LIBDIR}
                     \${SRC_DIR}/${ROCM_INSTALL_LIBDIR})
-                execute_process(COMMAND \${CMAKE_COMMAND} -E create_symlink
-                    \${LINK_PATH}/$<TARGET_LINKER_FILE_NAME:${TARGET}>
-                    \${LINK_DIR}/${ROCM_INSTALL_LIBDIR}/$<TARGET_LINKER_FILE_NAME:${TARGET}>
-                )
+                if(NOT EXISTS \${LINK_DIR}/${ROCM_INSTALL_LIBDIR}/$<TARGET_LINKER_FILE_NAME:${TARGET}>)
+                    execute_process(COMMAND \${CMAKE_COMMAND} -E create_symlink
+                        \${LINK_PATH}/$<TARGET_LINKER_FILE_NAME:${TARGET}>
+                        \${LINK_DIR}/${ROCM_INSTALL_LIBDIR}/$<TARGET_LINKER_FILE_NAME:${TARGET}>
+                    )
+                endif()
             ")
 
             rocm_install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_symlink.cmake")
