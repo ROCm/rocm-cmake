@@ -15,9 +15,12 @@ Commands
         [GUARDS <guard>...]
         [WRAPPER_LOCATIONS <wrapper-location>...]
         [OUTPUT_LOCATIONS <output-location>...]
+        [ORIGINAL_FILES <original-file>...]
     )
 
-Create a C/C++ wrapper file for each specified header file.
+Create a C/C++ wrapper file for each specified header file. The wrapper is simply a C/C++ header
+that emits a deprecation warning before including its corresponding header. The warning can be
+turned off by defining ``ROCM_NO_WRAPPER_HEADER_WARNING``.
 
 Any relative header or wrapper locations are relative to ``${CPACK_PACKAGING_INSTALL_PREFIX}`` if it is set,
 or to ``${CMAKE_INSTALL_PREFIX}`` otherwise (i.e. the install directory).
@@ -67,18 +70,23 @@ The second wrapper file uses the default locations, so it will be created at ``$
 Its include guard will be ``ROCM_EXAMPLE_INC_FOO_BAR_H``, and it will include the file ``../../../include/rocexample/foo/bar.h``
 (which is the correct file when this wrapper is installed at ``${CMAKE_INSTALL_PREFIX}/rocexample/include/foo/bar.h``)
 
+If the name of the wrapper file being generated is the same as the name of any ``<original-file>``, the contents of that
+``<original-file>`` will be added to the wrapper file inside a ``#if 0`` block. This has no effect on the code of the header,
+but it does allow projects which search for specific strings inside a header file to function correctly.
+
 
 .. cmake::command:: rocm_wrap_header_dir
 
 .. code-block:: cmake
 
-    rocm_wrap_header_file(
+    rocm_wrap_header_dir(
         <include-directory>
         [HEADER_LOCATION <header-location>]
         [GUARDS <guard>...]
         [WRAPPER_LOCATIONS <wrapper-location>...]
         [OUTPUT_LOCATIONS <output-location>...]
         [PATTERNS <pattern>...]
+        [ORIGINAL_FILES <original-file>...]
     )
 
 Create a C/C++ wrapper file for each header file in the given directory (or any subdirectory) matching at least one pattern.
