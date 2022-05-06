@@ -3,6 +3,7 @@
 ## [0.7.3]
 ### Added
 - Header wrapper functionality included. This is to support the change in header file locations in ROCm 5.2, while providing backwards compatibility via header file wrappers.
+  The associated deprecation warning can be disabled by defining `ROCM_NO_WRAPPER_HEADER_WARNING` before including the wrapper header.
 ### Fixed
 - Fixed spurious failures in `rocm_check_target_ids` for target ids with target features when `-Werror` is enabled.
   The `HAVE_<target-id>` result variable has been renamed to `COMPILER_HAS_TARGET_ID_<sanitized-target-id>`.

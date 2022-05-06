@@ -109,7 +109,7 @@ function(install_dir DIR)
     configure_dir(
         ${DIR}
         TARGETS all ${PARSE_TARGETS} install
-        CMAKE_ARGS ${PARSE_CMAKE_ARGS})
+        CMAKE_ARGS ${PARSE_CMAKE_ARGS} -DROCM_SYMLINK_LIBS=OFF)
 endfunction()
 
 function(write_version_cmake DIR VERSION CONTENT)

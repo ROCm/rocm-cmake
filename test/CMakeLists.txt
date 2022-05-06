@@ -20,6 +20,10 @@ foreach(TEST ${PASS_TESTS})
 endforeach()
 
 file(GLOB FAIL_TESTS fail/*.cmake)
+# Disable wrapper fail test, as the warning is changed to message
+# This is temporary and will be enabled back later when the behavior is reverted
+list(FILTER FAIL_TESTS EXCLUDE REGEX ".*wrapper\.cmake$")
+
 foreach(TEST ${FAIL_TESTS})
     get_filename_component(NAME ${TEST} NAME_WE)
     create_test(fail-${NAME} ${TEST})
