@@ -4,11 +4,14 @@
 
 cmake_policy(SET CMP0057 NEW)
 
+# Default libdir to "lib", this skips GNUInstallDirs from trying to take a guess if it's unset:
+set(CMAKE_INSTALL_LIBDIR "lib" CACHE STRING "Library install directory")
+
 include(CMakeParseArguments)
 include(GNUInstallDirs)
 include(ROCMPackageConfigHelpers)
 
-set(ROCM_INSTALL_LIBDIR lib)
+set(ROCM_INSTALL_LIBDIR ${CMAKE_INSTALL_LIBDIR})
 if(WIN32)
     set(ROCM_USE_DEV_COMPONENT OFF CACHE BOOL "Generate a devel package?")
 else()
