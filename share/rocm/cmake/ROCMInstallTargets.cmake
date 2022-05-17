@@ -339,7 +339,11 @@ function(rocm_export_targets)
             if(NOT EXISTS \${LINK_DIR})
                 file(MAKE_DIRECTORY \${LINK_DIR})
             endif()
-            file(GLOB TARGET_FILES LIST_DIRECTORIES false RELATIVE \${SRC_DIR} \${SRC_DIR}/${TARGET_FILE}*.cmake)
+            file(GLOB TARGET_FILES
+                LIST_DIRECTORIES false
+                RELATIVE \${SRC_DIR}
+                \${SRC_DIR}/${TARGET_FILE}*.cmake
+            )
             foreach(filename ${CONFIG_NAME}.cmake ${CONFIG_NAME}-version.cmake \${TARGET_FILES})
                 file(RELATIVE_PATH LINK_PATH \${LINK_DIR} \${SRC_DIR}/\${filename})
                 if(NOT EXISTS \${LINK_DIR}/\${filename})
