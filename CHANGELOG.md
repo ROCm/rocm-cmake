@@ -1,17 +1,18 @@
 # Change Log for rocm-cmake
 
+## [0.8.0]
+### Changed
+- `ROCM_USE_DEV_COMPONENT` set to on by default for all platforms. This means that Windows will now generate runtime and devel packages by default
+- ROCMInstallTargets now defaults `CMAKE_INSTALL_LIBDIR` to `lib` if not otherwise specified.
+- Changed default Debian compression type to xz and enabled multi-threaded package compression.
+
 ## [0.7.3]
 ### Added
 - Header wrapper functionality included. This is to support the change in header file locations in ROCm 5.2, while providing backwards compatibility via header file wrappers.
   The associated deprecation warning can be disabled by defining `ROCM_NO_WRAPPER_HEADER_WARNING` before including the wrapper header.
-### Changed
-- `ROCM_USE_DEV_COMPONENT` set to on by default for all platforms. This means that Windows will now generate runtime and devel packages by default
-- ROCMInstallTargets now defaults `CMAKE_INSTALL_LIBDIR` to `lib` if not otherwise specified.
 ### Fixed
 - Fixed spurious failures in `rocm_check_target_ids` for target ids with target features when `-Werror` is enabled.
   The `HAVE_<target-id>` result variable has been renamed to `COMPILER_HAS_TARGET_ID_<sanitized-target-id>`.
-### Changed
-- Changed default Debian compression type to xz and enabled multi-threaded package compression.
 
 ## [0.7.2]
 - `rocm_create_package` now will attempt to set a default `CPACK_GENERATOR` based on the `ROCM_PKGTYPE` environment variable if one is not already set.
