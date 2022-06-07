@@ -4,6 +4,7 @@
 
 cmake_policy(SET CMP0057 NEW)
 
+# todo: consolidate with duplicate in ROCMCreatePackage.cmake
 # Default libdir to "lib", this skips GNUInstallDirs from trying to take a guess if it's unset:
 set(CMAKE_INSTALL_LIBDIR "lib" CACHE STRING "Library install directory")
 
