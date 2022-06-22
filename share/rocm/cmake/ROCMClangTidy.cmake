@@ -134,7 +134,7 @@ macro(rocm_enable_clang_tidy)
     endif()
 
     if(EXISTS ${CMAKE_SOURCE_DIR}/.clang-tidy)
-        set(CLANG_TIDY_CONFIG_ARG "-config-file=${CMAKE_SOURCE_DIR}/.clang-tidy")
+        set(CLANG_TIDY_CONFIG_ARG "--config-file=${CMAKE_SOURCE_DIR}/.clang-tidy")
     else()
         set(CLANG_TIDY_CONFIG_ARG)
     endif()
