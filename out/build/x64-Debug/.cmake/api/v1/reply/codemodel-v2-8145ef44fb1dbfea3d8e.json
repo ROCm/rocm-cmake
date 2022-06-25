@@ -1,0 +1,384 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-5f741ebca141b6497e92.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.6"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						7
+					]
+				},
+				{
+					"build" : "test",
+					"jsonFile" : "directory-test-Debug-f18be1977b403cfd1a50.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.6"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "test",
+					"targetIndexes" : 
+					[
+						3,
+						4,
+						5,
+						6,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19,
+						20,
+						21,
+						22,
+						23,
+						24,
+						25,
+						26,
+						27,
+						28,
+						29,
+						30,
+						31
+					]
+				},
+				{
+					"build" : "doc",
+					"jsonFile" : "directory-doc-Debug-6029fece2c59a9c3a315.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.6"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "doc",
+					"targetIndexes" : 
+					[
+						2,
+						32
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2
+					],
+					"name" : "rocm-cmake",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7,
+						8,
+						9,
+						10,
+						11,
+						12,
+						13,
+						14,
+						15,
+						16,
+						17,
+						18,
+						19,
+						20,
+						21,
+						22,
+						23,
+						24,
+						25,
+						26,
+						27,
+						28,
+						29,
+						30,
+						31,
+						32
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "analyze::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-analyze-Debug-aa942b83abd9178bbbf1.json",
+					"name" : "analyze",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "check::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-check-Debug-7751d4138e05e55f72a6.json",
+					"name" : "check",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "doc::@c2466c91de71b9c692d9",
+					"jsonFile" : "target-doc-Debug-3baaf744a62caf38629a.json",
+					"name" : "doc",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "fail-basic-shared::@36f028580bb02cc8272a",
+					"jsonFile" : "target-fail-basic-shared-Debug-079c960b28441aeacf19.json",
+					"name" : "fail-basic-shared",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "fail-rocm-find-program-version::@36f028580bb02cc8272a",
+					"jsonFile" : "target-fail-rocm-find-program-version-Debug-426437986e195c2d6e0c.json",
+					"name" : "fail-rocm-find-program-version",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "fail-toolchain-var::@36f028580bb02cc8272a",
+					"jsonFile" : "target-fail-toolchain-var-Debug-b5b6e2e3af5c9770a712.json",
+					"name" : "fail-toolchain-var",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "fail-wrapper::@36f028580bb02cc8272a",
+					"jsonFile" : "target-fail-wrapper-Debug-a70c6f51dd3f5a3d6ba9.json",
+					"name" : "fail-wrapper",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "format::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-format-Debug-f92c04f187330dca6a6c.json",
+					"name" : "format",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-analyze::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-analyze-Debug-db46a7260afb0a2d9157.json",
+					"name" : "pass-analyze",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-analyze-gh::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-analyze-gh-Debug-07dc90d33dcc3793f420.json",
+					"name" : "pass-analyze-gh",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-basic-shared::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-basic-shared-Debug-b65a624935c057aa6990.json",
+					"name" : "pass-basic-shared",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-basic-static::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-basic-static-Debug-f4e5874817abaa53d6a3.json",
+					"name" : "pass-basic-static",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-headeronly::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-headeronly-Debug-8cf1d015715533d7efbc.json",
+					"name" : "pass-headeronly",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-rocm-find-program-version::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-rocm-find-program-version-Debug-3c76ee242fcb26090e55.json",
+					"name" : "pass-rocm-find-program-version",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-rocm-join-if-set::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-rocm-join-if-set-Debug-3cbde4a8142f0cdc1327.json",
+					"name" : "pass-rocm-join-if-set",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-rocm-list-split::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-rocm-list-split-Debug-e1d794fd6c79786c09ee.json",
+					"name" : "pass-rocm-list-split",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-rocm-package-add-dependencies::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-rocm-package-add-dependencies-Debug-5268597ed637a1f85dd9.json",
+					"name" : "pass-rocm-package-add-dependencies",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-rocm-package-setup-component::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-rocm-package-setup-component-Debug-f7d2d1d7195a1ed1a99c.json",
+					"name" : "pass-rocm-package-setup-component",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-simple::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-simple-Debug-dab8f107569da5c6512d.json",
+					"name" : "pass-simple",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-simple-build-id::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-simple-build-id-Debug-8c83b9efb57df2168d07.json",
+					"name" : "pass-simple-build-id",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-simple-prefix::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-simple-prefix-Debug-40124ff106f8daacd4dc.json",
+					"name" : "pass-simple-prefix",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-simple-rocmversion-env::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-simple-rocmversion-env-Debug-a080dd9c1d757ddb8d8f.json",
+					"name" : "pass-simple-rocmversion-env",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-simple-soversion::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-simple-soversion-Debug-aa19537b51b9ea7a9ba7.json",
+					"name" : "pass-simple-soversion",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-simple-soversion-env::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-simple-soversion-env-Debug-c173383416c1291c8d7b.json",
+					"name" : "pass-simple-soversion-env",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-version::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-version-Debug-801db0001bd39774ad06.json",
+					"name" : "pass-version",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-version-atag::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-version-atag-Debug-8332953848c301aaf7b2.json",
+					"name" : "pass-version-atag",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-version-atag-short::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-version-atag-short-Debug-1dc10c5c71d3c876feb8.json",
+					"name" : "pass-version-atag-short",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-version-nogit::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-version-nogit-Debug-1090548958b45bfe47d3.json",
+					"name" : "pass-version-nogit",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-version-norepo::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-version-norepo-Debug-f6bfc03f8957e38113e0.json",
+					"name" : "pass-version-norepo",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-version-parent::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-version-parent-Debug-08adfc640cb82ce979d8.json",
+					"name" : "pass-version-parent",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-version-patch::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-version-patch-Debug-45022a06c0ebb130ce33.json",
+					"name" : "pass-version-patch",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "pass-wrapper::@36f028580bb02cc8272a",
+					"jsonFile" : "target-pass-wrapper-Debug-55b5204b7f774acae646.json",
+					"name" : "pass-wrapper",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "sphinx-HTML::@c2466c91de71b9c692d9",
+					"jsonFile" : "target-sphinx-HTML-Debug-1850c57b3e90bc2c094b.json",
+					"name" : "sphinx-HTML",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/vrues/source/repos/Winslohw/rocm-cmake/out/build/x64-Debug",
+		"source" : "C:/Users/vrues/source/repos/Winslohw/rocm-cmake"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}
