@@ -21,6 +21,10 @@ else()
     set(ROCM_DEP_ROCMCORE TRUE CACHE BOOL "Add dependency on rocm-core package")
 endif()
 
+# todo: consolidate with duplicate in ROCMInstallTargets.cmake
+# Default libdir to "lib", this skips GNUInstallDirs from trying to take a guess if it's unset:
+set(CMAKE_INSTALL_LIBDIR "lib" CACHE STRING "Library install directory")
+
 include(CMakeParseArguments)
 include(GNUInstallDirs)
 include(ROCMSetupVersion)
@@ -218,6 +222,30 @@ macro(rocm_set_cpack_gen)
     endif()
 endmacro()
 
+macro(rocm_set_cpack_compression)
+    # Default to xz unless otherwise specified.
+    # The CPack default compression type is gzip, but xz packages are much smaller.
+    # Native packages have defaulted to xz since at least Ubuntu 14.04.
+    if(NOT CPACK_DEBIAN_COMPRESSION_TYPE)
+        if(DEFINED ENV{ROCM_DEBIAN_COMPRESSION_TYPE})
+            set(CPACK_DEBIAN_COMPRESSION_TYPE "$ENV{ROCM_DEBIAN_COMPRESSION_TYPE}" CACHE STRING "")
+        else()
+            set(CPACK_DEBIAN_COMPRESSION_TYPE "xz" CACHE STRING "")
+        endif()
+    endif()
+
+    # xz compression is slow, but can be parallelized with CMake 3.20 or later.
+    # The compression ratio is marginally affected. The speedup is subject to
+    # diminishing returns at higher thread counts.
+    if(NOT CPACK_THREADS)
+        if(DEFINED ENV{ROCM_PKGTHREADS})
+            set(CPACK_THREADS "$ENV{ROCM_PKGTHREADS}" CACHE STRING "")
+        else()
+            set(CPACK_THREADS "0" CACHE STRING "")
+        endif()
+    endif()
+endmacro()
+
 macro(rocm_create_package)
     set(options LDCONFIG PTH HEADER_ONLY)
     set(oneValueArgs NAME DESCRIPTION SECTION MAINTAINER LDCONFIG_DIR PREFIX)
@@ -299,6 +327,7 @@ macro(rocm_create_package)
     endif()
 
     rocm_set_cpack_gen()      # Set CPACK_GENERATOR if not already set
+    rocm_set_cpack_compression()
     if(CPACK_GENERATOR MATCHES ".*RPM.*")
         # '%{?dist}' breaks manual builds on debian systems due to empty Provides
         execute_process(
