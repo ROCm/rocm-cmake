@@ -308,7 +308,7 @@ macro(rocm_create_package)
         rocm_join_if_set(", " CPACK_DEBIAN_RUNTIME_PACKAGE_RECOMMENDS
             "${CPACK_PACKAGE_NAME}-dev (>=${CPACK_PACKAGE_VERSION})")
 
-        rocm_find_program_version(rpmbuild GREATER_EQUAL 4.12.0)
+        rocm_find_program_version(rpmbuild GREATER_EQUAL 4.12.0 QUIET)
         if(rpmbuild_VERSION_OK)
             rocm_join_if_set(", " CPACK_RPM_RUNTIME_PACKAGE_SUGGESTS
                 "${CPACK_PACKAGE_NAME}-devel >= ${CPACK_PACKAGE_VERSION}"
