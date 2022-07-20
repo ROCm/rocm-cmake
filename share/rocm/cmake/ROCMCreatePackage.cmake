@@ -160,7 +160,7 @@ function(rocm_parse_python_syspath DIR_PATH PKG_NAME)
         file(
             APPEND ${PROJECT_BINARY_DIR}/debian/prerm
             "
-            rm ${PYTHON_SITE}/${PKG_NAME}.pth
+            rm -f ${PYTHON_SITE}/${PKG_NAME}.pth
         ")
     endforeach()
     #end function and invoke the function
