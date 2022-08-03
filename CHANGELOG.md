@@ -1,6 +1,6 @@
 # Change Log for rocm-cmake
 
-## [0.8.0]
+## [rocm-cmake 0.8.0 for ROCm 5.3]
 ### Fixed
 - Fixed error in prerm scripts created by `rocm_create_package` that could break uninstall for packages using the `PTH` option.
 ### Changed
