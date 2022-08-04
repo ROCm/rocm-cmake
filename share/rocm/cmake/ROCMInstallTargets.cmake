@@ -289,6 +289,7 @@ function(rocm_export_targets)
     foreach(INCLUDE ${PARSE_INCLUDE})
         rocm_install(FILES ${INCLUDE} DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR})
         get_filename_component(INCLUDE_BASE ${INCLUDE} NAME)
+        list(APPEND PARSE_INCLUDE_NAME ${INCLUDE_BASE})
         rocm_write_package_template_function(${CONFIG_TEMPLATE} include "\${CMAKE_CURRENT_LIST_DIR}/${INCLUDE_BASE}")
     endforeach()
 
@@ -344,7 +345,8 @@ function(rocm_export_targets)
                 RELATIVE \${SRC_DIR}
                 \${SRC_DIR}/${TARGET_FILE}*.cmake
             )
-            foreach(filename ${CONFIG_NAME}.cmake ${CONFIG_NAME}-version.cmake \${TARGET_FILES})
+            set(PARSE_INCLUDE_NAME \"${PARSE_INCLUDE_NAME}\")
+            foreach(filename ${CONFIG_NAME}.cmake ${CONFIG_NAME}-version.cmake \${TARGET_FILES} \${PARSE_INCLUDE_NAME})
                 file(RELATIVE_PATH LINK_PATH \${LINK_DIR} \${SRC_DIR}/\${filename})
                 if(NOT EXISTS \${LINK_DIR}/\${filename})
                     execute_process(COMMAND \${CMAKE_COMMAND} -E create_symlink
