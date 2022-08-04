@@ -1,10 +1,13 @@
 # Change Log for rocm-cmake
 
-## [0.8.0]
+## [rocm-cmake 0.8.0 for ROCm 5.3]
+### Fixed
+- Fixed error in prerm scripts created by `rocm_create_package` that could break uninstall for packages using the `PTH` option.
 ### Changed
 - `ROCM_USE_DEV_COMPONENT` set to on by default for all platforms. This means that Windows will now generate runtime and devel packages by default
 - ROCMInstallTargets now defaults `CMAKE_INSTALL_LIBDIR` to `lib` if not otherwise specified.
 - Changed default Debian compression type to xz and enabled multi-threaded package compression.
+- `rocm_create_package` will no longer warn upon failure to determine version of program rpmbuild.
 
 ## [0.7.3]
 ### Added
