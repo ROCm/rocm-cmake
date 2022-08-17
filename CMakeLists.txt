@@ -6,7 +6,7 @@ cmake_minimum_required (VERSION 3.6)
 
 set(CMAKE_INSTALL_PREFIX "/opt/rocm" CACHE PATH "")
 
-project(rocm-cmake)
+project(rocm-cmake LANGUAGES NONE)
 
 install(DIRECTORY share DESTINATION .)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ROCMConfigVersion.cmake DESTINATION share/rocm/cmake)
