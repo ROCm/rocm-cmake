@@ -4,7 +4,7 @@
 
 
 cmake_minimum_required (VERSION 3.5)
-project(simple)
+project(simple LANGUAGES CXX)
 
 find_package(ROCM)
 
