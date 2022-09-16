@@ -169,10 +169,16 @@ function(rocm_parse_python_syspath DIR_PATH PKG_NAME)
         }
         set_libdir
     ")
+    # Remove the path configuration files (.pth) only during remove/uninstall
+    # NOT during upgrade operation.
+    # Since same prerm scriptlet is used for both DEB and RPM pkgs, adding both
+    # conditions for rpm and deb scriptlets for remove case.
     file(APPEND ${PROJECT_BINARY_DIR}/debian/prerm
         "
         }
-        rm_libdir
+        if [ "$1" = "remove" ] || [ $1 -eq 0 ]; then
+            rm_libdir
+        fi
     ")
 endfunction()
 
