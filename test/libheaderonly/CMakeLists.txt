@@ -4,7 +4,7 @@
 
 
 cmake_minimum_required (VERSION 3.5)
-project(headeronly)
+project(headeronly LANGUAGES NONE)
 
 find_package(ROCM)
 

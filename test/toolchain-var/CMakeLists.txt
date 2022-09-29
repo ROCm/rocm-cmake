@@ -5,8 +5,7 @@
 
 cmake_minimum_required (VERSION 3.5)
 find_package(ROCM)
-project(toolchain-var)
-enable_language(CXX)
+project(toolchain-var CXX)
 
 if(CHANGE_TOOLCHAIN)
 set(CMAKE_CXX_COMPILER gcc)

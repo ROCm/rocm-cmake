@@ -4,7 +4,7 @@
 
 
 cmake_minimum_required (VERSION 3.5)
-project(test-wrapper)
+project(test-wrapper CXX)
 
 find_package(ROCM)
 

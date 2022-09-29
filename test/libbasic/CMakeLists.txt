@@ -4,7 +4,7 @@
 
 
 cmake_minimum_required (VERSION 3.5)
-project(basic)
+project(basic CXX)
 
 find_package(ROCM)
 find_package(simple)
@@ -24,4 +24,3 @@ target_link_libraries(basic PRIVATE simple)
 
 rocm_install_targets(TARGETS basic INCLUDE include)
 rocm_export_targets(TARGETS basic STATIC_DEPENDS simple)
-
