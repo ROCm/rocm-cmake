@@ -151,8 +151,9 @@ function(rocm_parse_python_syspath DIR_PATH PKG_NAME)
     # conditions for rpm and deb scriptlets for remove case.
     file(APPEND ${PROJECT_BINARY_DIR}/debian/prerm
         "
+        arg1=\"$1\"
         rm_libdir(){
-        if [ \"$1\" = \"remove\" ] || [ $1 -eq 0 ]; then
+        if [ \"$arg1\" = \"remove\" ] || [ \"$arg1\" = \"0\" ]; then
     ")
     foreach(PYTHON_SITE ${PYTHON_SITE_PACKAGES})
         file(
