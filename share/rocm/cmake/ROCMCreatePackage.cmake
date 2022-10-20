@@ -149,6 +149,8 @@ function(rocm_parse_python_syspath DIR_PATH PKG_NAME)
     # NOT during upgrade operation.
     # Since same prerm scriptlet is used for both DEB and RPM pkgs, adding both
     # conditions for rpm and deb scriptlets for remove case.
+    # Arg value of the prerm script is saved in to a variable arg1 and used inside
+    # the rm_libdir() function as $1 inside the function will be empty as its not called with arguments.
     file(APPEND ${PROJECT_BINARY_DIR}/debian/prerm
         "
         arg1=\"$1\"
@@ -175,6 +177,11 @@ function(rocm_parse_python_syspath DIR_PATH PKG_NAME)
         }
         set_libdir
     ")
+
+    # Keep the function call "rm_libdir" at the end of the prerm script and
+    # do not modify that line.
+    # This function call line of the prerm script will be removed
+    # during the versioned package rebuild using a sed command.
     file(APPEND ${PROJECT_BINARY_DIR}/debian/prerm
         "
         fi
