@@ -13,7 +13,7 @@
 #if defined(_MSC_VER)
 #pragma message(": warning:This file is deprecated. Use the header file from @header_location@ by using #include <@correct_include@>")
 #elif defined(__GNUC__)
-#pragma message(": warning : This file is deprecated. Use the header file from @header_location@ by using #include <@correct_include@>")
+#warning "This file is deprecated. Use the header file from @header_location@ by using #include <@correct_include@>"
 #endif
 /* include file */
 #define ROCM_@ITEM_GUARD@_GAVE_WARNING
