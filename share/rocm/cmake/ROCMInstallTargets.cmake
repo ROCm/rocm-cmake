@@ -11,6 +11,7 @@ set(CMAKE_INSTALL_LIBDIR "lib" CACHE STRING "Library install directory")
 include(CMakeParseArguments)
 include(GNUInstallDirs)
 include(ROCMPackageConfigHelpers)
+include(ROCMVersionDLL)
 
 set(ROCM_INSTALL_LIBDIR ${CMAKE_INSTALL_LIBDIR})
 set(ROCM_USE_DEV_COMPONENT ON CACHE BOOL "Generate a devel package?")
@@ -158,6 +159,7 @@ function(rocm_install_targets)
                         COMPONENT ${development}
                         NAMELINK_ONLY
             )
+            rocm_version_dll(${TARGET})
         endif()
         if(ROCM_SYMLINK_LIBS AND NOT WIN32 AND T_TYPE MATCHES ".*_LIBRARY"
             AND NOT T_TYPE STREQUAL "INTERFACE_LIBRARY")
