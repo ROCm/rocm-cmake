@@ -4,7 +4,7 @@
 
 cmake_policy(SET CMP0057 NEW)
 
-# todo: consolidate with duplicate in ROCMCreatePackage.cmake
+# todo: consolidate with duplicate in ROCMCreatePtackage.cmake
 # Default libdir to "lib", this skips GNUInstallDirs from trying to take a guess if it's unset:
 set(CMAKE_INSTALL_LIBDIR "lib" CACHE STRING "Library install directory")
 
@@ -159,7 +159,7 @@ function(rocm_install_targets)
                         COMPONENT ${development}
                         NAMELINK_ONLY
             )
-            rocm_version_dll(${TARGET})
+            # rocm_version_dll(${TARGET})
         endif()
         if(ROCM_SYMLINK_LIBS AND NOT WIN32 AND T_TYPE MATCHES ".*_LIBRARY"
             AND NOT T_TYPE STREQUAL "INTERFACE_LIBRARY")
