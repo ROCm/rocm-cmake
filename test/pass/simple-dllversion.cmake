@@ -8,7 +8,8 @@ function(test_expect_realpath PATH EXPECTED_PATH)
     test_expect_eq(${REALPATH} ${EXPECTED_PATH})
 endfunction()
 
-install_dir(${TEST_DIR}/libsimple CMAKE_ARGS -DBUILD_SHARED_LIBS=On -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=On -DROCM_DLL_VERSION=1.1.2)
+install_dir(${TEST_DIR}/libsimple CMAKE_ARGS -DBUILD_SHARED_LIBS=On -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=On
+    -DROCM_DLL_VERSION=1.1.2)
 if(WIN32)
     test_expect_file(${PREFIX}/bin/simple.dll)
     test_expect_file(${PREFIX}/lib/simple.lib)

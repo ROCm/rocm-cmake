@@ -11,7 +11,11 @@ function(rocm_version_dll TARGET)
         endif()
         if(ROCM_DLL_VERSION)
             string(REPLACE "." "," ROCM_DLL_VERSION_COMMA "${ROCM_DLL_VERSION}")
-            configure_file(${_ROCMVersionDLL_LIST_DIR}/version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/version_${TARGET}.rc @ONLY)
+            configure_file(
+                ${_ROCMVersionDLL_LIST_DIR}/version.rc.in
+                ${CMAKE_CURRENT_BINARY_DIR}/version_${TARGET}.rc
+                @ONLY
+            )
             set_property(TARGET ${TARGET} APPEND PROPERTY SOURCES "${CMAKE_CURRENT_BINARY_DIR}/version_${TARGET}.rc")
         endif()
     endif()
