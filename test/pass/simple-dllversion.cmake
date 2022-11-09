@@ -12,7 +12,7 @@ install_dir(${TEST_DIR}/libsimple CMAKE_ARGS -DBUILD_SHARED_LIBS=On -DCMAKE_WIND
 if(WIN32)
     test_expect_file(${PREFIX}/bin/simple.dll)
     test_expect_file(${PREFIX}/lib/simple.lib)
-    test_exec(COMMAND powershell -command "(Get-Item C:\Path\To\MyFile.dll).VersionInfo" OUTPUT_VARIABLE DLL_VER)
+    test_exec(COMMAND powershell -command "(Get-Item ${PREFIX}/bin/simple.dll).VersionInfo" OUTPUT_VARIABLE DLL_VER)
     test_expect_matches("${DLL_VER}" "1.1.2")
     # test_expect_file(${PREFIX}/lib/libsimple.so.1)
     # test_expect_file(${PREFIX}/lib/libsimple.so.1.1.2)
