@@ -7,6 +7,7 @@ set(_ROCMVersionDLL_LIST_DIR "${CMAKE_CURRENT_LIST_DIR}")
 define_property(
     TARGET PROPERTY DLL_FILE_VERSION
     BRIEF_DOCS "This target property records the version of the generated DLL file."
+    FULL_DOCS "The value stored in this property will be set as the FileVersion property of the DLL."
 )
 
 set(ROCM_DLL_VERSION "$ENV{ROCM_DLL_VERSION}" CACHE STRING "The version to add to DLLs by default.")
