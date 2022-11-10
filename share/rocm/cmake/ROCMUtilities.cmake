@@ -91,3 +91,27 @@ function(rocm_read_os_release OUTPUT KEYVALUE)
         ${_output}
         PARENT_SCOPE)
 endfunction()
+
+set(_rocm_tmp_list_marker "@@__rocm_tmp_list_marker__@@")
+
+function(rocm_list_split LIST ELEMENT OUTPUT_LIST)
+    string(REPLACE ";" ${_rocm_tmp_list_marker} TMPLIST "${${LIST}}")
+    string(REPLACE "${_rocm_tmp_list_marker}${ELEMENT}${_rocm_tmp_list_marker}" ";" TMPLIST "${TMPLIST}")
+    string(REPLACE "${ELEMENT}${_rocm_tmp_list_marker}" "" TMPLIST "${TMPLIST}")
+    string(REPLACE "${_rocm_tmp_list_marker}${ELEMENT}" "" TMPLIST "${TMPLIST}")
+    set(LIST_PREFIX _rocm_list_split_${OUTPUT_LIST}_SUBLIST)
+    set(count 0)
+    set(result)
+    foreach(SUBLIST ${TMPLIST})
+        string(REPLACE ${_rocm_tmp_list_marker} ";" TMPSUBLIST "${SUBLIST}")
+        math(EXPR count "${count}+1")
+        set(list_var ${LIST_PREFIX}_${count})
+        set(${list_var}
+            "${TMPSUBLIST}"
+            PARENT_SCOPE)
+        list(APPEND result ${LIST_PREFIX}_${count})
+    endforeach()
+    set(${OUTPUT_LIST}
+        "${result}"
+        PARENT_SCOPE)
+endfunction()

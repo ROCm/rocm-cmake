@@ -1,5 +1,5 @@
 use_rocm_cmake()
-include(ROCMInstallTargets)
+include(ROCMUtilities)
 
 function(test_rocm_list_split INPUT_LIST ELEMENT)
     rocm_list_split(INPUT_LIST ${ELEMENT} OUTPUT_LIST)

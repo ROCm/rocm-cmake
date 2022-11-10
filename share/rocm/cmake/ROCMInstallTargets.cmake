@@ -12,6 +12,7 @@ include(CMakeParseArguments)
 include(GNUInstallDirs)
 include(ROCMPackageConfigHelpers)
 include(ROCMVersionDLL)
+include(ROCMUtilities)
 
 set(ROCM_INSTALL_LIBDIR ${CMAKE_INSTALL_LIBDIR})
 set(ROCM_USE_DEV_COMPONENT ON CACHE BOOL "Generate a devel package?")
@@ -185,30 +186,6 @@ function(rocm_install_targets)
             rocm_install(SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_symlink.cmake")
         endif()
     endforeach()
-endfunction()
-
-set(_rocm_tmp_list_marker "@@__rocm_tmp_list_marker__@@")
-
-function(rocm_list_split LIST ELEMENT OUTPUT_LIST)
-    string(REPLACE ";" ${_rocm_tmp_list_marker} TMPLIST "${${LIST}}")
-    string(REPLACE "${_rocm_tmp_list_marker}${ELEMENT}${_rocm_tmp_list_marker}" ";" TMPLIST "${TMPLIST}")
-    string(REPLACE "${ELEMENT}${_rocm_tmp_list_marker}" "" TMPLIST "${TMPLIST}")
-    string(REPLACE "${_rocm_tmp_list_marker}${ELEMENT}" "" TMPLIST "${TMPLIST}")
-    set(LIST_PREFIX _rocm_list_split_${OUTPUT_LIST}_SUBLIST)
-    set(count 0)
-    set(result)
-    foreach(SUBLIST ${TMPLIST})
-        string(REPLACE ${_rocm_tmp_list_marker} ";" TMPSUBLIST "${SUBLIST}")
-        math(EXPR count "${count}+1")
-        set(list_var ${LIST_PREFIX}_${count})
-        set(${list_var}
-            "${TMPSUBLIST}"
-            PARENT_SCOPE)
-        list(APPEND result ${LIST_PREFIX}_${count})
-    endforeach()
-    set(${OUTPUT_LIST}
-        "${result}"
-        PARENT_SCOPE)
 endfunction()
 
 function(rocm_write_package_template_function FILENAME NAME)
