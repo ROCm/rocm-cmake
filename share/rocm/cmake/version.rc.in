@@ -1,13 +1,13 @@
 1 VERSIONINFO
-FILEVERSION     @ROCM_DLL_VERSION_COMMA@
-PRODUCTVERSION  @ROCM_DLL_VERSION_COMMA@
+FILEVERSION     @DLL_FILE_VERSION_COMMA@
+PRODUCTVERSION  @DLL_PRODUCT_VERSION_COMMA@
 BEGIN
   BLOCK "StringFileInfo"
   BEGIN
     BLOCK "040904E4"
     BEGIN
-      VALUE "FileVersion", "@ROCM_DLL_VERSION@\0"
-      VALUE "ProductVersion", "@ROCM_DLL_VERSION@\0"
+      VALUE "FileVersion", "@DLL_FILE_VERSION@\0"
+      VALUE "ProductVersion", "@DLL_PRODUCT_VERSION@\0"
     END
   END
   /* For some reason the ProductVersion would not appear unless I add */
