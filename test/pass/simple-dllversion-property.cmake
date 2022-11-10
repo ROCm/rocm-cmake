@@ -8,7 +8,8 @@ function(test_expect_version PATH KIND EXPECTED_VERSION)
     test_expect_eq(${TEST_VERSION} ${EXPECTED_VERSION})
 endfunction()
 
-install_dir(${TEST_DIR}/libsimple CMAKE_ARGS -DBUILD_SHARED_LIBS=On -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=On -DSIMPLE_DLL_VERSION=3.1.4)
+install_dir(${TEST_DIR}/libsimple CMAKE_ARGS -DBUILD_SHARED_LIBS=On -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=On
+    -DSIMPLE_DLL_VERSION=3.1.4)
 if(WIN32)
     test_expect_file(${PREFIX}/bin/simple.dll)
     test_expect_version(${PREFIX}/bin/simple.dll FileVersion 3.1.4)
