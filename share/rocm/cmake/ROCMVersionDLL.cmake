@@ -12,7 +12,10 @@ define_property(
 
 set(ROCM_DLL_VERSION "$ENV{ROCM_DLL_VERSION}" CACHE STRING "The version to add to DLLs by default.")
 set(ROCM_DLL_FILE_VERSION "$ENV{ROCM_DLL_FILE_VERSION}" CACHE STRING "The version of the file to attach to DLLs.")
-set(ROCM_DLL_PRODUCT_VERSION "$ENV{ROCM_DLL_PRODUCT_VERSION}" CACHE STRING "The version of the product to attach to DLLs.")
+set(
+    ROCM_DLL_PRODUCT_VERSION "$ENV{ROCM_DLL_PRODUCT_VERSION}"
+    CACHE STRING "The version of the product to attach to DLLs."
+)
 mark_as_advanced(ROCM_DLL_VERSION ROCM_DLL_FILE_VERSION ROCM_DLL_PRODUCT_VERSION)
 
 function(rocm_version_dll TARGET)
