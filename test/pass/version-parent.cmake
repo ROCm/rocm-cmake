@@ -7,7 +7,7 @@ find_program(GIT NAMES git)
 # Try to test without git
 file(MAKE_DIRECTORY ${TMP_DIR}/repo)
 execute_process(
-    COMMAND ${GIT} describe --dirty --long --always
+    COMMAND ${GIT} describe --dirty --long --always --match [0-9]*
     WORKING_DIRECTORY ${TMP_DIR}/repo
     OUTPUT_VARIABLE GIT_TAG
     RESULT_VARIABLE RESULT)
