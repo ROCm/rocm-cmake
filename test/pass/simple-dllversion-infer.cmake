@@ -5,7 +5,7 @@
 function(test_expect_version PATH KIND EXPECTED_VERSION)
     test_exec(COMMAND powershell -command "(GET-ITEM ${PATH}).VersionInfo.${KIND}" OUTPUT_VARIABLE TEST_VERSION)
     string(STRIP "${TEST_VERSION}" TEST_VERSION)
-    test_expect_eq(${TEST_VERSION} ${EXPECTED_VERSION})
+    test_expect_eq("${TEST_VERSION}" "${EXPECTED_VERSION}")
 endfunction()
 
 install_dir(${TEST_DIR}/libsimple CMAKE_ARGS -DBUILD_SHARED_LIBS=On -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=On)
