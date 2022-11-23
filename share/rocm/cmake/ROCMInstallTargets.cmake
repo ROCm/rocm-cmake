@@ -160,7 +160,7 @@ function(rocm_install_targets)
                         COMPONENT ${development}
                         NAMELINK_ONLY
             )
-            # rocm_version_dll(${TARGET})
+            rocm_version_dll(${TARGET})
         endif()
         if(ROCM_SYMLINK_LIBS AND NOT WIN32 AND T_TYPE MATCHES ".*_LIBRARY"
             AND NOT T_TYPE STREQUAL "INTERFACE_LIBRARY")
