@@ -23,7 +23,7 @@ function(rocm_version_dll TARGET)
         # Get file version
         if(ROCM_DLL_FILE_VERSION STREQUAL "" AND ROCM_DLL_VERSION STREQUAL "")
             get_property(DLL_FILE_VERSION TARGET ${TARGET} PROPERTY DLL_FILE_VERSION)
-            if(DLL_FILE_VERSION STREQUAL "")
+            if("${DLL_FILE_VERSION}" STREQUAL "")
                 get_property(DLL_FILE_VERSION TARGET ${TARGET} PROPERTY VERSION)
             endif()
         elseif(ROCM_DLL_FILE_VERSION STREQUAL "")
