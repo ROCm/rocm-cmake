@@ -242,6 +242,8 @@ function(rocm_export_targets)
 
     set(CONFIG_TEMPLATE "${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_NAME_LOWER}-config.cmake.in")
 
+    set(INCLUDED_FILES "")
+
     file(
         WRITE ${CONFIG_TEMPLATE}
         "
@@ -268,6 +270,7 @@ function(rocm_export_targets)
     foreach(INCLUDE ${PARSE_INCLUDE})
         rocm_install(FILES ${INCLUDE} DESTINATION ${CONFIG_PACKAGE_INSTALL_DIR})
         get_filename_component(INCLUDE_BASE ${INCLUDE} NAME)
+        list(APPEND INCLUDED_FILES ${INCLUDE_BASE})
         rocm_write_package_template_function(${CONFIG_TEMPLATE} include "\${CMAKE_CURRENT_LIST_DIR}/${INCLUDE_BASE}")
     endforeach()
 
@@ -315,6 +318,7 @@ function(rocm_export_targets)
             CONTENT "
             set(SRC_DIR \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CONFIG_PACKAGE_INSTALL_DIR})
             set(LINK_DIR \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${LINK_SUBDIR}/${ROCM_INSTALL_LIBDIR}/cmake)
+            set(INCLUDED_FILES \"${INCLUDED_FILES}\")
             if(NOT EXISTS \${LINK_DIR})
                 file(MAKE_DIRECTORY \${LINK_DIR})
             endif()
@@ -323,7 +327,7 @@ function(rocm_export_targets)
                 RELATIVE \${SRC_DIR}
                 \${SRC_DIR}/${TARGET_FILE}*.cmake
             )
-            foreach(filename ${CONFIG_NAME}.cmake ${CONFIG_NAME}-version.cmake \${TARGET_FILES})
+            foreach(filename ${CONFIG_NAME}.cmake ${CONFIG_NAME}-version.cmake \${TARGET_FILES} \${INCLUDED_FILES})
                 file(RELATIVE_PATH LINK_PATH \${LINK_DIR} \${SRC_DIR}/\${filename})
                 if(NOT EXISTS \${LINK_DIR}/\${filename})
                     execute_process(COMMAND \${CMAKE_COMMAND} -E create_symlink
