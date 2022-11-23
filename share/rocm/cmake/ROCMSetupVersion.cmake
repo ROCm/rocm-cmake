@@ -156,7 +156,7 @@ function(rocm_get_patch_version OUTPUT)
 endfunction()
 
 function(rocm_set_soversion LIBRARY_TARGET SOVERSION)
-    if(NOT WIN32 AND NOT APPLE)
+    if(NOT APPLE)
         rocm_version_regex_parse("^([0-9]+).*" LIB_VERSION_MAJOR "${SOVERSION}")
         rocm_version_regex_parse("^[0-9]+\\.(.*)" LIB_VERSION_MINOR "${SOVERSION}")
 
