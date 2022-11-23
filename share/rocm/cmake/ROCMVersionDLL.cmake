@@ -39,7 +39,10 @@ function(rocm_version_dll TARGET)
         else()
             set(DLL_PRODUCT_VERSION "${ROCM_DLL_PRODUCT_VERSION}")
         endif()
-        if(DLL_FILE_VERSION STREQUAL "" OR DLL_PRODUCT_VERSION STREQUAL "")
+        if(
+            NOT DEFINED DLL_FILE_VERSION OR NOT DEFINED DLL_PRODUCT_VERSION OR
+            DLL_FILE_VERSION STREQUAL "" OR DLL_PRODUCT_VERSION STREQUAL ""
+        )
             return()
         endif()
 
