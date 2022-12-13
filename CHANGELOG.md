@@ -1,5 +1,18 @@
 # Change Log for rocm-cmake
 
+## [(Unreleased) rocm-cmake]
+### Fixed
+- ROCMInstallTargets: Added compatibility symlinks for included cmake files in `<ROCM>/lib/cmake/<PACKAGE>`.
+### Changed
+- ROCMHeaderWrapper: The wrapper header deprecation message is now a deprecation warning.
+
+## [rocm-cmake 0.8.0 for ROCm 5.4]
+### Fixed
+- ROCMCreatePackage: Fixed error in prerm scripts that could break package upgrades when using the `PTH` option.
+- Removed unnecessary requirement for having C and C++ compilers available when building rocm-cmake from source.
+### Known issues
+- This release did not have a unique version number.
+
 ## [rocm-cmake 0.8.0 for ROCm 5.3]
 ### Fixed
 - Fixed error in prerm scripts created by `rocm_create_package` that could break uninstall for packages using the `PTH` option.
