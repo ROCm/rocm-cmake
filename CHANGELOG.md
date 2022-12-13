@@ -3,6 +3,8 @@
 ## [(Unreleased) rocm-cmake]
 ### Fixed
 - ROCMInstallTargets: Added compatibility symlinks for included cmake files in `<ROCM>/lib/cmake/<PACKAGE>`.
+### Changed
+- ROCMHeaderWrapper: The wrapper header deprecation message is now a deprecation warning.
 
 ## [rocm-cmake 0.8.0 for ROCm 5.4]
 ### Fixed
