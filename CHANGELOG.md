@@ -2,11 +2,11 @@
 
 ## [(Unreleased) rocm-cmake]
 ### Fixed
-- Added compatibility symlinks for included cmake files in `<ROCM>/lib/cmake/<PACAKGE>`.
+- ROCMInstallTargets: Added compatibility symlinks for included cmake files in `<ROCM>/lib/cmake/<PACKAGE>`.
 
 ## [rocm-cmake 0.8.0 for ROCm 5.4]
 ### Fixed
-- ROCmCreatePackage: Fixed error in prerm scripts that could break package upgrades when using the `PTH` option.
+- ROCMCreatePackage: Fixed error in prerm scripts that could break package upgrades when using the `PTH` option.
 - Removed unnecessary requirement for having C and C++ compilers available when building rocm-cmake from source.
 ### Known issues
 - This release did not have a unique version number.
