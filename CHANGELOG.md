@@ -1,6 +1,6 @@
 # Change Log for rocm-cmake
 
-## [(Unreleased) rocm-cmake]
+## [rocm-cmake 0.8.1 for ROCm 5.5.0]
 ### Fixed
 - ROCMInstallTargets: Added compatibility symlinks for included cmake files in `<ROCM>/lib/cmake/<PACKAGE>`.
 ### Changed
