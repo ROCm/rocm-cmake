@@ -16,7 +16,9 @@ set(ROCM_INSTALL_LIBDIR ${CMAKE_INSTALL_LIBDIR})
 set(ROCM_USE_DEV_COMPONENT ON CACHE BOOL "Generate a devel package?")
 
 function(rocm_install)
-    if(ARGV0 STREQUAL "TARGETS")
+    if(ENABLE_ASAN_PACKAGING)
+        rocm_install_asan("${ARGN}")
+    elseif(ARGV0 STREQUAL "TARGETS")
         # rocm_install_targets deals with the component in its own fashion.
         rocm_install_targets("${ARGN}")
     elseif(NOT ROCM_USE_DEV_COMPONENT)
@@ -67,6 +69,42 @@ function(rocm_install)
         endif()
         install(${INSTALL_ARGS})
     endif()
+endfunction()
+
+function(rocm_install_asan)
+    set(OLD_ROCM_INSTALL_LIBDIR "${ROCM_INSTALL_LIBDIR}")
+    set(ROCM_INSTALL_LIBDIR "${ROCM_INSTALL_LIBDIR}/asan")
+    if(ARGV0 STREQUAL "TARGETS")
+        set(options)
+        set(oneValueArgs PREFIX EXPORT COMPONENT)
+        set(multiValueArgs TARGETS INCLUDE)
+
+        cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+        set(ASAN_TARGETS "")
+        foreach(TARGET ${PARSE_TARGETS})
+            get_target_property(T_TYPE ${TARGET} TYPE)
+            if(T_TYPE STREQUAL "SHARED_LIBRARY" OR T_TYPE STREQUAL "STATIC_LIBRARY")
+                list(APPEND ASAN_TARGETS "${TARGET}")
+            endif()
+        endforeach()
+        if(NOT ASAN_TARGETS STREQUAL "")
+            if(PARSE_PREFIX)
+                set(PREFIX_ARGS PREFIX ${PARSE_PREFIX})
+            endif()
+            if(PARSE_EXPORT)
+                set(EXPORT_ARGS EXPORT ${PARSE_EXPORT})
+            endif()
+            rocm_install_targets(
+                TARGETS ${ASAN_TARGETS}
+                ${PREFIX_ARGS}
+                ${EXPORT_ARGS}
+                COMPONENT asan
+                INCLUDE ${PARSE_INCLUDE}
+            )
+        endif()
+    endif()
+    set(ROCM_INSTALL_LIBDIR "${OLD_ROCM_INSTALL_LIBDIR}")
 endfunction()
 
 option(ROCM_SYMLINK_LIBS "Create backwards compatibility symlink for library files." ON)
