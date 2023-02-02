@@ -54,6 +54,11 @@ set(_rocm_test_run_save_tests ${_rocm_test_package_dir}/run-save-tests.cmake)
 file(MAKE_DIRECTORY ${_rocm_test_package_dir})
 file(WRITE ${_rocm_test_run_save_tests} "")
 
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
+    set(_rocm_test_genex_eval "GENEX_EVAL")
+else()
+    set(_rocm_test_genex_eval "1")
+endif()
 function(rocm_save_test)
     set(options)
     set(oneValueArgs NAME)
@@ -74,7 +79,7 @@ function(rocm_save_test)
     foreach(ARG ${PARSE_COMMAND})
         if(TARGET ${ARG})
             string(APPEND COMMAND
-                   " \"$<GENEX_EVAL:$<TARGET_PROPERTY:${ARG},ROCM_INSTALL_DIR>>/$<TARGET_FILE_NAME:${ARG}>\"")
+                   " \"$<${_rocm_test_genex_eval}:$<TARGET_PROPERTY:${ARG},ROCM_INSTALL_DIR>>/$<TARGET_FILE_NAME:${ARG}>\"")
         else()
             string(APPEND COMMAND " \"${ARG}\"")
         endif()
@@ -273,9 +278,21 @@ endfunction()
 function(rocm_test_install_ctest)
     file(WRITE ${_rocm_test_config_file}.in "")
     include(${_rocm_test_run_save_tests})
-    file(
-        GENERATE
-        OUTPUT ${_rocm_test_config_file}
-        INPUT ${_rocm_test_config_file}.in)
+    if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
+        file(
+            GENERATE
+            OUTPUT ${_rocm_test_config_file}
+            INPUT ${_rocm_test_config_file}.in)
+    else()
+        # Multi-pass generate to workaround missing `GENEX_EVAL`
+        file(
+            GENERATE
+            OUTPUT ${_rocm_test_config_file}.in2
+            INPUT ${_rocm_test_config_file}.in)
+        file(
+            GENERATE
+            OUTPUT ${_rocm_test_config_file}
+            INPUT ${_rocm_test_config_file}.in2)
+    endif()
     rocm_install_test(FILES ${_rocm_test_config_file})
 endfunction()
