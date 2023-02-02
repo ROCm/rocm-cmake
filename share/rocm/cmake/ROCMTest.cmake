@@ -140,7 +140,7 @@ function(rocm_add_test)
     set(COMMAND ${PARSE_COMMAND})
     list(GET COMMAND 0 COMMAND_EXE)
     set(COMMAND_ARGS ${COMMAND})
-    list(POP_FRONT COMMAND_ARGS)
+    list(REMOVE_AT COMMAND_ARGS 0)
 
     if(ROCM_TEST_GDB AND TARGET ${COMMAND_EXE})
         set(TEST_DIR ${CMAKE_CURRENT_BINARY_DIR}/gdb/test_${PARSE_NAME})
