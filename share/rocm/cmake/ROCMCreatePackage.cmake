@@ -456,13 +456,19 @@ macro(rocm_set_comp_cpackvar HEADER_ONLY components)
     # Setting component specific variables
     set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
 
-    if(NOT ROCM_USE_DEV_COMPONENT OR NOT ${HEADER_ONLY})
+    if((NOT ROCM_USE_DEV_COMPONENT OR NOT ${HEADER_ONLY}) AND NOT ENABLE_ASAN_PACKAGING)
         set(CPACK_RPM_MAIN_COMPONENT "runtime")
         set(CPACK_RPM_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
         list(APPEND CPACK_COMPONENTS_ALL runtime)
         set(CPACK_DEBIAN_RUNTIME_FILE_NAME
            "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}-${DEBIAN_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
         set(CPACK_DEBIAN_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
+    endif()
+
+    if(ENABLE_ASAN_PACKAGING)
+        set(_rocm_components asan)
+    else()
+        set(_rocm_components ${components})
     endif()
 
     foreach(COMPONENT ${components})
