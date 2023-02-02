@@ -431,7 +431,13 @@ macro(rocm_setup_license HEADER_ONLY)
     endif()
 
     if(CPACK_RESOURCE_FILE_LICENSE)
-        if(ROCM_USE_DEV_COMPONENT AND ${HEADER_ONLY})
+        if(ENABLE_ASAN_PACKAGING)
+            install(
+                FILES ${CPACK_RESOURCE_FILE_LICENSE}
+                DESTINATION share/doc/${_rocm_cpack_package_name}-asan
+                COMPONENT ASAN
+            )
+        elseif(ROCM_USE_DEV_COMPONENT AND ${HEADER_ONLY})
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
                 DESTINATION share/doc/${_rocm_cpack_package_name}
