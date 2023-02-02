@@ -24,20 +24,21 @@ function(rocm_set_install_dir_property)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
     if(PARSE_UNPARSED_ARGUMENTS)
-        message(FATAL_ERROR "Unknown keywords given to rocm_set_install_dir_property(): \"${PARSE_UNPARSED_ARGUMENTS}\"")
+        message(
+            FATAL_ERROR "Unknown keywords given to rocm_set_install_dir_property(): \"${PARSE_UNPARSED_ARGUMENTS}\"")
     endif()
 
     set(RUNTIME_DESTINATION ${PARSE_DESTINATION})
     if(PARSE_RUNTIME_DESTINATION)
-       set(RUNTIME_DESTINATION ${PARSE_RUNTIME_DESTINATION})
+        set(RUNTIME_DESTINATION ${PARSE_RUNTIME_DESTINATION})
     endif()
     set(ARCHIVE_DESTINATION ${PARSE_DESTINATION})
     if(PARSE_ARCHIVE_DESTINATION)
-       set(ARCHIVE_DESTINATION ${PARSE_ARCHIVE_DESTINATION})
+        set(ARCHIVE_DESTINATION ${PARSE_ARCHIVE_DESTINATION})
     endif()
     set(LIBRARY_DESTINATION ${PARSE_DESTINATION})
     if(PARSE_LIBRARY_DESTINATION)
-       set(LIBRARY_DESTINATION ${PARSE_LIBRARY_DESTINATION})
+        set(LIBRARY_DESTINATION ${PARSE_LIBRARY_DESTINATION})
     endif()
 
     foreach(TARGET ${PARSE_TARGETS})
@@ -195,7 +196,12 @@ function(rocm_install_targets)
                 DESTINATION ${LIB_INSTALL_DIR}
                 COMPONENT ${development}
         )
-        rocm_set_install_dir_property(TARGETS ${TARGET} RUNTIME_DESTINATION ${BIN_INSTALL_DIR} LIBRARY_DESTINATION ${LIB_INSTALL_DIR} ARCHIVE_DESTINATION ${LIB_INSTALL_DIR})
+        rocm_set_install_dir_property(
+            TARGETS ${TARGET}
+            RUNTIME_DESTINATION ${BIN_INSTALL_DIR}
+            LIBRARY_DESTINATION ${LIB_INSTALL_DIR}
+            ARCHIVE_DESTINATION ${LIB_INSTALL_DIR}
+        )
         if(T_TYPE STREQUAL "SHARED_LIBRARY")
             install(
                     TARGETS ${TARGET}

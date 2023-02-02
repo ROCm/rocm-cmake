@@ -7,10 +7,15 @@ include(CTest)
 
 find_package(Threads REQUIRED)
 include(ProcessorCount)
-ProcessorCount(_rocm_ctest_parallel_level)
-set(CTEST_PARALLEL_LEVEL ${_rocm_ctest_parallel_level} CACHE STRING "CTest parallel level")
-set(CTEST_TIMEOUT 5000 CACHE STRING "CTest timeout")
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -j ${CTEST_PARALLEL_LEVEL} -C ${CMAKE_CFG_INTDIR} --timeout ${CTEST_TIMEOUT})
+processorcount(_rocm_ctest_parallel_level)
+set(CTEST_PARALLEL_LEVEL
+    ${_rocm_ctest_parallel_level}
+    CACHE STRING "CTest parallel level")
+set(CTEST_TIMEOUT
+    5000
+    CACHE STRING "CTest timeout")
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -j ${CTEST_PARALLEL_LEVEL} -C
+                                ${CMAKE_CFG_INTDIR} --timeout ${CTEST_TIMEOUT})
 add_custom_target(tests COMMENT "Build all tests.")
 add_dependencies(check tests)
 
@@ -20,7 +25,6 @@ function(rocm_enable_test_package NAME)
     rocm_package_setup_component(test DEPENDS COMPONENT runtime)
     rocm_defer(rocm_test_install_ctest)
 endfunction()
-
 
 add_library(rocm_test_dependencies INTERFACE)
 function(rocm_test_link_libraries)
@@ -33,9 +37,13 @@ endfunction()
 find_program(ROCM_GDB gdb)
 
 if(ROCM_GDB)
-    set(ROCM_TEST_GDB On CACHE BOOL "")
+    set(ROCM_TEST_GDB
+        On
+        CACHE BOOL "")
 else()
-    set(ROCM_TEST_GDB Off CACHE BOOL "")
+    set(ROCM_TEST_GDB
+        Off
+        CACHE BOOL "")
 endif()
 
 set(_rocm_test_config_content "")
@@ -65,7 +73,8 @@ function(rocm_save_test)
     set(COMMAND "")
     foreach(ARG ${PARSE_COMMAND})
         if(TARGET ${ARG})
-            string(APPEND COMMAND " \"$<GENEX_EVAL:$<TARGET_PROPERTY:${ARG},ROCM_INSTALL_DIR>>/$<TARGET_FILE_NAME:${ARG}>\"")
+            string(APPEND COMMAND
+                   " \"$<GENEX_EVAL:$<TARGET_PROPERTY:${ARG},ROCM_INSTALL_DIR>>/$<TARGET_FILE_NAME:${ARG}>\"")
         else()
             string(APPEND COMMAND " \"${ARG}\"")
         endif()
@@ -97,8 +106,7 @@ function(rocm_save_test)
         TIMEOUT
         TIMEOUT_AFTER_MATCH
         WILL_FAIL
-        WORKING_DIRECTORY
-    )
+        WORKING_DIRECTORY)
     set(PROPS "")
     foreach(PROPERTY ${PROP_NAMES})
         get_test_property(${PARSE_NAME} ${PROPERTY} VALUE)
@@ -134,25 +142,24 @@ function(rocm_add_test)
     set(COMMAND_ARGS ${COMMAND})
     list(POP_FRONT COMMAND_ARGS)
 
-
     if(ROCM_TEST_GDB AND TARGET ${COMMAND_EXE})
-        # add_test(NAME ${NAME} COMMAND ${ROCM_GDB} 
-        #     --batch
-        #     --return-child-result
-        #     -ex "set disable-randomization off"
-        #     -ex run
-        #     -ex backtrace
-        #     --args $<TARGET_FILE:${EXE}> ${ARGN})
         set(TEST_DIR ${CMAKE_CURRENT_BINARY_DIR}/gdb/test_${PARSE_NAME})
         file(MAKE_DIRECTORY ${TEST_DIR})
-        if (NOT EXISTS ${TEST_DIR})
+        if(NOT EXISTS ${TEST_DIR})
             message(FATAL_ERROR "Failed to create test directory: ${TEST_DIR}")
         endif()
-        file(GENERATE OUTPUT "${TEST_DIR}/run.cmake"
-            CONTENT "
+        file(
+            GENERATE
+            OUTPUT "${TEST_DIR}/run.cmake"
+            CONTENT
+                "
             # Remove previous core dump
             file(REMOVE ${TEST_DIR}/core)
-            execute_process(COMMAND $<TARGET_FILE:${COMMAND_EXE}> ${COMMAND_ARGS} WORKING_DIRECTORY ${TEST_DIR} RESULT_VARIABLE RESULT)
+            execute_process(
+                COMMAND $<TARGET_FILE:${COMMAND_EXE}> ${COMMAND_ARGS}
+                WORKING_DIRECTORY ${TEST_DIR}
+                RESULT_VARIABLE RESULT
+            )
             if(NOT RESULT EQUAL 0)
                 # TODO: check for core files based on pid when setting /proc/sys/kernel/core_uses_pid
                 if(EXISTS ${TEST_DIR}/core)
@@ -174,9 +181,7 @@ function(rocm_mark_as_test)
         get_target_property(TEST_TARGET_TYPE ${TEST_TARGET} TYPE)
         # We can only use EXCLUDE_FROM_ALL on build targets
         if(NOT "${TEST_TARGET_TYPE}" STREQUAL "INTERFACE_LIBRARY")
-            set_target_properties(${TEST_TARGET}
-                PROPERTIES EXCLUDE_FROM_ALL TRUE
-            )
+            set_target_properties(${TEST_TARGET} PROPERTIES EXCLUDE_FROM_ALL TRUE)
         endif()
         add_dependencies(tests ${TEST_TARGET})
     endforeach()
@@ -203,20 +208,26 @@ function(rocm_install_test)
     endif()
     set(INSTALL_PREFIX "$<TARGET_PROPERTY:tests,ROCM_TEST_INSTALLDIR>")
     if(PARSE_TARGETS)
-        install(TARGETS ${PARSE_TARGETS} COMPONENT test DESTINATION ${INSTALL_PREFIX}/bin)
+        install(
+            TARGETS ${PARSE_TARGETS}
+            COMPONENT test
+            DESTINATION ${INSTALL_PREFIX}/bin)
         rocm_set_install_dir_property(TARGETS ${PARSE_TARGETS} DESTINATION ${INSTALL_PREFIX}/bin)
         get_target_property(INSTALLDIR ${PARSE_TARGETS} ROCM_INSTALL_DIR)
     endif()
     if(PARSE_FILES)
-        install(FILES ${PARSE_FILES} COMPONENT test DESTINATION ${INSTALL_PREFIX}/${PARSE_DESTINATION})
+        install(
+            FILES ${PARSE_FILES}
+            COMPONENT test
+            DESTINATION ${INSTALL_PREFIX}/${PARSE_DESTINATION})
     endif()
 endfunction()
 
 function(rocm_add_test_executable EXE)
-    add_executable (${EXE} EXCLUDE_FROM_ALL ${ARGN})
+    add_executable(${EXE} EXCLUDE_FROM_ALL ${ARGN})
     target_link_libraries(${EXE} ${CMAKE_THREAD_LIBS_INIT})
     # Cmake does not add flags correctly for gcc
-    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU") 
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         set_target_properties(${EXE} PROPERTIES COMPILE_FLAGS -pthread LINK_FLAGS -pthread)
     endif()
     rocm_mark_as_test(${EXE})
@@ -226,16 +237,10 @@ function(rocm_add_test_executable EXE)
 endfunction()
 
 function(rocm_test_header NAME HEADER)
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/header-main-include-${NAME}.cpp 
-        "#include <${HEADER}>\nint main() {}\n"
-    )
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/header-static-include-${NAME}.cpp 
-        "#include <${HEADER}>\n"
-    )
-    rocm_add_test_executable(${NAME}
-        ${CMAKE_CURRENT_BINARY_DIR}/header-main-include-${NAME}.cpp 
-        ${CMAKE_CURRENT_BINARY_DIR}/header-static-include-${NAME}.cpp
-    )
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/header-main-include-${NAME}.cpp "#include <${HEADER}>\nint main() {}\n")
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/header-static-include-${NAME}.cpp "#include <${HEADER}>\n")
+    rocm_add_test_executable(${NAME} ${CMAKE_CURRENT_BINARY_DIR}/header-main-include-${NAME}.cpp
+                             ${CMAKE_CURRENT_BINARY_DIR}/header-static-include-${NAME}.cpp)
 endfunction()
 
 function(rocm_test_headers)
@@ -268,7 +273,9 @@ endfunction()
 function(rocm_test_install_ctest)
     file(WRITE ${_rocm_test_config_file}.in "")
     include(${_rocm_test_run_save_tests})
-    file(GENERATE OUTPUT ${_rocm_test_config_file} INPUT ${_rocm_test_config_file}.in)
+    file(
+        GENERATE
+        OUTPUT ${_rocm_test_config_file}
+        INPUT ${_rocm_test_config_file}.in)
     rocm_install_test(FILES ${_rocm_test_config_file})
 endfunction()
-
