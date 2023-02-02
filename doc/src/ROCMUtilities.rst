@@ -12,6 +12,14 @@ Commands
 
 Join all the ``<input>`` arguments together using the ``<glue>`` string. If ``<inout_var>`` names a variable with a set value, join that string at the beginning, also using the ``<glue>`` string, and always store the result in ``<inout_var>``.
 
+.. cmake::command:: rocm_defer
+
+.. code-block:: cmake
+
+    rocm_defer(<command>)
+
+Call ``<command>`` at the end of configure.
+
 .. cmake::command:: rocm_find_program_version
 
 .. code-block:: cmake

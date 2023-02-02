@@ -177,7 +177,6 @@ function(rocm_mark_as_test)
             set_target_properties(${TEST_TARGET}
                 PROPERTIES EXCLUDE_FROM_ALL TRUE
             )
-            target_link_libraries(${TEST_TARGET} rocm_test_dependencies)
         endif()
         add_dependencies(tests ${TEST_TARGET})
     endforeach()

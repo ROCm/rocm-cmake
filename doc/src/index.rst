@@ -53,8 +53,22 @@ rocm-cmake
    + :any:`rocm_add_doxygen_doc`
    + :any:`SPHINX_EXECUTABLE`
    + :any:`SPHINX_${BUILDER}_DIR`
+- :any:`ROCMTest`
+   + :any:`rocm_enable_test_package`
+   + :any:`rocm_add_test`
+   + :any:`rocm_add_test_executable`
+   + :any:`rocm_test_header`
+   + :any:`rocm_test_headers`
+   + :any:`rocm_install_test`
+   + :any:`rocm_mark_as_test`
+   + :any:`rocm_link_test_dependencies`
+   + :any:`rocm_test_link_libraries`
+   + :any:`CTEST_PARALLEL_LEVEL`
+   + :any:`CTEST_TIMEOUT`
+   + :any:`ROCM_TEST_GDB`
 - :any:`ROCMUtilities`
    + :any:`rocm_join_if_set`
+   + :any:`rocm_defer`
    + :any:`rocm_find_program_version`
 
 Indices and tables
