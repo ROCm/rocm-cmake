@@ -2,6 +2,8 @@
 # Copyright (C) 2023 Advanced Micro Devices, Inc.
 # ######################################################################################################################
 
-install_dir(${TEST_DIR}/libsimpletest TARGETS check package)
-test_expect_file(${PREFIX}/share/test/simple/CTestTestfile.cmake)
-test_exec(COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure WORKING_DIRECTORY ${PREFIX}/share/test/simple)
+function(rocm_define_property SCOPE NAME DOC)
+    if(NOT CMAKE_SCRIPT_MODE_FILE)
+        define_property(${SCOPE} PROPERTY "${NAME}" BRIEF_DOCS "${DOC}" FULL_DOCS "${DOC}")
+    endif()
+endfunction()

@@ -1,3 +1,6 @@
+# ######################################################################################################################
+# Copyright (C) 2023 Advanced Micro Devices, Inc.
+# ######################################################################################################################
 include(ROCMCreatePackage)
 include(ROCMInstallTargets)
 include(CTest)
@@ -6,7 +9,8 @@ find_package(Threads REQUIRED)
 include(ProcessorCount)
 ProcessorCount(_rocm_ctest_parallel_level)
 set(CTEST_PARALLEL_LEVEL ${_rocm_ctest_parallel_level} CACHE STRING "CTest parallel level")
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -j ${CTEST_PARALLEL_LEVEL} -C ${CMAKE_CFG_INTDIR} --timeout 5000)
+set(CTEST_TIMEOUT 5000 CACHE STRING "CTest timeout")
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -j ${CTEST_PARALLEL_LEVEL} -C ${CMAKE_CFG_INTDIR} --timeout ${CTEST_TIMEOUT})
 add_custom_target(tests COMMENT "Build all tests.")
 add_dependencies(check tests)
 
@@ -14,26 +18,7 @@ function(rocm_enable_test_package)
     rocm_package_setup_component(test DEPENDS COMPONENT runtime)
 endfunction()
 
-define_property(TARGET PROPERTY "ROCM_TEST_INSTALLDIR" BRIEF_DOCS "Install dir for tests" FULL_DOCS "Install dir for tests")
-
-# TODO: Move to ROCMInstallTargets
-define_property(TARGET PROPERTY "ROCM_INSTALL_DIR" BRIEF_DOCS "Install dir for target" FULL_DOCS "Install dir for target")
-function(rocm_set_install_dir_property)
-    set(options)
-    set(oneValueArgs DESTINATION)
-    set(multiValueArgs TARGETS)
-
-    cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-    if(PARSE_UNPARSED_ARGUMENTS)
-        message(FATAL_ERROR "Unknown keywords given to rocm_set_install_dir_property(): \"${PARSE_UNPARSED_ARGUMENTS}\"")
-    endif()
-
-    if(PARSE_DESTINATION MATCHES "^/|$")
-        set_target_properties(${PARSE_TARGETS} PROPERTIES ROCM_INSTALL_DIR ${PARSE_DESTINATION})
-    else()
-        set_target_properties(${PARSE_TARGETS} PROPERTIES ROCM_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/${PARSE_DESTINATION})
-    endif()
-endfunction()
+rocm_define_property(TARGET "ROCM_TEST_INSTALLDIR" "Install dir for tests")
 
 add_library(rocm_test_dependencies INTERFACE)
 function(rocm_test_link_libraries)
