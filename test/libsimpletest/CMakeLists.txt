@@ -17,7 +17,7 @@ include(ROCMTest)
 
 rocm_setup_version(VERSION 1.0.0)
 
-rocm_enable_test_package()
+rocm_enable_test_package(simple)
 
 rocm_create_package(
     NAME simple 
@@ -41,4 +41,3 @@ rocm_export_targets(TARGETS simple)
 rocm_test_link_libraries(simple)
 rocm_add_test_executable(simple-test test.cpp)
 rocm_test_headers(HEADERS include/simple.h)
-rocm_test_install_ctest(NAME simple)

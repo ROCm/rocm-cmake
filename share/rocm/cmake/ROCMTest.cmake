@@ -14,11 +14,13 @@ add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -j ${
 add_custom_target(tests COMMENT "Build all tests.")
 add_dependencies(check tests)
 
-function(rocm_enable_test_package)
+rocm_define_property(TARGET "ROCM_TEST_INSTALLDIR" "Install dir for tests")
+function(rocm_enable_test_package NAME)
+    set_target_properties(tests PROPERTIES ROCM_TEST_INSTALLDIR ${CMAKE_INSTALL_PREFIX}/share/test/${NAME})
     rocm_package_setup_component(test DEPENDS COMPONENT runtime)
+    rocm_defer(rocm_test_install_ctest)
 endfunction()
 
-rocm_define_property(TARGET "ROCM_TEST_INSTALLDIR" "Install dir for tests")
 
 add_library(rocm_test_dependencies INTERFACE)
 function(rocm_test_link_libraries)
@@ -265,16 +267,6 @@ function(rocm_test_headers)
 endfunction()
 
 function(rocm_test_install_ctest)
-    set(options)
-    set(oneValueArgs NAME)
-    set(multiValueArgs)
-
-    cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-    if(PARSE_UNPARSED_ARGUMENTS)
-        message(FATAL_ERROR "Unknown keywords given to rocm_test_install_ctest(): \"${PARSE_UNPARSED_ARGUMENTS}\"")
-    endif()
-
-    set_target_properties(tests PROPERTIES ROCM_TEST_INSTALLDIR ${CMAKE_INSTALL_PREFIX}/share/test/${PARSE_NAME})
     file(WRITE ${_rocm_test_config_file}.in "")
     include(${_rocm_test_run_save_tests})
     file(GENERATE OUTPUT ${_rocm_test_config_file} INPUT ${_rocm_test_config_file}.in)
