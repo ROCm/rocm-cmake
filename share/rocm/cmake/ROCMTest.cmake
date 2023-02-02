@@ -78,10 +78,9 @@ function(rocm_save_test)
     set(COMMAND "")
     foreach(ARG ${PARSE_COMMAND})
         if(TARGET ${ARG})
+            set(INSTALL_PREFIX "$<${_rocm_test_genex_eval}:$<TARGET_PROPERTY:${ARG},ROCM_INSTALL_DIR>>")
             string(APPEND COMMAND
-                   " \"$<${_rocm_test_genex_eval}:
-                        $<TARGET_PROPERTY:${ARG},ROCM_INSTALL_DIR>>/$<TARGET_FILE_NAME:${ARG}
-                    >\"")
+                    " \"${INSTALL_PREFIX}/$<TARGET_FILE_NAME:${ARG}>\"")
         else()
             string(APPEND COMMAND " \"${ARG}\"")
         endif()
