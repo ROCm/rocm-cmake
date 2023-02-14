@@ -17,7 +17,7 @@ set(ROCM_USE_DEV_COMPONENT ON CACHE BOOL "Generate a devel package?")
 
 function(rocm_install)
     if(ENABLE_ASAN_PACKAGING)
-        rocm_install_asan("${ARGN}")
+        rocm_install_asan(${ARGN})
     elseif(ARGV0 STREQUAL "TARGETS")
         # rocm_install_targets deals with the component in its own fashion.
         rocm_install_targets("${ARGN}")
@@ -95,12 +95,15 @@ function(rocm_install_asan)
             if(PARSE_EXPORT)
                 set(EXPORT_ARGS EXPORT ${PARSE_EXPORT})
             endif()
+            if(PARSE_INCLUDE)
+                set(INCLUDE_ARGS INCLUDE ${PARSE_INCLUDE})
+            endif()
             rocm_install_targets(
                 TARGETS ${ASAN_TARGETS}
                 ${PREFIX_ARGS}
                 ${EXPORT_ARGS}
                 COMPONENT asan
-                INCLUDE ${PARSE_INCLUDE}
+                ${INCLUDE_ARGS}
             )
         endif()
     endif()
