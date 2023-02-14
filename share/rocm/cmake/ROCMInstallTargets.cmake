@@ -157,18 +157,20 @@ function(rocm_install_targets)
         set(development "devel")
     endif()
 
-    foreach(INCLUDE ${PARSE_INCLUDE})
-        install(
-            DIRECTORY ${INCLUDE}/
-            DESTINATION ${INCLUDE_INSTALL_DIR}
-            COMPONENT ${development}
-            FILES_MATCHING
-            PATTERN "*.h"
-            PATTERN "*.hpp"
-            PATTERN "*.hh"
-            PATTERN "*.hxx"
-            PATTERN "*.inl")
-    endforeach()
+    if(NOT ENABLE_ASAN_PACKAGING)
+        foreach(INCLUDE ${PARSE_INCLUDE})
+            install(
+                DIRECTORY ${INCLUDE}/
+                DESTINATION ${INCLUDE_INSTALL_DIR}
+                COMPONENT ${development}
+                FILES_MATCHING
+                PATTERN "*.h"
+                PATTERN "*.hpp"
+                PATTERN "*.hh"
+                PATTERN "*.hxx"
+                PATTERN "*.inl")
+        endforeach()
+    endif()
 
     foreach(TARGET IN LISTS PARSE_TARGETS)
         get_target_property(T_TYPE ${TARGET} TYPE)
