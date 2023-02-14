@@ -471,7 +471,7 @@ macro(rocm_set_comp_cpackvar HEADER_ONLY components)
         set(_rocm_components ${components})
     endif()
 
-    foreach(COMPONENT ${components})
+    foreach(COMPONENT ${_rocm_components})
         list(APPEND CPACK_COMPONENTS_ALL "${COMPONENT}")
         string(TOUPPER "${COMPONENT}" COMPONENT_UC)
         set(CPACK_RPM_${COMPONENT_UC}_FILE_NAME "RPM-DEFAULT")
