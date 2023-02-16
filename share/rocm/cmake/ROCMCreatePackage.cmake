@@ -435,7 +435,6 @@ macro(rocm_setup_license HEADER_ONLY)
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
                 DESTINATION share/doc/${_rocm_cpack_package_name}-asan
-                COMPONENT asan
             )
         elseif(ROCM_USE_DEV_COMPONENT AND ${HEADER_ONLY})
             install(
@@ -456,17 +455,25 @@ macro(rocm_set_comp_cpackvar HEADER_ONLY components)
     # Setting component specific variables
     set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
 
-    if((NOT ROCM_USE_DEV_COMPONENT OR NOT ${HEADER_ONLY}) AND NOT ENABLE_ASAN_PACKAGING)
+    if(NOT ROCM_USE_DEV_COMPONENT OR NOT ${HEADER_ONLY})
         set(CPACK_RPM_MAIN_COMPONENT "runtime")
-        set(CPACK_RPM_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
-        list(APPEND CPACK_COMPONENTS_ALL runtime)
-        set(CPACK_DEBIAN_RUNTIME_FILE_NAME
-           "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}-${DEBIAN_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
-        set(CPACK_DEBIAN_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
+        if (NOT ENABLE_ASAN_PACKAGING)
+            set(CPACK_RPM_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
+            list(APPEND CPACK_COMPONENTS_ALL runtime)
+            set(CPACK_DEBIAN_RUNTIME_FILE_NAME
+            "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}-${DEBIAN_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
+            set(CPACK_DEBIAN_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
+        else()
+            set(CPACK_RPM_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}-asan")
+            set(CPACK_RPM_RUNTIME_FILE_NAME "RPM-DEFAULT")
+            set(CPACK_DEBIAN_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}-asan")
+            set(CPACK_DEBIAN_RUNTIME_FILE_NAME "DEB-DEFAULT")
+            list(APPEND CPACK_COMPONENTS_ALL runtime)
+        endif()
     endif()
 
     if(ENABLE_ASAN_PACKAGING)
-        set(_rocm_components asan)
+        set(_rocm_components)
     else()
         set(_rocm_components ${components})
     endif()
