@@ -39,6 +39,8 @@ function(rocm_wrap_header_dir DIRECTORY)
     endforeach()
 endfunction()
 
+option(ROCM_HEADER_WRAPPER_WARN_AS_ERROR "Wrapper header files emit error instead of warning" OFF)
+
 function(rocm_wrap_header_file)
     set(options )
     set(oneValueArgs HEADER_LOCATION INCLUDE_LOCATION)
@@ -91,6 +93,12 @@ ${file_contents}
         get_filename_component(file_path ${INCLUDE_FILE} DIRECTORY)
         file(RELATIVE_PATH correct_include "${HEADER_INSTALL_PREFIX}/${PARSE_INCLUDE_LOCATION}" "${header_location}")
         string(REPLACE "/" ";" path_dirs "${file_path}")
+
+        if (ROCM_HEADER_WRAPPER_WARN_AS_ERROR OR ENV{ROCM_HEADER_WRAPPER_WARN_AS_ERROR})
+            set(deprecated_error 1)
+        else()
+            set(deprecated_error 0)
+        endif()
 
         set(guard_common "")
         foreach(subdir IN LISTS path_dirs)

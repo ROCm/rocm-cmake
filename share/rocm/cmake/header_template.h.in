@@ -5,17 +5,25 @@
 #ifndef @include_guard@
 #define @include_guard@
 
-#if defined(ROCM_NO_WRAPPER_HEADER_ERROR) || defined(ROCM_@ITEM_GUARD@_GAVE_ERROR)
+#if defined(ROCM_NO_WRAPPER_HEADER_WARNING) || defined(ROCM_@ITEM_GUARD@_GAVE_WARNING)
 /* include file */
 #include "@file_rel_path@"
 #else
-/* give error */
+#if @deprecated_error@  // ROCM_HEADER_WRAPPER_WARN_AS_ERROR
 #error "This file is deprecated. Use the header file from @header_location@ by using #include <@correct_include@>"
+#else  // ROCM_HEADER_WRAPPER_WARN_AS_ERROR
+/* give warning */
+#if defined(_MSC_VER)
+#pragma message(": warning:This file is deprecated. Use the header file from @header_location@ by using #include <@correct_include@>")
+#elif defined(__GNUC__)
+#warning "This file is deprecated. Use the header file from @header_location@ by using #include <@correct_include@>"
+#endif
+#endif
 /* include file */
-#define ROCM_@ITEM_GUARD@_GAVE_ERROR
+#define ROCM_@ITEM_GUARD@_GAVE_WARNING
 #include "@file_rel_path@"
-#undef ROCM_@ITEM_GUARD@_GAVE_ERROR
-#endif /* defined(ROCM_NO_WRAPPER_HEADER_ERROR) || defined(ROCM_@ITEM_GUARD@_GAVE_ERROR) */
+#undef ROCM_@ITEM_GUARD@_GAVE_WARNING
+#endif /* defined(ROCM_NO_WRAPPER_HEADER_WARNING) || defined(ROCM_@ITEM_GUARD@_GAVE_WARNING) */
 
 #endif /* @include_guard@ */
 
