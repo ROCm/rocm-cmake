@@ -1,6 +1,14 @@
 # Change Log for rocm-cmake
 
 ## [(Unreleased) rocm-cmake]
+### Added
+- Added the option ROCM_HEADER_WRAPPER_WARN_AS_ERROR
+    - When set to a CMake truthy value, generated wrapper header files will throw
+    an error instead of a warning.
+    - The environment variable of the same name is also checked.
+    - Disabled by default in rocm-cmake.
+
+## [(Unreleased) rocm-cmake 0.8.1 for ROCm 5.5]
 ### Fixed
 - ROCMInstallTargets: Added compatibility symlinks for included cmake files in `<ROCM>/lib/cmake/<PACKAGE>`.
 ### Changed
@@ -110,4 +118,3 @@
 
 ## [0.4]
 Pre Change Log versions
-
