@@ -2,11 +2,10 @@
 
 ## [(Unreleased) rocm-cmake]
 ### Added
-- Added the option ROCM_HEADER_WRAPPER_WARN_AS_ERROR
-    - When set to a CMake truthy value, generated wrapper header files will throw
-    an error instead of a warning.
-    - The environment variable of the same name is also checked.
-    - Disabled by default in rocm-cmake.
+- Added the option ROCM_HEADER_WRAPPER_WERROR
+    - Compile-time C macro in the wrapper headers causes errors to be emitted instead of warnings.
+    - Configure-time CMake option sets the default for the
+    C macro.
 
 ## [(Unreleased) rocm-cmake 0.8.1 for ROCm 5.5]
 ### Fixed
