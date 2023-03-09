@@ -12,16 +12,16 @@
 #ifndef ROCM_HEADER_WRAPPER_WARN_AS_ERROR
 #define ROCM_HEADER_WRAPPER_WARN_AS_ERROR @deprecated_error@
 #endif
-#if ROCM_HEADER_WRAPPER_WARN_AS_ERROR  // ROCM_HEADER_WRAPPER_WARN_AS_ERROR 1
+#if ROCM_HEADER_WRAPPER_WARN_AS_ERROR  /* ROCM_HEADER_WRAPPER_WARN_AS_ERROR 1 */
 #error "This file is deprecated. Use the header file from @header_location@ by using #include <@correct_include@>"
-#else  // ROCM_HEADER_WRAPPER_WARN_AS_ERROR 0
+#else  /* ROCM_HEADER_WRAPPER_WARN_AS_ERROR 0 */
 /* give warning */
 #if defined(_MSC_VER)
 #pragma message(": warning:This file is deprecated. Use the header file from @header_location@ by using #include <@correct_include@>")
 #elif defined(__GNUC__)
 #warning "This file is deprecated. Use the header file from @header_location@ by using #include <@correct_include@>"
 #endif
-#endif // ROCM_HEADER_WRAPPER_WARN_AS_ERROR
+#endif  /* ROCM_HEADER_WRAPPER_WARN_AS_ERROR */
 /* include file */
 #define ROCM_@ITEM_GUARD@_GAVE_WARNING
 #include "@file_rel_path@"
