@@ -96,7 +96,8 @@ ${file_contents}
 
         if (NOT DEFINED ROCM_HEADER_WRAPPER_WARN_AS_ERROR)
             if (DEFINED ENV{ROCM_HEADER_WRAPPER_WARN_AS_ERROR})
-                set(ROCM_HEADER_WRAPPER_WARN_AS_ERROR "$ENV{ROCM_HEADER_WRAPPER_WARN_AS_ERROR}" CACHE STRING "Header wrapper warnings as errors.")
+                set(ROCM_HEADER_WRAPPER_WARN_AS_ERROR "$ENV{ROCM_HEADER_WRAPPER_WARN_AS_ERROR}"
+                    CACHE STRING "Header wrapper warnings as errors.")
             else()
                 set(ROCM_HEADER_WRAPPER_WARN_AS_ERROR "OFF" CACHE STRING "Header wrapper warnings as errors.")
             endif()
