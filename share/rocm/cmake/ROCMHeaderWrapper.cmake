@@ -39,8 +39,6 @@ function(rocm_wrap_header_dir DIRECTORY)
     endforeach()
 endfunction()
 
-option(ROCM_HEADER_WRAPPER_WERROR "Wrapper header files emit error instead of warning" OFF)
-
 function(rocm_wrap_header_file)
     set(options )
     set(oneValueArgs HEADER_LOCATION INCLUDE_LOCATION)
@@ -97,9 +95,9 @@ ${file_contents}
         if (NOT DEFINED ROCM_HEADER_WRAPPER_WERROR)
             if (DEFINED ENV{ROCM_HEADER_WRAPPER_WERROR})
                 set(ROCM_HEADER_WRAPPER_WERROR "$ENV{ROCM_HEADER_WRAPPER_WERROR}"
-                    CACHE STRING "Header wrapper warnings as errors.")
+                    CACHE STRING "Wrapper header files emit error instead of warning.")
             else()
-                set(ROCM_HEADER_WRAPPER_WERROR "OFF" CACHE STRING "Header wrapper warnings as errors.")
+                set(ROCM_HEADER_WRAPPER_WERROR "OFF" CACHE STRING "Wrapper header files emit error instead of warning.")
             endif()
         endif()
 
