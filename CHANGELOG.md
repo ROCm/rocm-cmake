@@ -1,6 +1,11 @@
 # Change Log for rocm-cmake
 
 ## [(Unreleased) rocm-cmake]
+### Added
+- ROCMLocalTargets: Added rocm_local_targets function to get all local build
+targets.
+
+## [(Unreleased) rocm-cmake]
 ### Fixed
 - ROCMInstallTargets: Added compatibility symlinks for included cmake files in `<ROCM>/lib/cmake/<PACKAGE>`.
 ### Changed
@@ -110,4 +115,3 @@
 
 ## [0.4]
 Pre Change Log versions
-
