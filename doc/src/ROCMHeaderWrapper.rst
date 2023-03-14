@@ -20,7 +20,10 @@ Commands
 
 Create a C/C++ wrapper file for each specified header file. The wrapper is simply a C/C++ header
 that emits a deprecation warning before including its corresponding header. The warning can be
-turned off by defining ``ROCM_NO_WRAPPER_HEADER_WARNING``.
+turned off by defining ``ROCM_NO_WRAPPER_HEADER_WARNING`` when using the wrapper header files.
+There is an additional configure-time CMake variable ``ROCM_HEADER_WRAPPER_WERROR``, which is used
+to set the default value for the compile-time C macro of the same name (with CMake truthy values setting a default of
+true/1). If the compile-time macro is true, then deprecation errors will be emitted instead of warnings.
 
 Any relative header or wrapper locations are relative to ``${CPACK_PACKAGING_INSTALL_PREFIX}`` if it is set,
 or to ``${CMAKE_INSTALL_PREFIX}`` otherwise (i.e. the install directory).

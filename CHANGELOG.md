@@ -1,6 +1,12 @@
 # Change Log for rocm-cmake
 
 ## [(Unreleased) rocm-cmake]
+### Added
+- Added the option ROCM_HEADER_WRAPPER_WERROR
+    - Compile-time C macro in the wrapper headers causes errors to be emitted instead of warnings.
+    - Configure-time CMake option sets the default for the C macro.
+
+## [(Unreleased) rocm-cmake 0.8.1 for ROCm 5.5]
 ### Fixed
 - ROCMInstallTargets: Added compatibility symlinks for included cmake files in `<ROCM>/lib/cmake/<PACKAGE>`.
 ### Changed
@@ -110,4 +116,3 @@
 
 ## [0.4]
 Pre Change Log versions
-
