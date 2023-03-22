@@ -22,7 +22,7 @@ add_dependencies(check tests)
 rocm_define_property(TARGET "ROCM_TEST_INSTALLDIR" "Install dir for tests")
 function(rocm_enable_test_package NAME)
     set_target_properties(tests PROPERTIES ROCM_TEST_INSTALLDIR ${CMAKE_INSTALL_PREFIX}/share/test/${NAME})
-    rocm_package_setup_component(test DEPENDS COMPONENT runtime)
+    rocm_package_setup_component(tests DEPENDS COMPONENT runtime)
     rocm_defer(rocm_test_install_ctest)
 endfunction()
 
