@@ -431,7 +431,12 @@ macro(rocm_setup_license HEADER_ONLY)
     endif()
 
     if(CPACK_RESOURCE_FILE_LICENSE)
-        if(ROCM_USE_DEV_COMPONENT AND ${HEADER_ONLY})
+        if(ENABLE_ASAN_PACKAGING)
+            install(
+                FILES ${CPACK_RESOURCE_FILE_LICENSE}
+                DESTINATION share/doc/${_rocm_cpack_package_name}-asan
+            )
+        elseif(ROCM_USE_DEV_COMPONENT AND ${HEADER_ONLY})
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
                 DESTINATION share/doc/${_rocm_cpack_package_name}
@@ -452,14 +457,28 @@ macro(rocm_set_comp_cpackvar HEADER_ONLY components)
 
     if(NOT ROCM_USE_DEV_COMPONENT OR NOT ${HEADER_ONLY})
         set(CPACK_RPM_MAIN_COMPONENT "runtime")
-        set(CPACK_RPM_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
-        list(APPEND CPACK_COMPONENTS_ALL runtime)
-        set(CPACK_DEBIAN_RUNTIME_FILE_NAME
-           "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}-${DEBIAN_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
-        set(CPACK_DEBIAN_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
+        if (NOT ENABLE_ASAN_PACKAGING)
+            set(CPACK_RPM_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
+            list(APPEND CPACK_COMPONENTS_ALL runtime)
+            set(CPACK_DEBIAN_RUNTIME_FILE_NAME
+            "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}-${DEBIAN_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
+            set(CPACK_DEBIAN_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
+        else()
+            set(CPACK_RPM_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}-asan")
+            set(CPACK_RPM_RUNTIME_FILE_NAME "RPM-DEFAULT")
+            set(CPACK_DEBIAN_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}-asan")
+            set(CPACK_DEBIAN_RUNTIME_FILE_NAME "DEB-DEFAULT")
+            list(APPEND CPACK_COMPONENTS_ALL runtime)
+        endif()
     endif()
 
-    foreach(COMPONENT ${components})
+    if(ENABLE_ASAN_PACKAGING)
+        set(_rocm_components)
+    else()
+        set(_rocm_components ${components})
+    endif()
+
+    foreach(COMPONENT ${_rocm_components})
         list(APPEND CPACK_COMPONENTS_ALL "${COMPONENT}")
         string(TOUPPER "${COMPONENT}" COMPONENT_UC)
         set(CPACK_RPM_${COMPONENT_UC}_FILE_NAME "RPM-DEFAULT")
