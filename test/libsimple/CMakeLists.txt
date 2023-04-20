@@ -37,9 +37,13 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 add_library(simple simple.cpp)
 rocm_set_soversion(simple 1.1.2)
+if(DEFINED SIMPLE_DLL_VERSION)
+    set_property(TARGET simple PROPERTY DLL_FILE_VERSION ${SIMPLE_DLL_VERSION})
+endif()
 
 add_executable(simple-main main.cpp)
 target_link_libraries(simple-main simple)
+
 
 if(ROCM_PREFIX)
     rocm_install_targets(TARGETS simple simple-main INCLUDE include PREFIX ${ROCM_PREFIX})
