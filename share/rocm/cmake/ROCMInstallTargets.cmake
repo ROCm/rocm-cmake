@@ -11,9 +11,56 @@ set(CMAKE_INSTALL_LIBDIR "lib" CACHE STRING "Library install directory")
 include(CMakeParseArguments)
 include(GNUInstallDirs)
 include(ROCMPackageConfigHelpers)
+include(ROCMProperty)
 
 set(ROCM_INSTALL_LIBDIR ${CMAKE_INSTALL_LIBDIR})
 set(ROCM_USE_DEV_COMPONENT ON CACHE BOOL "Generate a devel package?")
+
+rocm_define_property(TARGET "ROCM_INSTALL_DIR" "Install dir for target")
+function(rocm_set_install_dir_property)
+    set(options)
+    set(oneValueArgs DESTINATION RUNTIME_DESTINATION ARCHIVE_DESTINATION LIBRARY_DESTINATION)
+    set(multiValueArgs TARGETS)
+
+    cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    if(PARSE_UNPARSED_ARGUMENTS)
+        message(
+            FATAL_ERROR "Unknown keywords given to rocm_set_install_dir_property(): \"${PARSE_UNPARSED_ARGUMENTS}\"")
+    endif()
+
+    set(RUNTIME_DESTINATION ${PARSE_DESTINATION})
+    if(PARSE_RUNTIME_DESTINATION)
+        set(RUNTIME_DESTINATION ${PARSE_RUNTIME_DESTINATION})
+    endif()
+    set(ARCHIVE_DESTINATION ${PARSE_DESTINATION})
+    if(PARSE_ARCHIVE_DESTINATION)
+        set(ARCHIVE_DESTINATION ${PARSE_ARCHIVE_DESTINATION})
+    endif()
+    set(LIBRARY_DESTINATION ${PARSE_DESTINATION})
+    if(PARSE_LIBRARY_DESTINATION)
+        set(LIBRARY_DESTINATION ${PARSE_LIBRARY_DESTINATION})
+    endif()
+
+    foreach(TARGET ${PARSE_TARGETS})
+        get_target_property(TARGET_TYPE ${TARGET} TYPE)
+        set(DESTINATION ${PARSE_DESTINATION})
+        if(TARGET_TYPE STREQUAL "EXECUTABLE")
+            set(DESTINATION ${RUNTIME_DESTINATION})
+        elseif(TARGET_TYPE STREQUAL "STATIC_LIBRARY")
+            set(DESTINATION ${ARCHIVE_DESTINATION})
+        elseif(TARGET_TYPE MATCHES "LIBRARY")
+            set(DESTINATION ${PARSE_LIBRARY_DESTINATION})
+        endif()
+        # Interface targets dont have an install dir
+        if(NOT TARGET_TYPE STREQUAL "INTERFACE_LIBRARY")
+            if(DESTINATION MATCHES "^/|$")
+                set_target_properties(${TARGET} PROPERTIES ROCM_INSTALL_DIR ${DESTINATION})
+            else()
+                set_target_properties(${TARGET} PROPERTIES ROCM_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/${DESTINATION})
+            endif()
+        endif()
+    endforeach()
+endfunction()
 
 function(rocm_install)
     if(ARGV0 STREQUAL "TARGETS")
@@ -152,6 +199,12 @@ function(rocm_install_targets)
             ARCHIVE
                 DESTINATION ${LIB_INSTALL_DIR}
                 COMPONENT ${development}
+        )
+        rocm_set_install_dir_property(
+            TARGETS ${TARGET}
+            RUNTIME_DESTINATION ${BIN_INSTALL_DIR}
+            LIBRARY_DESTINATION ${LIB_INSTALL_DIR}
+            ARCHIVE_DESTINATION ${LIB_INSTALL_DIR}
         )
         if(T_TYPE STREQUAL "SHARED_LIBRARY")
             install(
