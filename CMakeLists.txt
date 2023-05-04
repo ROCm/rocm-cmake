@@ -17,7 +17,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/share/rocm/cmake)
 include(ROCMCreatePackage)
 include(ROCMSetupVersion)
 
-rocm_setup_version(VERSION 0.8.2)
+rocm_setup_version(VERSION 0.9.0)
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/ROCMConfigVersion.cmake
