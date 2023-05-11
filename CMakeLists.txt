@@ -9,18 +9,21 @@ set(CMAKE_INSTALL_PREFIX "/opt/rocm" CACHE PATH "")
 project(rocm-cmake LANGUAGES NONE)
 
 install(DIRECTORY share DESTINATION .)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ROCMConfigVersion.cmake DESTINATION share/rocm/cmake)
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/ROCmCMakeBuildToolsConfigVersion.cmake
+    DESTINATION share/rocmcmakebuildtools/cmake
+)
 
 set(CPACK_RPM_PACKAGE_LICENSE "MIT")
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/share/rocm/cmake)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/share/rocmcmakebuildtools/cmake)
 include(ROCMCreatePackage)
 include(ROCMSetupVersion)
 
 rocm_setup_version(VERSION 0.10.0)
 
 include(CMakePackageConfigHelpers)
-write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/ROCMConfigVersion.cmake
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/ROCmCMakeBuildToolsConfigVersion.cmake
     COMPATIBILITY SameMajorVersion)
 
 rocm_create_package(
@@ -41,4 +44,3 @@ enable_testing()
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -C ${CMAKE_CFG_INTDIR})
 add_subdirectory(test)
 add_subdirectory(doc)
-
