@@ -38,6 +38,4 @@ target_link_libraries(simple-main simple)
 rocm_install_targets(TARGETS simple simple-main INCLUDE include)
 rocm_export_targets(TARGETS simple)
 
-rocm_test_link_libraries(simple)
-rocm_add_test_executable(simple-test test.cpp)
-rocm_test_headers(HEADERS include/simple.h)
+add_subdirectory(test)
