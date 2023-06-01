@@ -11,7 +11,7 @@ jobs:
         with:
           access_token: ${{ github.token }}
   lint:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python 3.9
@@ -31,7 +31,7 @@ jobs:
       max-parallel: 4
       matrix:
         platform:
-          - ubuntu-18.04
+          - ubuntu-20.04
           - macos-11
           - windows-2019
         cmake-version:
