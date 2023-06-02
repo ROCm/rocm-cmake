@@ -1,5 +1,10 @@
 # Change Log for rocm-cmake
 
+## [rocm-cmake 0.10.0 for ROCm 5.7.0]
+### Added
+- Added ROCMTest module
+- ROCMCreatePackage: Added support for ASAN packages
+
 ## [rocm-cmake 0.9.0 for ROCm 5.6.0]
 ### Added
 - Added the option ROCM_HEADER_WRAPPER_WERROR
