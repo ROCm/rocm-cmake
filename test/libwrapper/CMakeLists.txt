@@ -6,7 +6,7 @@
 cmake_minimum_required (VERSION 3.5)
 project(test-wrapper CXX)
 
-find_package(ROCM)
+find_package(ROCmCMakeBuildTools)
 
 include(ROCMInstallTargets)
 include(ROCMPackageConfigHelpers)
@@ -19,14 +19,14 @@ rocm_setup_version(VERSION 1.0.0)
 
 if(ROCM_PREFIX)
 rocm_create_package(
-    NAME wrapper 
+    NAME wrapper
     PREFIX ${ROCM_PREFIX}
     MAINTAINER "Amd amd@amd.com"
     PTH
     LDCONFIG)
 else()
 rocm_create_package(
-    NAME wrapper 
+    NAME wrapper
     MAINTAINER "Amd amd@amd.com"
     PTH
     LDCONFIG)
