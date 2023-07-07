@@ -21,10 +21,15 @@ add_dependencies(check tests)
 
 rocm_define_property(TARGET "ROCM_TEST_INSTALLDIR" "Install dir for tests")
 function(rocm_enable_test_package NAME)
+    message(STATUS "Enable test package ${NAME}")
     set_target_properties(tests PROPERTIES ROCM_TEST_INSTALLDIR ${CMAKE_INSTALL_PREFIX}/share/test/${NAME})
     rocm_package_setup_component(tests DEPENDS COMPONENT runtime)
     rocm_defer(rocm_test_install_ctest)
 endfunction()
+
+if(POLICY CMP0079)
+    cmake_policy(SET CMP0079 OLD)
+endif()
 
 add_library(rocm_test_dependencies INTERFACE)
 function(rocm_test_link_libraries)
@@ -279,6 +284,7 @@ endfunction()
 function(rocm_test_install_ctest)
     file(WRITE ${_rocm_test_config_file}.in "")
     include(${_rocm_test_run_save_tests})
+    message(STATUS "Generate ctest file")
     if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.12.0")
         file(
             GENERATE
