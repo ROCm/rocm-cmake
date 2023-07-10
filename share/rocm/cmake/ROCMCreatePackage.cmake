@@ -131,8 +131,14 @@ macro(rocm_package_add_rocm_core_dependency)
     # This mainly empty package exists to allow all of rocm
     # to be removed in one step by removing rocm-core
     if(ROCM_DEP_ROCMCORE)
-        rocm_join_if_set(", " CPACK_DEBIAN_PACKAGE_DEPENDS "rocm-core")
-        rocm_join_if_set(", " CPACK_RPM_PACKAGE_REQUIRES "rocm-core")
+        if(ENABLE_ASAN_PACKAGING)
+            # For ASAN packages, add dependency to rocm-core-asan
+            set(ROCM_CORE_PKG "rocm-core-asan")
+        else()
+            set(ROCM_CORE_PKG "rocm-core")
+        endif()
+        rocm_join_if_set(", " CPACK_DEBIAN_PACKAGE_DEPENDS ${ROCM_CORE_PKG})
+        rocm_join_if_set(", " CPACK_RPM_PACKAGE_REQUIRES ${ROCM_CORE_PKG})
     endif()
 endmacro()
 
