@@ -129,11 +129,15 @@ endfunction()
 option(ROCM_SYMLINK_LIBS "Create backwards compatibility symlink for library files." ON)
 
 function(rocm_install_targets)
-    set(options)
+    set(options PRIVATE)
     set(oneValueArgs PREFIX EXPORT COMPONENT)
     set(multiValueArgs TARGETS INCLUDE)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    if(PARSE_PRIVATE AND ENABLE_ASAN_PACKAGING)
+        return()
+    endif()
 
     string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
     set(EXPORT_FILE ${PROJECT_NAME_LOWER}-targets)
