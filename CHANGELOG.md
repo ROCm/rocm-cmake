@@ -1,6 +1,10 @@
 # Change Log for rocm-cmake
 
 ## [rocm-cmake 0.10.0 for ROCm 5.7.0]
+
+### Changed
+- Rename CMake package to ROCmCMakeBuildTools
+  - Deprecate use of ROCM package name, redirects to ROCmCMakeBuildTools for backwards compatibility
 ### Added
 - Added ROCMTest module
 - ROCMCreatePackage: Added support for ASAN packages
