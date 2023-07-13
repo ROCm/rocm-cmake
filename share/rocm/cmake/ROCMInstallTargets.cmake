@@ -66,6 +66,16 @@ function(rocm_install)
     if(ARGV0 STREQUAL "TARGETS")
         # rocm_install_targets deals with the component in its own fashion.
         rocm_install_targets("${ARGN}")
+    elseif(ENABLE_ASAN_PACKAGING)
+        set(oneValueArgs ASAN_DESTINATION DESTINATION COMPONENT)
+        cmake_parse_arguments(PARSE "" "${oneValueArgs}" "" ${ARGN})
+        if(DEFINED PARSE_ASAN_DESTINATION)
+            install(
+                ${PARSE_UNPARSED_ARGUMENTS}
+                DESTINATION ${PARSE_ASAN_DESTINATION}
+                COMPONENT runtime
+            )
+        endif()
     elseif(NOT ROCM_USE_DEV_COMPONENT)
         # If we want legacy behaviour, directly call install with no meddling.
         install(${ARGN})
