@@ -66,6 +66,16 @@ function(rocm_install)
     if(ARGV0 STREQUAL "TARGETS")
         # rocm_install_targets deals with the component in its own fashion.
         rocm_install_targets("${ARGN}")
+    elseif(ENABLE_ASAN_PACKAGING)
+        set(oneValueArgs ASAN_DESTINATION DESTINATION COMPONENT)
+        cmake_parse_arguments(PARSE "" "${oneValueArgs}" "" ${ARGN})
+        if(DEFINED PARSE_ASAN_DESTINATION)
+            install(
+                ${PARSE_UNPARSED_ARGUMENTS}
+                DESTINATION ${PARSE_ASAN_DESTINATION}
+                COMPONENT runtime
+            )
+        endif()
     elseif(NOT ROCM_USE_DEV_COMPONENT)
         # If we want legacy behaviour, directly call install with no meddling.
         install(${ARGN})
@@ -119,7 +129,7 @@ endfunction()
 option(ROCM_SYMLINK_LIBS "Create backwards compatibility symlink for library files." ON)
 
 function(rocm_install_targets)
-    set(options)
+    set(options PRIVATE)
     set(oneValueArgs PREFIX EXPORT COMPONENT)
     set(multiValueArgs TARGETS INCLUDE)
 
@@ -137,13 +147,18 @@ function(rocm_install_targets)
         set(LIB_INSTALL_DIR ${PARSE_PREFIX}/${ROCM_INSTALL_LIBDIR})
         set(INCLUDE_INSTALL_DIR ${PARSE_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR})
     elseif(ENABLE_ASAN_PACKAGING)
-        set(BIN_INSTALL_DIR ${CMAKE_INSTALL_BINDIR})
+        set(BIN_INSTALL_DIR ${CMAKE_INSTALL_BINDIR}/asan)
         set(LIB_INSTALL_DIR ${ROCM_INSTALL_LIBDIR}/asan)
         set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR})
     else()
         set(BIN_INSTALL_DIR ${CMAKE_INSTALL_BINDIR})
         set(LIB_INSTALL_DIR ${ROCM_INSTALL_LIBDIR})
         set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR})
+    endif()
+
+    if (PARSE_PRIVATE)
+        set(BIN_INSTALL_DIR ${BIN_INSTALL_DIR}/${PROJECT_NAME})
+        set(LIB_INSTALL_DIR ${LIB_INSTALL_DIR}/${PROJECT_NAME})
     endif()
 
     foreach(TARGET ${PARSE_TARGETS})
