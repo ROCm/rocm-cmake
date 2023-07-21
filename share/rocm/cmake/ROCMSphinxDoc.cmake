@@ -2,6 +2,8 @@
 # Copyright (C) 2021 Advanced Micro Devices, Inc.
 # ######################################################################################################################
 
+include_guard(GLOBAL)
+
 include(CMakeParseArguments)
 include(ROCMDocs)
 
