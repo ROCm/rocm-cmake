@@ -23,6 +23,7 @@ find_program(
     DOC "Doxygen documentation generator")
 
 mark_as_advanced(SPHINX_EXECUTABLE)
+mark_as_advanced(DOXYGEN_EXECUTABLE)
 
 function(rocm_add_sphinx_doc SRC_DIR)
     set(options USES_DOXYGEN)
