@@ -15,7 +15,7 @@ Commands
         [DEPENDS <doc-targets>...]
         [VARS <sphinx-variables>...]
         [TEMPLATE_VARS <sphinx-variables>...]
-        [USES_DOXYGEN]
+        [USE_DOXYGEN]
     )
 
 This will create a ``sphinx-${BUILDER}`` doc-type target which will generate
@@ -40,7 +40,7 @@ The options are:
   List of HTML template values passed to Sphinx. List items will be passed as
   command-line args by prepending ``-A`` to each item.
 
-``USES_DOXYGEN``
+``USE_DOXYGEN``
   Flag denoting the use of Doxygen in the fashion rocm-docs-core expects it.
 
 Variables

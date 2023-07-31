@@ -26,7 +26,7 @@ mark_as_advanced(SPHINX_EXECUTABLE)
 mark_as_advanced(DOXYGEN_EXECUTABLE)
 
 function(rocm_add_sphinx_doc SRC_DIR)
-    set(options USES_DOXYGEN)
+    set(options USE_DOXYGEN)
     set(oneValueArgs BUILDER OUTPUT_DIR)
     set(multiValueArgs DEPENDS VARS TEMPLATE_VARS)
 
