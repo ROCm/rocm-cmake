@@ -51,7 +51,9 @@ else()
     message(STATUS "Clang tidy found: ${CLANG_TIDY_VERSION}")
 endif()
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
+set(CMAKE_EXPORT_COMPILE_COMMANDS
+    ON
+    CACHE INTERNAL "")
 
 set(CLANG_TIDY_CACHE
     "${CMAKE_BINARY_DIR}/tidy-cache"
@@ -99,8 +101,7 @@ macro(rocm_enable_clang_tidy)
         string(REPLACE ";" "," CLANG_TIDY_ERRORS "${PARSE_ERRORS}")
 
         if(PARSE_UNPARSED_ARGUMENTS)
-            message(
-                FATAL_ERROR "Unknown keywords given to rocm_enable_clang_tidy(): \"${PARSE_UNPARSED_ARGUMENTS}\"")
+            message(FATAL_ERROR "Unknown keywords given to rocm_enable_clang_tidy(): \"${PARSE_UNPARSED_ARGUMENTS}\"")
         endif()
 
         message(STATUS "Clang tidy checks: ${CLANG_TIDY_CHECKS}")
@@ -293,7 +294,8 @@ function(rocm_clang_tidy_check TARGET)
                 ")
                 add_custom_target(
                     ${tidy_target}
-                    COMMAND ${CMAKE_COMMAND} ${CLANG_TIDY_DEV_WARNINGS_AS_ERRORS} -P ${CMAKE_CURRENT_BINARY_DIR}/${tidy_target}.cmake
+                    COMMAND ${CMAKE_COMMAND} ${CLANG_TIDY_DEV_WARNINGS_AS_ERRORS} -P
+                            ${CMAKE_CURRENT_BINARY_DIR}/${tidy_target}.cmake
                     COMMENT "clang-tidy: Running clang-tidy on target ${SOURCE}...")
             else()
                 add_custom_target(
