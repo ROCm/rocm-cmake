@@ -12,15 +12,9 @@ include(ROCMInstallTargets)
 include(ROCMAnalyzers)
 include(ROCMSetupVersion)
 
-rocm_setup_version(VERSION 1.0.0)
-
-configure_file(simple2.cpp.in simple2.cpp)
-
-add_library(simple simple.cpp ${CMAKE_CURRENT_BINARY_DIR}/simple2.cpp)
-rocm_install_targets(TARGETS simple INCLUDE include)
-
 include(ROCMClangTidy)
 rocm_enable_clang_tidy(
+    DEV_WARNINGS_AS_ERRORS
     CHECKS 
         *
         -llvmlibc-*
@@ -45,5 +39,13 @@ rocm_enable_cppcheck(
         findcasts
         threadsafety
 )
+
+rocm_setup_version(VERSION 1.0.0)
+
+configure_file(simple2.cpp.in simple2.cpp)
+
+add_library(simple simple.cpp ${CMAKE_CURRENT_BINARY_DIR}/simple2.cpp)
+rocm_install_targets(TARGETS simple INCLUDE include)
+
 
 rocm_clang_tidy_check(simple)

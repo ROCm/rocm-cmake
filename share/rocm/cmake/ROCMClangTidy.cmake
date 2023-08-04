@@ -51,7 +51,7 @@ else()
     message(STATUS "Clang tidy found: ${CLANG_TIDY_VERSION}")
 endif()
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "")
 
 set(CLANG_TIDY_CACHE
     "${CMAKE_BINARY_DIR}/tidy-cache"
@@ -90,7 +90,7 @@ cmake_dependent_option(ROCM_ENABLE_CLANG_TIDY "Enable Clang-Tidy checks" ON CLAN
 
 macro(rocm_enable_clang_tidy)
     if(ROCM_ENABLE_CLANG_TIDY)
-        set(options ALL ANALYZE_TEMPORARY_DTORS ENABLE_ALPHA_CHECKS)
+        set(options ALL ANALYZE_TEMPORARY_DTORS ENABLE_ALPHA_CHECKS DEV_WARNINGS_AS_ERRORS)
         set(oneValueArgs HEADER_FILTER)
         set(multiValueArgs CHECKS ERRORS EXTRA_ARGS CLANG_ARGS)
 
@@ -98,7 +98,19 @@ macro(rocm_enable_clang_tidy)
         string(REPLACE ";" "," CLANG_TIDY_CHECKS "${PARSE_CHECKS}")
         string(REPLACE ";" "," CLANG_TIDY_ERRORS "${PARSE_ERRORS}")
 
+        if(PARSE_UNPARSED_ARGUMENTS)
+            message(
+                FATAL_ERROR "Unknown keywords given to rocm_enable_clang_tidy(): \"${PARSE_UNPARSED_ARGUMENTS}\"")
+        endif()
+
         message(STATUS "Clang tidy checks: ${CLANG_TIDY_CHECKS}")
+
+        set(CLANG_TIDY_DEV_WARNINGS_AS_ERRORS)
+        set(CLANG_TIDY_DEV_WARNING_MODE WARNING)
+        if(PARSE_DEV_WARNINGS_AS_ERRORS)
+            set(CLANG_TIDY_DEV_WARNING_MODE FATAL_ERROR)
+            set(CLANG_TIDY_DEV_WARNINGS_AS_ERRORS -Werror=dev)
+        endif()
 
         set(CLANG_TIDY_ALL)
         if(PARSE_ALL)
@@ -209,7 +221,7 @@ function(rocm_clang_tidy_check TARGET)
                         OUTPUT_VARIABLE PP_OUT
                         RESULT_VARIABLE RESULT1)
                     if(NOT RESULT1 EQUAL 0)
-                        message(WARNING \"Could not preprocess ${SOURCE} -> ${BASE_SOURCE}.i\")
+                        message(${CLANG_TIDY_DEV_WARNING_MODE} \"Could not preprocess ${SOURCE} -> ${BASE_SOURCE}.i\")
                         execute_process(
                             COMMAND
                                 \${CLANG_TIDY_COMMAND_LIST}
@@ -281,7 +293,7 @@ function(rocm_clang_tidy_check TARGET)
                 ")
                 add_custom_target(
                     ${tidy_target}
-                    COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/${tidy_target}.cmake
+                    COMMAND ${CMAKE_COMMAND} ${CLANG_TIDY_DEV_WARNINGS_AS_ERRORS} -P ${CMAKE_CURRENT_BINARY_DIR}/${tidy_target}.cmake
                     COMMENT "clang-tidy: Running clang-tidy on target ${SOURCE}...")
             else()
                 add_custom_target(
