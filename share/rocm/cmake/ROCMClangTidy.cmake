@@ -217,7 +217,8 @@ function(rocm_clang_tidy_check TARGET)
                     set(GH_ANNOTATIONS ${ROCM_ENABLE_GH_ANNOTATIONS})
                     execute_process(
                         COMMAND
-                            ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR} --target ${BASE_SOURCE}.i -- -e COLOR=OFF
+                            ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR} --target ${BASE_SOURCE}.i --
+                            -e COLOR=OFF
                         ERROR_QUIET
                         OUTPUT_VARIABLE PP_OUT
                         RESULT_VARIABLE RESULT1)
