@@ -25,8 +25,9 @@ contains the ``conf.py`` file.
 The options are:
 
 ``OUTPUT_DIR``
-  The directory where build output will be written. By default, it's
-  ``${CMAKE_CURRENT_BINARY_DIR}/sphinx/${BUILDER}``
+  The directory where build output will be written. It takes its default, from
+  ``ROCM_CMAKE_DOCS_DIR`` if set, otherwise defaults to ``sphinx/${BUILDER}``.
+  Relative paths are interpreted relative to ``CMAKE_CURRENT_BINARY_DIR``.
 
 ``DEPENDS``
   Sets up target-level dependencies between ``sphinx-${BUILDER}`` and the
