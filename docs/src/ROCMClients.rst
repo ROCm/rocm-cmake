@@ -4,7 +4,7 @@ ROCMClients
 Commands
 --------
 
-.. cmake::command:: rocm_package_setup_client_component
+.. cmake:command:: rocm_package_setup_client_component
 
 .. code-block:: cmake
 
@@ -21,4 +21,3 @@ Commands
     )
 
 Setup a client component for packaging. See ``rocm_package_setup_component``.
-

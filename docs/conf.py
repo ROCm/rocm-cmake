@@ -14,12 +14,17 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+setting_all_article_info = True
+
+# TODO: remove this for cross-linking with other projects using intersphinx
+external_projects_remote_repository = ""
+
+external_projects_current_project = "ROCmCMakeBuildTools"
+
 
 # -- Project information -----------------------------------------------------
 
-project = 'rocm-cmake'
-copyright = '2021, Paul Fultz II'
-author = 'Paul Fultz II'
+project = 'ROCmCMakeBuildTools'
 
 
 # -- General configuration ---------------------------------------------------
@@ -28,7 +33,8 @@ author = 'Paul Fultz II'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinxcontrib.moderncmakedomain'
+    'sphinxcontrib.moderncmakedomain',
+    "rocm_docs"
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -44,28 +50,8 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-#
-html_theme = 'default'
-html_theme_options = {
-    'footerbgcolor':    '#00182d',
-    'footertextcolor':  '#ffffff',
-    'sidebarbgcolor':   '#e4ece8',
-    'sidebarbtncolor':  '#00a94f',
-    'sidebartextcolor': '#333333',
-    'sidebarlinkcolor': '#00a94f',
-    'relbarbgcolor':    '#00529b',
-    'relbartextcolor':  '#ffffff',
-    'relbarlinkcolor':  '#ffffff',
-    'bgcolor':          '#ffffff',
-    'textcolor':        '#444444',
-    'headbgcolor':      '#f2f2f2',
-    'headtextcolor':    '#003564',
-    'headlinkcolor':    '#3d8ff2',
-    'linkcolor':        '#2b63a8',
-    'visitedlinkcolor': '#2b63a8',
-    'codebgcolor':      '#eeeeee',
-    'codetextcolor':    '#333333',
-}
+
+html_theme = 'rocm_docs_theme'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

@@ -4,7 +4,7 @@ ROCMHeaderWrapper
 Commands
 --------
 
-.. cmake::command:: rocm_wrap_header_file
+.. cmake:command:: rocm_wrap_header_file
 
 .. code-block:: cmake
 
@@ -39,9 +39,9 @@ Guards
 A guard item consists of the guard string ``<guard>``, a wrapper location ``<wrapper-location>``, and an output location ``<output-location>``.
 You may specify any number of guard strings, wrapper locations and output locations.
 Guard items will be created from the arguments, and if necessary the following defaults will be used:
- - Default ``<guard>``: ``WRAPPER``
- - Default ``<wrapper-location>``: ``${CMAKE_PROJECT_NAME}/include``
- - Default ``<output-location>``: The associated ``<wrapper-location>``
+* Default ``<guard>``: ``WRAPPER``
+* Default ``<wrapper-location>``: ``${CMAKE_PROJECT_NAME}/include``
+* Default ``<output-location>``: The associated ``<wrapper-location>``
 If no guard items are specified, one will be created using all of the default values.
 Each guard item will create a wrapper file at ``${PROJECT_BINARY_DIR}/<output-location>/<header-file>`` for each header file.
 This wrapper file will have the include guard ``ROCM_<guard>_<item-path>``, where ``<item-path>`` is ``<header-file>`` with each ``/`` and ``.`` replaced with ``_``.
@@ -78,7 +78,7 @@ If the name of the wrapper file being generated is the same as the name of any `
 but it does allow projects which search for specific strings inside a header file to function correctly.
 
 
-.. cmake::command:: rocm_wrap_header_dir
+.. cmake:command:: rocm_wrap_header_dir
 
 .. code-block:: cmake
 

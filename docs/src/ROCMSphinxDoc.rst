@@ -4,7 +4,7 @@ ROCMSphinxDoc
 Commands
 --------
 
-.. cmake:command:: rocm_add_doxygen_doc
+.. cmake:command:: rocm_add_sphinx_doc
 
 .. code-block:: cmake
 
