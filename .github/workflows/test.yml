@@ -24,7 +24,8 @@ jobs:
         python -m pip install cget cmakelang[YAML]
     - name: Run linter
       run: |
-        cget build -T analyze
+        cget build -T analyze -DSPHINX_EXECUTABLE=python3
+#       python isn't sphinx, but we won't be calling it anyway
   test:
     runs-on: ${{ matrix.platform }}
     strategy:
