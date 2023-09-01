@@ -221,7 +221,7 @@ function(rocm_install_test)
     if(PARSE_TARGETS)
         install(
             TARGETS ${PARSE_TARGETS}
-            COMPONENT test
+            COMPONENT tests
             DESTINATION ${INSTALL_PREFIX}/bin)
         rocm_set_install_dir_property(TARGETS ${PARSE_TARGETS} DESTINATION ${INSTALL_PREFIX}/bin)
         get_target_property(INSTALLDIR ${PARSE_TARGETS} ROCM_INSTALL_DIR)
@@ -229,7 +229,7 @@ function(rocm_install_test)
     if(PARSE_FILES)
         install(
             FILES ${PARSE_FILES}
-            COMPONENT test
+            COMPONENT tests
             DESTINATION ${INSTALL_PREFIX}/${PARSE_DESTINATION})
     endif()
 endfunction()
@@ -302,4 +302,5 @@ function(rocm_test_install_ctest)
             INPUT ${_rocm_test_config_file}.in2)
     endif()
     rocm_install_test(FILES ${_rocm_test_config_file})
+    add_dependencies(package tests)
 endfunction()
