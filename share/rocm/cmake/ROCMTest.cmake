@@ -235,7 +235,7 @@ function(rocm_install_test)
 endfunction()
 
 function(rocm_add_test_executable EXE)
-    add_executable(${EXE} EXCLUDE_FROM_ALL ${ARGN})
+    add_executable(${EXE} ${ARGN})
     target_link_libraries(${EXE} ${CMAKE_THREAD_LIBS_INIT})
     # Cmake does not add flags correctly for gcc
     if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
