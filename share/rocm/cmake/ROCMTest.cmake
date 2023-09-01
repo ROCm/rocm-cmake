@@ -19,6 +19,9 @@ add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -j ${
 add_custom_target(tests COMMENT "Build all tests.")
 add_dependencies(check tests)
 
+add_custom_target(install-tests COMMAND ${CMAKE_COMMAND} -DCOMPONENT=tests -P ${CMAKE_BINARY_DIR}/cmake_install.cmake)
+add_dependencies(install-tests tests)
+
 rocm_define_property(TARGET "ROCM_TEST_INSTALLDIR" "Install dir for tests")
 macro(rocm_enable_test_package NAME)
     message(STATUS "Enable test package ${NAME}")
@@ -189,11 +192,6 @@ endfunction()
 
 function(rocm_mark_as_test)
     foreach(TEST_TARGET ${ARGN})
-        get_target_property(TEST_TARGET_TYPE ${TEST_TARGET} TYPE)
-        # We can only use EXCLUDE_FROM_ALL on build targets
-        if(NOT "${TEST_TARGET_TYPE}" STREQUAL "INTERFACE_LIBRARY")
-            set_target_properties(${TEST_TARGET} PROPERTIES EXCLUDE_FROM_ALL TRUE)
-        endif()
         add_dependencies(tests ${TEST_TARGET})
     endforeach()
 endfunction()
@@ -222,7 +220,8 @@ function(rocm_install_test)
         install(
             TARGETS ${PARSE_TARGETS}
             COMPONENT tests
-            DESTINATION ${INSTALL_PREFIX}/bin)
+            DESTINATION ${INSTALL_PREFIX}/bin
+            EXCLUDE_FROM_ALL)
         rocm_set_install_dir_property(TARGETS ${PARSE_TARGETS} DESTINATION ${INSTALL_PREFIX}/bin)
         get_target_property(INSTALLDIR ${PARSE_TARGETS} ROCM_INSTALL_DIR)
     endif()
@@ -230,7 +229,8 @@ function(rocm_install_test)
         install(
             FILES ${PARSE_FILES}
             COMPONENT tests
-            DESTINATION ${INSTALL_PREFIX}/${PARSE_DESTINATION})
+            DESTINATION ${INSTALL_PREFIX}/${PARSE_DESTINATION}
+            EXCLUDE_FROM_ALL)
     endif()
 endfunction()
 
@@ -302,5 +302,4 @@ function(rocm_test_install_ctest)
             INPUT ${_rocm_test_config_file}.in2)
     endif()
     rocm_install_test(FILES ${_rocm_test_config_file})
-    add_dependencies(package tests)
 endfunction()
