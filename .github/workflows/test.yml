@@ -24,7 +24,8 @@ jobs:
         python -m pip install cget cmakelang[YAML]
     - name: Run linter
       run: |
-        cget build -T analyze
+        cget build -T analyze -DSPHINX_EXECUTABLE=python3
+#       python isn't sphinx, but we won't be calling it anyway
   test:
     runs-on: ${{ matrix.platform }}
     strategy:
@@ -56,6 +57,9 @@ jobs:
         python -m pip install --upgrade setuptools pip wheel
         python -m pip install cget ninja
         python -m pip install -r doc/requirements.txt
+        python -m pip install -r test/docsphinx/docs/.sphinx/requirements.txt
+    - name: Install Doxygen
+      uses: ssciwr/doxygen-install@v1
     - name: Run tests
       run: |
         git config --global user.email "you@example.com"

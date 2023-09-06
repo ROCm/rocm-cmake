@@ -1,5 +1,5 @@
 # ######################################################################################################################
-# Copyright (C) 2017 Advanced Micro Devices, Inc.
+# Copyright (C) 2023 Advanced Micro Devices, Inc.
 # ######################################################################################################################
 
 include(CMakeParseArguments)
@@ -23,6 +23,26 @@ set(TMP_DIR ${TMP_DIR_ROOT}-${_TEST_RAND})
 file(MAKE_DIRECTORY ${TMP_DIR})
 set(PREFIX ${TMP_DIR}/usr)
 set(BUILDS_DIR ${TMP_DIR}/builds)
+
+macro(rocm_cmake_read_test_argument CMAKE_VAR VAR_TYPE)
+    if(DEFINED ROCM_${CMAKE_VAR})
+        if(${CMAKE_VAR} STREQUAL "CMAKE_GENERATOR")
+            list(APPEND ADDITIONAL_CONFIGURE_ARGS -G "${ROCM_${CMAKE_VAR}}")
+        else()
+            if(NOT ${ROCM_${CMAKE_VAR}} STREQUAL "")
+                list(APPEND ADDITIONAL_CONFIGURE_ARGS -D "${CMAKE_VAR}=${ROCM_${CMAKE_VAR}}")
+            endif()
+        endif()
+    endif()
+endmacro()
+
+rocm_cmake_read_test_argument(CMAKE_MAKE_PROGRAM FILEPATH)
+rocm_cmake_read_test_argument(CMAKE_GENERATOR STRING)
+rocm_cmake_read_test_argument(CMAKE_GENERATOR_INSTANCE STRING)
+rocm_cmake_read_test_argument(CMAKE_GENERATOR_PLATFORM STRING)
+rocm_cmake_read_test_argument(CMAKE_GENERATOR_TOOLSET STRING)
+rocm_cmake_read_test_argument(CMAKE_PREFIX_PATH PATH)
+rocm_cmake_read_test_argument(CMAKE_PROGRAM_PATH PATH)
 
 # cmake-lint: disable=C0103
 macro(test_expect_eq X Y)
@@ -49,6 +69,12 @@ macro(test_expect_file FILE)
     endif()
 endmacro()
 
+macro(test_expect_installed_file FILE)
+    if(NOT EXISTS "${PREFIX}/${FILE}")
+        message(FATAL_ERROR "EXPECT INSTALLED FILE: ${FILE}")
+    endif()
+endmacro()
+
 macro(test_expect_no_file FILE)
     if(EXISTS ${FILE})
         message(FATAL_ERROR "EXPECT NO FILE: ${FILE}")
@@ -57,10 +83,11 @@ endmacro()
 
 macro(test_exec)
     string(REPLACE ";" " " EXEC_COMMAND "${ARGN}")
-    message("${EXEC_COMMAND}")
-    execute_process(${ARGN} RESULT_VARIABLE test_exec_RESULT)
+    string(REPLACE "|" "\;" EXEC_COMMAND "${EXEC_COMMAND}")
+    string(REPLACE "|" "\;" REAL_EXEC_COMMAND "${ARGN}")
+    execute_process(${REAL_EXEC_COMMAND} RESULT_VARIABLE test_exec_RESULT)
     if(NOT test_exec_RESULT EQUAL 0)
-        message(FATAL_ERROR "Process failed: ${ARGN}")
+        message(FATAL_ERROR "Process failed: ${EXEC_COMMAND}")
     endif()
 endmacro()
 
@@ -80,12 +107,7 @@ function(configure_dir DIR)
     if(NOT EXISTS ${BUILD_DIR})
         file(MAKE_DIRECTORY ${BUILD_DIR})
     endif()
-    if(ROCM_CMAKE_GENERATOR)
-        set(GENERATOR_FLAG -G "${ROCM_CMAKE_GENERATOR}")
-    else()
-        set(GENERATOR_FLAG)
-    endif()
-    test_exec(COMMAND ${CMAKE_COMMAND} -Werror=dev ${GENERATOR_FLAG} -DCMAKE_PREFIX_PATH=${PREFIX}
+    test_exec(COMMAND ${CMAKE_COMMAND} -Werror=dev ${ADDITIONAL_CONFIGURE_ARGS} -DCMAKE_PREFIX_PATH=${PREFIX}
                       -DCMAKE_INSTALL_PREFIX=${PREFIX} -DROCM_ERROR_TOOLCHAIN_VAR=On ${PARSE_CMAKE_ARGS} ${DIR}
               WORKING_DIRECTORY ${BUILD_DIR})
     foreach(TARGET ${PARSE_TARGETS})
