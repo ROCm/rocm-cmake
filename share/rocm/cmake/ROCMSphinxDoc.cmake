@@ -12,8 +12,7 @@ find_program(
     NAMES sphinx-build
     HINTS "$ENV{SPHINX_DIR}"
     PATH_SUFFIXES bin
-    DOC "Sphinx documentation generator"
-    REQUIRED)
+    DOC "Sphinx documentation generator")
 
 find_program(
     DOXYGEN_EXECUTABLE
