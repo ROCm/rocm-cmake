@@ -61,10 +61,6 @@ function(rocm_add_sphinx_doc SRC_DIR)
     endforeach()
 
     if(PARSE_USES_DOXYGEN)
-        if(NOT DOXYGEN_EXECUTABLE)
-            message(FATAL_ERROR
-                "rocm_add_sphinx_doc has USES_DOXYGEN set but DOXYGEN_EXECUTABLE is set to ${DOXYGEN_EXECUTABLE}.")
-        endif()
         set(USES_DOXYGEN -D "doxygen_executable=${DOXYGEN_EXECUTABLE}")
     else()
         set(USES_DOXYGEN)
