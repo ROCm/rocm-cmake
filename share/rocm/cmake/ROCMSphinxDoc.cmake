@@ -81,11 +81,11 @@ function(rocm_add_sphinx_doc SRC_DIR)
         endif()
         rocm_mark_as_doc(sphinx-${BUILDER})
     endif()
-    
+
     if(ERROR_MSG)
         return()
     endif()
-    
+
     add_custom_target(
         ${PROJECT_NAME}-sphinx-${BUILDER}
         COMMAND
