@@ -84,7 +84,8 @@ function(rocm_add_sphinx_doc SRC_DIR)
     
     if(ERROR_MSG)
         return()
-        
+    endif()
+    
     add_custom_target(
         ${PROJECT_NAME}-sphinx-${BUILDER}
         COMMAND
