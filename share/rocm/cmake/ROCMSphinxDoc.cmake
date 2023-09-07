@@ -60,10 +60,10 @@ function(rocm_add_sphinx_doc SRC_DIR)
         list(APPEND VARS -A "${VAR}")
     endforeach()
 
-    if(PARSE_USES_DOXYGEN)
-        set(USES_DOXYGEN -D "doxygen_executable=${DOXYGEN_EXECUTABLE}")
+    if(PARSE_USE_DOXYGEN)
+        set(USE_DOXYGEN -D "doxygen_executable=${DOXYGEN_EXECUTABLE}")
     else()
-        set(USES_DOXYGEN)
+        set(USE_DOXYGEN)
     endif()
 
     if(NOT TARGET sphinx-${BUILDER})
@@ -76,7 +76,7 @@ function(rocm_add_sphinx_doc SRC_DIR)
             "${SPHINX_EXECUTABLE}"
             -b ${PARSE_BUILDER}
             -d "${CMAKE_CURRENT_BINARY_DIR}/doctrees"
-            ${USES_DOXYGEN}
+            ${USE_DOXYGEN}
             ${VARS}
             "${SRC_DIR}"
             "${OUTPUT_DIR}"
