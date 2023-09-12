@@ -12,8 +12,7 @@ find_program(
     NAMES sphinx-build
     HINTS "$ENV{SPHINX_DIR}"
     PATH_SUFFIXES bin
-    DOC "Sphinx documentation generator"
-    REQUIRED)
+    DOC "Sphinx documentation generator")
 
 find_program(
     DOXYGEN_EXECUTABLE
@@ -61,14 +60,10 @@ function(rocm_add_sphinx_doc SRC_DIR)
         list(APPEND VARS -A "${VAR}")
     endforeach()
 
-    if(PARSE_USES_DOXYGEN)
-        if(NOT DOXYGEN_EXECUTABLE)
-            message(FATAL_ERROR
-                "rocm_add_sphinx_doc has USES_DOXYGEN set but DOXYGEN_EXECUTABLE is set to ${DOXYGEN_EXECUTABLE}.")
-        endif()
-        set(USES_DOXYGEN -D "doxygen_executable=${DOXYGEN_EXECUTABLE}")
+    if(PARSE_USE_DOXYGEN)
+        set(USE_DOXYGEN -D "doxygen_executable=${DOXYGEN_EXECUTABLE}")
     else()
-        set(USES_DOXYGEN)
+        set(USE_DOXYGEN)
     endif()
 
     if(NOT TARGET sphinx-${BUILDER})
@@ -81,7 +76,7 @@ function(rocm_add_sphinx_doc SRC_DIR)
             "${SPHINX_EXECUTABLE}"
             -b ${PARSE_BUILDER}
             -d "${CMAKE_CURRENT_BINARY_DIR}/doctrees"
-            ${USES_DOXYGEN}
+            ${USE_DOXYGEN}
             ${VARS}
             "${SRC_DIR}"
             "${OUTPUT_DIR}"
