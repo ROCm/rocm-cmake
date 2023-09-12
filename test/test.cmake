@@ -97,7 +97,7 @@ endmacro()
 
 function(configure_dir DIR)
     set(options)
-    set(oneValueArgs)
+    set(oneValueArgs BUILD_DIR_VAR)
     set(multiValueArgs CMAKE_ARGS TARGETS)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -118,7 +118,11 @@ function(configure_dir DIR)
         endif()
     endforeach()
 
-    file(REMOVE_RECURSE ${BUILD_DIR})
+    if(PARSE_BUILD_DIR_VAR)
+        set(${PARSE_BUILD_DIR_VAR} ${BUILD_DIR} PARENT_SCOPE)
+    else()
+        file(REMOVE_RECURSE ${BUILD_DIR})
+    endif()
 endfunction()
 
 function(install_dir DIR)
