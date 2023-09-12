@@ -19,13 +19,16 @@ add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -j ${
 add_custom_target(tests COMMENT "Build all tests.")
 add_dependencies(check tests)
 
+add_custom_target(install-tests COMMAND ${CMAKE_COMMAND} -DCOMPONENT=tests -P ${CMAKE_BINARY_DIR}/cmake_install.cmake)
+add_dependencies(install-tests tests)
+
 rocm_define_property(TARGET "ROCM_TEST_INSTALLDIR" "Install dir for tests")
-function(rocm_enable_test_package NAME)
+macro(rocm_enable_test_package NAME)
     message(STATUS "Enable test package ${NAME}")
     set_target_properties(tests PROPERTIES ROCM_TEST_INSTALLDIR ${CMAKE_INSTALL_PREFIX}/share/test/${NAME})
     rocm_package_setup_component(tests DEPENDS COMPONENT runtime)
     rocm_defer(rocm_test_install_ctest)
-endfunction()
+endmacro()
 
 if(POLICY CMP0079)
     cmake_policy(SET CMP0079 OLD)
@@ -189,11 +192,6 @@ endfunction()
 
 function(rocm_mark_as_test)
     foreach(TEST_TARGET ${ARGN})
-        get_target_property(TEST_TARGET_TYPE ${TEST_TARGET} TYPE)
-        # We can only use EXCLUDE_FROM_ALL on build targets
-        if(NOT "${TEST_TARGET_TYPE}" STREQUAL "INTERFACE_LIBRARY")
-            set_target_properties(${TEST_TARGET} PROPERTIES EXCLUDE_FROM_ALL TRUE)
-        endif()
         add_dependencies(tests ${TEST_TARGET})
     endforeach()
 endfunction()
@@ -221,21 +219,23 @@ function(rocm_install_test)
     if(PARSE_TARGETS)
         install(
             TARGETS ${PARSE_TARGETS}
-            COMPONENT test
-            DESTINATION ${INSTALL_PREFIX}/bin)
+            COMPONENT tests
+            DESTINATION ${INSTALL_PREFIX}/bin
+            EXCLUDE_FROM_ALL)
         rocm_set_install_dir_property(TARGETS ${PARSE_TARGETS} DESTINATION ${INSTALL_PREFIX}/bin)
         get_target_property(INSTALLDIR ${PARSE_TARGETS} ROCM_INSTALL_DIR)
     endif()
     if(PARSE_FILES)
         install(
             FILES ${PARSE_FILES}
-            COMPONENT test
-            DESTINATION ${INSTALL_PREFIX}/${PARSE_DESTINATION})
+            COMPONENT tests
+            DESTINATION ${INSTALL_PREFIX}/${PARSE_DESTINATION}
+            EXCLUDE_FROM_ALL)
     endif()
 endfunction()
 
 function(rocm_add_test_executable EXE)
-    add_executable(${EXE} EXCLUDE_FROM_ALL ${ARGN})
+    add_executable(${EXE} ${ARGN})
     target_link_libraries(${EXE} ${CMAKE_THREAD_LIBS_INIT})
     # Cmake does not add flags correctly for gcc
     if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
