@@ -27,13 +27,13 @@ mark_as_advanced(DOXYGEN_EXECUTABLE)
 
 function(rocm_add_sphinx_doc SRC_DIR)
     set(options USE_DOXYGEN)
-    set(oneValueArgs BUILDER OUTPUT_DIR)
+    set(oneValueArgs BUILDER CONFIG_DIR OUTPUT_DIR)
     set(multiValueArgs DEPENDS VARS TEMPLATE_VARS)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     get_filename_component(SRC_DIR "${SRC_DIR}" ABSOLUTE BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-    if(NOT EXISTS "${SRC_DIR}/conf.py")
+    if(NOT PARSE_CONFIG_DIR AND NOT EXISTS "${SRC_DIR}/conf.py")
         message(FATAL_ERROR "rocm_add_sphinx_doc cannot find ${SRC_DIR}/conf.py")
     endif()
 
@@ -51,6 +51,16 @@ function(rocm_add_sphinx_doc SRC_DIR)
         else()
             set(OUTPUT_DIR "sphinx/${PARSE_BUILDER}")
         endif()
+    endif()
+
+    if(PARSE_CONFIG_DIR)
+        if(NOT EXISTS "${PARSE_CONFIG_DIR}/conf.py")
+            message(FATAL_ERROR "rocm_add_sphinx_doc cannot find ${PARSE_CONFIG_DIR}/conf.py")
+        endif()
+        get_filename_component(CONFIG_DIR "${PARSE_CONFIG_DIR}" ABSOLUTE BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+        set(CONFIG_DIR_ARG -c "${CONFIG_DIR}")
+    else()
+        set(CONFIG_DIR_ARG)
     endif()
 
     set(VARS)
@@ -79,6 +89,7 @@ function(rocm_add_sphinx_doc SRC_DIR)
         ${PROJECT_NAME}-sphinx-${BUILDER}
         COMMAND
             "${SPHINX_EXECUTABLE}"
+            ${CONFIG_DIR_ARG}
             -b ${PARSE_BUILDER}
             -d "${CMAKE_CURRENT_BINARY_DIR}/doctrees"
             ${USES_DOXYGEN}
