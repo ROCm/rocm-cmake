@@ -12,6 +12,7 @@ Commands
         SRC_DIR
         BUILDER <sphinx-builder>
         [OUTPUT_DIR <output-directory>]
+        [CONFIG_DIR <config-directory>]
         [DEPENDS <doc-targets>...]
         [VARS <sphinx-variables>...]
         [TEMPLATE_VARS <sphinx-variables>...]
@@ -28,6 +29,12 @@ The options are:
   The directory where build output will be written. It takes its default, from
   ``ROCM_CMAKE_DOCS_DIR`` if set, otherwise defaults to ``sphinx/${BUILDER}``.
   Relative paths are interpreted relative to ``CMAKE_CURRENT_BINARY_DIR``.
+
+``CONFIG_DIR``
+  The directory where ``conf.py`` will be searched. It sets the ``-c`` argument
+  of ``sphinx-build`` if set, otherwise defaults to ``${SRC_DIR}`` as per the
+  underlying tool. Relative paths are interpreted relative to
+  ``CMAKE_CURRENT_SOURCE_DIR``.
 
 ``DEPENDS``
   Sets up target-level dependencies between ``sphinx-${BUILDER}`` and the
