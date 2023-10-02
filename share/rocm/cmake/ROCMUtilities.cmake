@@ -117,3 +117,9 @@ function(rocm_read_os_release OUTPUT KEYVALUE)
         ${_output}
         PARENT_SCOPE)
 endfunction()
+
+function(rocm_error_target TARGET MESSAGE)
+    add_custom_target(${TARGET}
+        COMMAND ${CMAKE_COMMAND} -E echo "ERROR: ${MESSAGE}"
+        COMMAND ${CMAKE_COMMAND} -E false)
+endfunction()
