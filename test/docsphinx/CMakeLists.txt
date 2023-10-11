@@ -7,7 +7,7 @@ project(useful LANGUAGES CXX)
 # Ideally should be NONE, but GNUInstallDirs detects platform arch using try_compile
 # https://stackoverflow.com/questions/43379311/why-does-project-affect-cmakes-opinion-on-cmake-sizeof-void-p
 
-find_package(ROCM)
+find_package(ROCmCMakeBuildTools)
 
 include(ROCMSphinxDoc)
 include(GNUInstallDirs)
