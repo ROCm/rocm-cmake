@@ -4,7 +4,7 @@
 
 
 cmake_minimum_required (VERSION 3.5)
-find_package(ROCM)
+find_package(ROCmCMakeBuildTools)
 project(toolchain-var CXX)
 
 if(CHANGE_TOOLCHAIN)

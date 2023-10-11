@@ -6,7 +6,7 @@
 cmake_minimum_required (VERSION 3.5)
 project(basic CXX)
 
-find_package(ROCM)
+find_package(ROCmCMakeBuildTools)
 find_package(simple)
 
 include(ROCMInstallTargets)

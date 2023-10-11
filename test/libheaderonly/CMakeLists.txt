@@ -6,7 +6,7 @@
 cmake_minimum_required (VERSION 3.5)
 project(headeronly LANGUAGES NONE)
 
-find_package(ROCM)
+find_package(ROCmCMakeBuildTools)
 
 include(ROCMInstallTargets)
 include(ROCMPackageConfigHelpers)
@@ -18,7 +18,7 @@ rocm_setup_version(VERSION 1.0.0)
 
 if(ROCM_PREFIX)
 rocm_create_package(
-    NAME headeronly 
+    NAME headeronly
     PREFIX ${ROCM_PREFIX}
     MAINTAINER "Amd amd@amd.com"
     PTH
@@ -26,7 +26,7 @@ rocm_create_package(
     HEADER_ONLY)
 else()
 rocm_create_package(
-    NAME headeronly 
+    NAME headeronly
     MAINTAINER "Amd amd@amd.com"
     PTH
     LDCONFIG
@@ -38,15 +38,15 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 add_library(headeronly INTERFACE)
-target_include_directories(headeronly 
-    INTERFACE 
+target_include_directories(headeronly
+    INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:headeronly/include/>)
 
 if(ROCM_PREFIX)
     rocm_install_targets(
-        TARGETS headeronly 
-        INCLUDE include 
+        TARGETS headeronly
+        INCLUDE include
         PREFIX ${ROCM_PREFIX})
     rocm_install(
         DIRECTORY
@@ -58,8 +58,8 @@ if(ROCM_PREFIX)
         PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ
     )
     rocm_export_targets(
-        TARGETS headeronly 
-        INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/importtarget.cmake 
+        TARGETS headeronly
+        INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/importtarget.cmake
         PREFIX ${ROCM_PREFIX})
     rocm_install_symlink_subdir(${ROCM_PREFIX})
 else()
@@ -76,6 +76,6 @@ else()
         PERMISSIONS OWNER_WRITE OWNER_READ GROUP_READ WORLD_READ
     )
     rocm_export_targets(
-        TARGETS headeronly 
+        TARGETS headeronly
         INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/importtarget.cmake)
 endif()

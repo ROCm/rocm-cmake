@@ -6,7 +6,7 @@
 cmake_minimum_required (VERSION 3.5)
 project(simple LANGUAGES CXX)
 
-find_package(ROCM)
+find_package(ROCmCMakeBuildTools)
 
 include(ROCMInstallTargets)
 include(ROCMAnalyzers)
@@ -15,7 +15,7 @@ include(ROCMSetupVersion)
 include(ROCMClangTidy)
 rocm_enable_clang_tidy(
     DEV_WARNINGS_AS_ERRORS
-    CHECKS 
+    CHECKS
         *
         -llvmlibc-*
     ERRORS
@@ -26,10 +26,10 @@ rocm_enable_clang_tidy(
 include(ROCMCppCheck)
 rocm_enable_cppcheck(
     INCONCLUSIVE
-    CHECKS 
+    CHECKS
         warning
     FORCE
-    SUPPRESS 
+    SUPPRESS
         unmatchedSuppression
     SOURCES
         simple.cpp
