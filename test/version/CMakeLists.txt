@@ -5,7 +5,7 @@
 cmake_minimum_required (VERSION 3.5)
 project(simple LANGUAGES NONE)
 
-find_package(ROCM)
+find_package(ROCmCMakeBuildTools)
 
 include(ROCMSetupVersion)
 include(ROCMCreatePackage)
@@ -32,7 +32,7 @@ endmacro()
 @CONTENT@
 
 rocm_create_package(
-    NAME simple 
+    NAME simple
     MAINTAINER "Amd amd@amd.com"
     PTH
     LDCONFIG)
