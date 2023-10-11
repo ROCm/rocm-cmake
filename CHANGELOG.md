@@ -3,15 +3,12 @@
 ## [rocm-cmake 0.11.0 for ROCm 6.0.0]
 ### Changed
 - ROCMSphinxDoc: Improved validation, documentation and rocm-docs-core integration.
+- Rename CMake package to ROCmCMakeBuildTools
 ### Fixed
 - ROCMClangTidy: Fixed extra make flags passed for clang tidy.
 - ROCMTest: Fixed issues when using module in a subdirectory.
 
 ## [rocm-cmake 0.10.0 for ROCm 5.7.0]
-
-### Changed
-- Rename CMake package to ROCmCMakeBuildTools
-  - Deprecate use of ROCM package name, redirects to ROCmCMakeBuildTools for backwards compatibility
 ### Added
 - Added ROCMTest module
 - ROCMCreatePackage: Added support for ASAN packages
