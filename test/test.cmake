@@ -92,7 +92,7 @@ macro(test_exec)
 endmacro()
 
 macro(use_rocm_cmake)
-    list(APPEND CMAKE_MODULE_PATH ${PREFIX}/share/rocm/cmake)
+    list(APPEND CMAKE_MODULE_PATH ${PREFIX}/share/rocmcmakebuildtools/cmake)
 endmacro()
 
 function(configure_dir DIR)
