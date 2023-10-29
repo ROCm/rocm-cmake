@@ -1,0 +1,176 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>ROCMHeaderWrapper &#8212; rocm-cmake  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="index.html">rocm-cmake  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">ROCMHeaderWrapper</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="rocmheaderwrapper">
+<h1>ROCMHeaderWrapper<a class="headerlink" href="#rocmheaderwrapper" title="Permalink to this headline">¶</a></h1>
+<section id="commands">
+<h2>Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">rocm_wrap_header_file(</span>
+<span class="w">    </span><span class="p">[</span><span class="no">HEADERS</span><span class="p">]</span><span class="w"> </span><span class="nv">&lt;header-file&gt;</span><span class="w"> </span><span class="p">[</span><span class="nv">&lt;header-file&gt;...</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">HEADER_LOCATION</span><span class="w"> </span><span class="nv">&lt;header-location&gt;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">INCLUDE_LOCATION</span><span class="w"> </span><span class="nv">&lt;include-location&gt;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">GUARDS</span><span class="w"> </span><span class="nv">&lt;guard&gt;...</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">WRAPPER_LOCATIONS</span><span class="w"> </span><span class="nv">&lt;wrapper-location&gt;...</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">OUTPUT_LOCATIONS</span><span class="w"> </span><span class="nv">&lt;output-location&gt;...</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">ORIGINAL_FILES</span><span class="w"> </span><span class="nv">&lt;original-file&gt;...</span><span class="p">]</span>
+<span class="nf">)</span>
+</pre></div>
+</div>
+<p>Create a C/C++ wrapper file for each specified header file. The wrapper is simply a C/C++ header
+that emits a deprecation warning before including its corresponding header. The warning can be
+turned off by defining <code class="docutils literal notranslate"><span class="pre">ROCM_NO_WRAPPER_HEADER_WARNING</span></code> when using the wrapper header files.
+There is an additional configure-time CMake variable <code class="docutils literal notranslate"><span class="pre">ROCM_HEADER_WRAPPER_WERROR</span></code>, which is used
+to set the default value for the compile-time C macro of the same name (with CMake truthy values setting a default of
+true/1). If the compile-time macro is true, then deprecation errors will be emitted instead of warnings.</p>
+<p>Any relative header or wrapper locations are relative to <code class="docutils literal notranslate"><span class="pre">${CPACK_PACKAGING_INSTALL_PREFIX}</span></code> if it is set,
+or to <code class="docutils literal notranslate"><span class="pre">${CMAKE_INSTALL_PREFIX}</span></code> otherwise (i.e. the install directory).
+Any relative output locations are relative to <code class="docutils literal notranslate"><span class="pre">${PROJECT_BINARY_DIR}</span></code> (i.e. the build directory)</p>
+<p>Each <code class="docutils literal notranslate"><span class="pre">&lt;header-file&gt;</span></code> is presumed to be installed to <code class="docutils literal notranslate"><span class="pre">${CMAKE_INSTALL_PREFIX}/&lt;header-location&gt;/&lt;header-file&gt;</span></code>.
+If it is not specified, <code class="docutils literal notranslate"><span class="pre">&lt;header-location&gt;</span></code> defaults to <code class="docutils literal notranslate"><span class="pre">include/${CMAKE_PROJECT_NAME}</span></code> (e.g. <code class="docutils literal notranslate"><span class="pre">include/rocblas</span></code>).</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">&lt;include-location&gt;</span></code> parameter specifies the presumed compiler include directory, to correctly calculate suggested include directives.</p>
+<section id="guards">
+<h3>Guards<a class="headerlink" href="#guards" title="Permalink to this headline">¶</a></h3>
+<p>A guard item consists of the guard string <code class="docutils literal notranslate"><span class="pre">&lt;guard&gt;</span></code>, a wrapper location <code class="docutils literal notranslate"><span class="pre">&lt;wrapper-location&gt;</span></code>, and an output location <code class="docutils literal notranslate"><span class="pre">&lt;output-location&gt;</span></code>.
+You may specify any number of guard strings, wrapper locations and output locations.
+Guard items will be created from the arguments, and if necessary the following defaults will be used:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Default <code class="docutils literal notranslate"><span class="pre">&lt;guard&gt;</span></code>: <code class="docutils literal notranslate"><span class="pre">WRAPPER</span></code></p></li>
+<li><p>Default <code class="docutils literal notranslate"><span class="pre">&lt;wrapper-location&gt;</span></code>: <code class="docutils literal notranslate"><span class="pre">${CMAKE_PROJECT_NAME}/include</span></code></p></li>
+<li><p>Default <code class="docutils literal notranslate"><span class="pre">&lt;output-location&gt;</span></code>: The associated <code class="docutils literal notranslate"><span class="pre">&lt;wrapper-location&gt;</span></code></p></li>
+</ul>
+</div></blockquote>
+<p>If no guard items are specified, one will be created using all of the default values.
+Each guard item will create a wrapper file at <code class="docutils literal notranslate"><span class="pre">${PROJECT_BINARY_DIR}/&lt;output-location&gt;/&lt;header-file&gt;</span></code> for each header file.
+This wrapper file will have the include guard <code class="docutils literal notranslate"><span class="pre">ROCM_&lt;guard&gt;_&lt;item-path&gt;</span></code>, where <code class="docutils literal notranslate"><span class="pre">&lt;item-path&gt;</span></code> is <code class="docutils literal notranslate"><span class="pre">&lt;header-file&gt;</span></code> with each <code class="docutils literal notranslate"><span class="pre">/</span></code> and <code class="docutils literal notranslate"><span class="pre">.</span></code> replaced with <code class="docutils literal notranslate"><span class="pre">_</span></code>.
+It assumes that it will be installed to <code class="docutils literal notranslate"><span class="pre">${CMAKE_INSTALL_PREFIX}/&lt;wrapper-location&gt;/&lt;header-file&gt;</span></code>, and will include a relative path that is correct if it is installed to that location.</p>
+<p>For example, suppose the project name is <code class="docutils literal notranslate"><span class="pre">rocexample</span></code> and consider the following:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">rocm_wrap_header_file(</span>
+<span class="w">    </span><span class="na">foo/bar.h</span>
+<span class="w">    </span><span class="no">HEADER_LOCATION</span><span class="w"> </span><span class="na">include/rocexample</span>
+<span class="w">    </span><span class="no">GUARDS</span>
+<span class="w">        </span><span class="no">EXAMPLE</span>
+<span class="w">        </span><span class="no">EXAMPLE_INC</span>
+<span class="w">    </span><span class="no">WRAPPER_LOCATIONS</span>
+<span class="w">        </span><span class="nb">rocexample</span><span class="w"> </span><span class="c"># EXAMPLE</span>
+<span class="w">    </span><span class="no">OUTPUT_LOCATIONS</span>
+<span class="w">        </span><span class="na">wrapper/rocexample</span><span class="w"> </span><span class="c"># EXAMPLE</span>
+<span class="nf">)</span>
+</pre></div>
+</div>
+<p>This will create two wrapper files.</p>
+<p>The first wrapper file will be created at <code class="docutils literal notranslate"><span class="pre">${PROJECT_BINARY_DIR}/wrapper/rocexample/foo/bar.h</span></code>.
+Its include guard will be <code class="docutils literal notranslate"><span class="pre">ROCM_EXAMPLE_FOO_BAR_H</span></code>, and it will include the file <code class="docutils literal notranslate"><span class="pre">../../include/rocexample/foo/bar.h</span></code>
+(which is the correct file when this wrapper is installed at <code class="docutils literal notranslate"><span class="pre">${CMAKE_INSTALL_PREFIX}/rocexample/foo/bar.h</span></code>).</p>
+<p>The second wrapper file uses the default locations, so it will be created at <code class="docutils literal notranslate"><span class="pre">${PROJECT_BINARY_DIR}/rocexample/include/foo/bar.h</span></code>.
+Its include guard will be <code class="docutils literal notranslate"><span class="pre">ROCM_EXAMPLE_INC_FOO_BAR_H</span></code>, and it will include the file <code class="docutils literal notranslate"><span class="pre">../../../include/rocexample/foo/bar.h</span></code>
+(which is the correct file when this wrapper is installed at <code class="docutils literal notranslate"><span class="pre">${CMAKE_INSTALL_PREFIX}/rocexample/include/foo/bar.h</span></code>)</p>
+<p>If the name of the wrapper file being generated is the same as the name of any <code class="docutils literal notranslate"><span class="pre">&lt;original-file&gt;</span></code>, the contents of that
+<code class="docutils literal notranslate"><span class="pre">&lt;original-file&gt;</span></code> will be added to the wrapper file inside a <code class="docutils literal notranslate"><span class="pre">#if</span> <span class="pre">0</span></code> block. This has no effect on the code of the header,
+but it does allow projects which search for specific strings inside a header file to function correctly.</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">rocm_wrap_header_dir(</span>
+<span class="w">    </span><span class="nv">&lt;include-directory&gt;</span>
+<span class="w">    </span><span class="p">[</span><span class="no">HEADER_LOCATION</span><span class="w"> </span><span class="nv">&lt;header-location&gt;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">GUARDS</span><span class="w"> </span><span class="nv">&lt;guard&gt;...</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">WRAPPER_LOCATIONS</span><span class="w"> </span><span class="nv">&lt;wrapper-location&gt;...</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">OUTPUT_LOCATIONS</span><span class="w"> </span><span class="nv">&lt;output-location&gt;...</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">PATTERNS</span><span class="w"> </span><span class="nv">&lt;pattern&gt;...</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">ORIGINAL_FILES</span><span class="w"> </span><span class="nv">&lt;original-file&gt;...</span><span class="p">]</span>
+<span class="nf">)</span>
+</pre></div>
+</div>
+<p>Create a C/C++ wrapper file for each header file in the given directory (or any subdirectory) matching at least one pattern.</p>
+<p>Each file in the specified directory which matches a pattern will have a wrapper file created for it.
+The <code class="docutils literal notranslate"><span class="pre">&lt;header-file&gt;</span></code> used in each call to <code class="docutils literal notranslate"><span class="pre">rocm_wrap_header_file</span></code> is the path to the header file relative to <code class="docutils literal notranslate"><span class="pre">&lt;include-directory&gt;</span></code>.</p>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ROCMHeaderWrapper</a><ul>
+<li><a class="reference internal" href="#commands">Commands</a><ul>
+<li><a class="reference internal" href="#guards">Guards</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ROCMHeaderWrapper.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="index.html">rocm-cmake  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">ROCMHeaderWrapper</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Paul Fultz II.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
+    </div>
+  </body>
+</html>

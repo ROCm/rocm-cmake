@@ -1,0 +1,115 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>ROCMAnalyzers &#8212; rocm-cmake  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="index.html">rocm-cmake  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">ROCMAnalyzers</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="rocmanalyzers">
+<h1>ROCMAnalyzers<a class="headerlink" href="#rocmanalyzers" title="Permalink to this headline">¶</a></h1>
+<p>This creates a <code class="docutils literal notranslate"><span class="pre">analyze</span></code> target which can run all analysis for a project.</p>
+<section id="commands">
+<h2>Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h2>
+<dl class="cmake command">
+<dt class="sig sig-object cmake" id="command:rocm_mark_as_analyzer">
+<span class="sig-name descname"><span class="pre">rocm_mark_as_analyzer</span></span><a class="headerlink" href="#command:rocm_mark_as_analyzer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">rocm_mark_as_analyzer(</span><span class="nv">&lt;target&gt;</span><span class="nf">)</span>
+</pre></div>
+</div>
+<p>Marks a target to be included with the <code class="docutils literal notranslate"><span class="pre">analyze</span></code> target.</p>
+</section>
+<section id="variables">
+<h2>Variables<a class="headerlink" href="#variables" title="Permalink to this headline">¶</a></h2>
+<dl class="cmake variable">
+<dt class="sig sig-object cmake" id="variable:ROCM_ENABLE_GH_ANNOTATIONS">
+<span class="sig-name descname"><span class="pre">ROCM_ENABLE_GH_ANNOTATIONS</span></span><a class="headerlink" href="#variable:ROCM_ENABLE_GH_ANNOTATIONS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Set this variable to <code class="docutils literal notranslate"><span class="pre">ON</span></code> so that analyzers will emit diagnostics in a format that github can use to annotate pull requests.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ROCMAnalyzers</a><ul>
+<li><a class="reference internal" href="#commands">Commands</a></li>
+<li><a class="reference internal" href="#variables">Variables</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ROCMAnalyzers.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="index.html">rocm-cmake  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">ROCMAnalyzers</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Paul Fultz II.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
+    </div>
+  </body>
+</html>

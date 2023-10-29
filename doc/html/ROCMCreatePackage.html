@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>ROCMCreatePackage &#8212; rocm-cmake  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="index.html">rocm-cmake  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">ROCMCreatePackage</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="rocmcreatepackage">
+<h1>ROCMCreatePackage<a class="headerlink" href="#rocmcreatepackage" title="Permalink to this headline">¶</a></h1>
+<section id="commands">
+<h2>Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h2>
+<dl class="cmake command">
+<dt class="sig sig-object cmake" id="command:rocm_create_package">
+<span class="sig-name descname"><span class="pre">rocm_create_package</span></span><a class="headerlink" href="#command:rocm_create_package" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">rocm_create_package(</span>
+<span class="w">    </span><span class="no">NAME</span><span class="w"> </span><span class="nv">&lt;name&gt;</span>
+<span class="w">    </span><span class="p">[</span><span class="no">DESCRIPTION</span><span class="w"> </span><span class="nv">&lt;description&gt;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">SECTION</span><span class="w"> </span><span class="nv">&lt;section&gt;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">MAINTAINER</span><span class="w"> </span><span class="nv">&lt;maintainer&gt;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">LDCONFIG_DIR</span><span class="w"> </span><span class="nv">&lt;lib-directory&gt;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">PREFIX</span><span class="w"> </span><span class="nv">&lt;path&gt;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">LDCONFIG</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">HEADER_ONLY</span><span class="p">]</span>
+<span class="nf">)</span>
+</pre></div>
+</div>
+<p>Sets up CPack packaging, including installing the license file to the correct location and component.
+If the license file is not specified, also attempts to locate a LICENSE, LICENSE.md, or LICENSE.txt file in <cite>CMAKE_SOURCE_DIR</cite>.</p>
+<p>If the CPACK_GENERATOR has not been specified then if ROCM_PKGTYPE is set
+then use that to set it, otherwise probe the system to see what
+programs are available.</p>
+<dl class="cmake command">
+<dt class="sig sig-object cmake" id="command:rocm_package_add_rpm_dependencies">
+<span class="sig-name descname"><span class="pre">rocm_package_add_rpm_dependencies</span></span><a class="headerlink" href="#command:rocm_package_add_rpm_dependencies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">rocm_package_add_rpm_dependencies(</span>
+<span class="w">    </span><span class="p">[</span><span class="no">QUIET</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">COMPONENT</span><span class="w"> </span><span class="nv">&lt;component&gt;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">DEPENDS</span><span class="w"> </span><span class="nv">&lt;dependencies&gt;...</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">SHARED_DEPENDS</span><span class="w"> </span><span class="nv">&lt;dependencies&gt;...</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">STATIC_DEPENDS</span><span class="w"> </span><span class="nv">&lt;dependencies&gt;...</span><span class="p">]</span>
+<span class="nf">)</span>
+</pre></div>
+</div>
+<p>Sets up the RPM package for a component to depend on some other packages, possibly versioned.
+The dependencies should be listed in RPM format (e.g. <cite>foo &gt; 0.3</cite> or <cite>bar = 1.0</cite>). Will warn if the package has already been created, unless QUIET is specified.</p>
+<dl class="cmake command">
+<dt class="sig sig-object cmake" id="command:rocm_package_add_deb_dependencies">
+<span class="sig-name descname"><span class="pre">rocm_package_add_deb_dependencies</span></span><a class="headerlink" href="#command:rocm_package_add_deb_dependencies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">rocm_package_add_deb_dependencies(</span>
+<span class="w">    </span><span class="p">[</span><span class="no">QUIET</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">COMPONENT</span><span class="w"> </span><span class="nv">&lt;component&gt;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">DEPENDS</span><span class="w"> </span><span class="nv">&lt;dependencies&gt;...</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">SHARED_DEPENDS</span><span class="w"> </span><span class="nv">&lt;dependencies&gt;...</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">STATIC_DEPENDS</span><span class="w"> </span><span class="nv">&lt;dependencies&gt;...</span><span class="p">]</span>
+<span class="nf">)</span>
+</pre></div>
+</div>
+<p>Sets up the deb package for a component to depend on some other packages, possibly versioned.
+The dependencies may be listed in RPM format (e.g. <cite>foo &gt; 0.3</cite> or <cite>bar = 1.0</cite>), and will automatically be converted to the DEB formatting. Will warn if the package has already been created, unless QUIET is specified.</p>
+<dl class="cmake command">
+<dt class="sig sig-object cmake" id="command:rocm_package_add_dependencies">
+<span class="sig-name descname"><span class="pre">rocm_package_add_dependencies</span></span><a class="headerlink" href="#command:rocm_package_add_dependencies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">rocm_package_add_dependencies(</span>
+<span class="w">    </span><span class="p">[</span><span class="no">QUIET</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">COMPONENT</span><span class="w"> </span><span class="nv">&lt;component&gt;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">DEPENDS</span><span class="w"> </span><span class="nv">&lt;dependencies&gt;...</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">SHARED_DEPENDS</span><span class="w"> </span><span class="nv">&lt;dependencies&gt;...</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">STATIC_DEPENDS</span><span class="w"> </span><span class="nv">&lt;dependencies&gt;...</span><span class="p">]</span>
+<span class="nf">)</span>
+</pre></div>
+</div>
+<p>A convenience function wrapping both <code class="docutils literal notranslate"><span class="pre">rocm_package_add_rpm_dependencies</span></code> and <code class="docutils literal notranslate"><span class="pre">rocm_package_add_deb_dependencies</span></code>.
+The dependencies must be listed in RPM format (e.g. <code class="docutils literal notranslate"><span class="pre">foo</span> <span class="pre">&gt;</span> <span class="pre">0.3</span></code> or <code class="docutils literal notranslate"><span class="pre">bar</span> <span class="pre">=</span> <span class="pre">1.0</span></code>), and will automatically be converted to the DEB formatting. Will warn if the package has already been created, unless QUIET is specified.</p>
+<dl class="cmake command">
+<dt class="sig sig-object cmake" id="command:rocm_package_setup_component">
+<span class="sig-name descname"><span class="pre">rocm_package_setup_component</span></span><a class="headerlink" href="#command:rocm_package_setup_component" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">rocm_package_setup_component(</span>
+<span class="w">    </span><span class="nv">&lt;component-name&gt;</span>
+<span class="w">    </span><span class="p">[</span><span class="no">PACKAGE_NAME</span><span class="w"> </span><span class="nv">&lt;package-name&gt;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">LIBRARY_NAME</span><span class="w"> </span><span class="nv">&lt;library-name&gt;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">PARENT</span><span class="w"> </span><span class="nv">&lt;parent&gt;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">DEPENDS</span>
+<span class="w">        </span><span class="p">[</span><span class="no">COMMON</span><span class="w"> </span><span class="nv">&lt;common-dependencies&gt;...</span><span class="p">]</span>
+<span class="w">        </span><span class="p">[</span><span class="no">RPM</span><span class="w"> </span><span class="nv">&lt;rpm-dependencies&gt;...</span><span class="p">]</span>
+<span class="w">        </span><span class="p">[</span><span class="no">DEB</span><span class="w"> </span><span class="nv">&lt;deb-dependencies&gt;...</span><span class="p">]</span>
+<span class="w">        </span><span class="p">[</span><span class="no">COMPONENT</span><span class="w"> </span><span class="nv">&lt;component-dependencies&gt;...</span><span class="p">]</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="nf">)</span>
+</pre></div>
+</div>
+<p>Set up a component for packaging. Sets the package name, and adds dependencies as appropriate.
+Component dependencies are where the package generated by component A depends on the package generated by component B. In order to ensure that these dependencies correctly use the generated package names, these dependencies are not fully added until the packages are generated.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ROCMCreatePackage</a><ul>
+<li><a class="reference internal" href="#commands">Commands</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ROCMCreatePackage.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="index.html">rocm-cmake  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">ROCMCreatePackage</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Paul Fultz II.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,210 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>ROCMTest &#8212; rocm-cmake  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="index.html">rocm-cmake  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">ROCMTest</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="rocmtest">
+<h1>ROCMTest<a class="headerlink" href="#rocmtest" title="Permalink to this headline">¶</a></h1>
+<p>This adds a <code class="docutils literal notranslate"><span class="pre">check</span></code> target to build and run the tests using CTest. A <code class="docutils literal notranslate"><span class="pre">tests</span></code> target can be used to just build the tests. All the tests are then packaged in the test component.</p>
+<section id="commands">
+<h2>Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h2>
+<dl class="cmake command">
+<dt class="sig sig-object cmake" id="command:rocm_enable_test_package">
+<span class="sig-name descname"><span class="pre">rocm_enable_test_package</span></span><a class="headerlink" href="#command:rocm_enable_test_package" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">rocm_enable_test_package(</span><span class="nv">&lt;name&gt;</span><span class="nf">)</span>
+</pre></div>
+</div>
+<p>Enable the test package. This must be called before <code class="docutils literal notranslate"><span class="pre">rocm_create_package</span></code> in the same directory. The <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;</span></code> specifies the name of the directory to install the tests to.</p>
+<dl class="cmake command">
+<dt class="sig sig-object cmake" id="command:rocm_add_test">
+<span class="sig-name descname"><span class="pre">rocm_add_test</span></span><a class="headerlink" href="#command:rocm_add_test" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">rocm_add_test(</span><span class="no">NAME</span><span class="w"> </span><span class="nv">&lt;name&gt;</span><span class="w"> </span><span class="no">COMMAND</span><span class="w"> </span><span class="nv">&lt;command&gt;</span><span class="w"> </span><span class="p">[</span><span class="nv">&lt;arg&gt;...</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">CONFIGURATIONS</span><span class="w"> </span><span class="nv">&lt;config&gt;...</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">COMMAND_EXPAND_LISTS</span><span class="p">]</span>
+<span class="nf">)</span>
+</pre></div>
+</div>
+<p>Add test command to CTest and to test package.</p>
+<dl class="cmake command">
+<dt class="sig sig-object cmake" id="command:rocm_add_test_executable">
+<span class="sig-name descname"><span class="pre">rocm_add_test_executable</span></span><a class="headerlink" href="#command:rocm_add_test_executable" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">rocm_add_test_executable(</span><span class="nv">&lt;name&gt;</span><span class="w"> </span><span class="nv">&lt;sources&gt;...</span><span class="nf">)</span>
+</pre></div>
+</div>
+<p>Adds an executable to be built and ran for tests. The executable will link in the dependencies specified with <code class="docutils literal notranslate"><span class="pre">rocm_test_link_libraries</span></code> or <code class="docutils literal notranslate"><span class="pre">rocm_test_include_directories</span></code>. It will also be installed with the test component. The name of the test will be the same as the name of the executable.</p>
+<dl class="cmake command">
+<dt class="sig sig-object cmake" id="command:rocm_test_header">
+<span class="sig-name descname"><span class="pre">rocm_test_header</span></span><a class="headerlink" href="#command:rocm_test_header" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">rocm_test_header(</span><span class="nv">&lt;test-name&gt;</span><span class="w"> </span><span class="nv">&lt;header-include&gt;</span><span class="nf">)</span>
+</pre></div>
+</div>
+<p>This will add a test for checking a header can be included standalone and that there is no ODR issues in the header.</p>
+<dl class="cmake command">
+<dt class="sig sig-object cmake" id="command:rocm_test_headers">
+<span class="sig-name descname"><span class="pre">rocm_test_headers</span></span><a class="headerlink" href="#command:rocm_test_headers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">rocm_test_headers(</span>
+<span class="w">    </span><span class="no">PREFIX</span><span class="w"> </span><span class="nv">&lt;prefix&gt;</span>
+<span class="w">    </span><span class="no">HEADERS</span><span class="w"> </span><span class="nv">&lt;header-paths&gt;</span>
+<span class="w">    </span><span class="no">DEPENDS</span><span class="w"> </span><span class="nv">&lt;targets&gt;...</span>
+<span class="nf">)</span>
+</pre></div>
+</div>
+<p>This will test multiple headers at once. The <code class="docutils literal notranslate"><span class="pre">PREFIX</span></code> will specifiy any prefix to the included file needed. THe <code class="docutils literal notranslate"><span class="pre">HEADERS</span></code> is a list of headers to test for. This can also include globbing. For each file, the <code class="docutils literal notranslate"><span class="pre">PREFIX</span></code> and base name will be used for the include. The <code class="docutils literal notranslate"><span class="pre">DEPENDS</span></code> can list targets to link in for the test.</p>
+<dl class="cmake command">
+<dt class="sig sig-object cmake" id="command:rocm_install_test">
+<span class="sig-name descname"><span class="pre">rocm_install_test</span></span><a class="headerlink" href="#command:rocm_install_test" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">rocm_install_test(</span>
+<span class="w">    </span><span class="p">[</span><span class="no">TARGETS</span><span class="w"> </span><span class="nv">&lt;targets&gt;...</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">FILES</span><span class="w"> </span><span class="nv">&lt;files&gt;...</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">DESTINATION</span><span class="w"> </span><span class="nv">&lt;path&gt;</span><span class="p">]</span>
+<span class="nf">)</span>
+</pre></div>
+</div>
+<p>Install the target or file into the test directory. The <code class="docutils literal notranslate"><span class="pre">DESTINATION</span></code> can be specified for <code class="docutils literal notranslate"><span class="pre">FILES</span></code> but is relative to the test installation directory.</p>
+<dl class="cmake command">
+<dt class="sig sig-object cmake" id="command:rocm_mark_as_test">
+<span class="sig-name descname"><span class="pre">rocm_mark_as_test</span></span><a class="headerlink" href="#command:rocm_mark_as_test" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">rocm_mark_as_test(</span><span class="nv">&lt;targets&gt;...</span><span class="nf">)</span>
+</pre></div>
+</div>
+<p>This will include the target as part of the <code class="docutils literal notranslate"><span class="pre">tests</span></code> target.</p>
+<dl class="cmake command">
+<dt class="sig sig-object cmake" id="command:rocm_link_test_dependencies">
+<span class="sig-name descname"><span class="pre">rocm_link_test_dependencies</span></span><a class="headerlink" href="#command:rocm_link_test_dependencies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">rocm_link_test_dependencies(</span><span class="nv">&lt;targets&gt;...</span><span class="nf">)</span>
+</pre></div>
+</div>
+<p>This will add test dependencies specified with <code class="docutils literal notranslate"><span class="pre">rocm_test_link_libraries</span></code> or <code class="docutils literal notranslate"><span class="pre">rocm_test_include_directories</span></code>.</p>
+<dl class="cmake command">
+<dt class="sig sig-object cmake" id="command:rocm_test_link_libraries">
+<span class="sig-name descname"><span class="pre">rocm_test_link_libraries</span></span><a class="headerlink" href="#command:rocm_test_link_libraries" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">rocm_test_link_libraries(</span><span class="nv">&lt;targets&gt;...</span><span class="nf">)</span>
+</pre></div>
+</div>
+<p>Targets to link to test executables.</p>
+</section>
+<section id="variables">
+<h2>Variables<a class="headerlink" href="#variables" title="Permalink to this headline">¶</a></h2>
+<dl class="cmake variable">
+<dt class="sig sig-object cmake" id="variable:CTEST_PARALLEL_LEVEL">
+<span class="sig-name descname"><span class="pre">CTEST_PARALLEL_LEVEL</span></span><a class="headerlink" href="#variable:CTEST_PARALLEL_LEVEL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The parallel level used for <code class="docutils literal notranslate"><span class="pre">check</span></code> target to run the tests. The default is the number of cores.</p>
+<dl class="cmake variable">
+<dt class="sig sig-object cmake" id="variable:CTEST_TIMEOUT">
+<span class="sig-name descname"><span class="pre">CTEST_TIMEOUT</span></span><a class="headerlink" href="#variable:CTEST_TIMEOUT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>The timeout used for <code class="docutils literal notranslate"><span class="pre">check</span></code> target to run the tests. The default is 5000 seconds.</p>
+<dl class="cmake variable">
+<dt class="sig sig-object cmake" id="variable:ROCM_TEST_GDB">
+<span class="sig-name descname"><span class="pre">ROCM_TEST_GDB</span></span><a class="headerlink" href="#variable:ROCM_TEST_GDB" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Use gdb to printout a stacktrace when a test fails. This is either set to <code class="docutils literal notranslate"><span class="pre">On</span></code> or <code class="docutils literal notranslate"><span class="pre">Off</span></code>.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ROCMTest</a><ul>
+<li><a class="reference internal" href="#commands">Commands</a></li>
+<li><a class="reference internal" href="#variables">Variables</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ROCMTest.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="index.html">rocm-cmake  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">ROCMTest</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Paul Fultz II.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
+    </div>
+  </body>
+</html>

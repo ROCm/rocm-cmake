@@ -1,0 +1,160 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>ROCMSphinxDoc &#8212; rocm-cmake  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="index.html">rocm-cmake  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">ROCMSphinxDoc</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="rocmsphinxdoc">
+<h1>ROCMSphinxDoc<a class="headerlink" href="#rocmsphinxdoc" title="Permalink to this headline">¶</a></h1>
+<section id="commands">
+<h2>Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h2>
+<dl class="cmake command">
+<dt class="sig sig-object cmake" id="command:rocm_add_sphinx_doc">
+<span class="sig-name descname"><span class="pre">rocm_add_sphinx_doc</span></span><a class="headerlink" href="#command:rocm_add_sphinx_doc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nf">rocm_add_sphinx_doc(</span>
+<span class="w">    </span><span class="no">SRC_DIR</span>
+<span class="w">    </span><span class="no">BUILDER</span><span class="w"> </span><span class="nv">&lt;sphinx-builder&gt;</span>
+<span class="w">    </span><span class="p">[</span><span class="no">OUTPUT_DIR</span><span class="w"> </span><span class="nv">&lt;output-directory&gt;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">CONFIG_DIR</span><span class="w"> </span><span class="nv">&lt;config-directory&gt;</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">DEPENDS</span><span class="w"> </span><span class="nv">&lt;doc-targets&gt;...</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">VARS</span><span class="w"> </span><span class="nv">&lt;sphinx-variables&gt;...</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">TEMPLATE_VARS</span><span class="w"> </span><span class="nv">&lt;sphinx-variables&gt;...</span><span class="p">]</span>
+<span class="w">    </span><span class="p">[</span><span class="no">USE_DOXYGEN</span><span class="p">]</span>
+<span class="nf">)</span>
+</pre></div>
+</div>
+<p>This will create a <code class="docutils literal notranslate"><span class="pre">sphinx-${BUILDER}</span></code> doc-type target which will generate
+documentation using sphinx. The <code class="docutils literal notranslate"><span class="pre">SRC_DIR</span></code> should be the directory that
+contains the <code class="docutils literal notranslate"><span class="pre">conf.py</span></code> file.</p>
+<p>The options are:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">OUTPUT_DIR</span></code></dt><dd><p>The directory where build output will be written. It takes its default, from
+<code class="docutils literal notranslate"><span class="pre">ROCM_CMAKE_DOCS_DIR</span></code> if set, otherwise defaults to <code class="docutils literal notranslate"><span class="pre">sphinx/${BUILDER}</span></code>.
+Relative paths are interpreted relative to <code class="docutils literal notranslate"><span class="pre">CMAKE_CURRENT_BINARY_DIR</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">CONFIG_DIR</span></code></dt><dd><p>The directory where <code class="docutils literal notranslate"><span class="pre">conf.py</span></code> will be searched. It sets the <code class="docutils literal notranslate"><span class="pre">-c</span></code> argument
+of <code class="docutils literal notranslate"><span class="pre">sphinx-build</span></code> if set, otherwise defaults to <code class="docutils literal notranslate"><span class="pre">${SRC_DIR}</span></code> as per the
+underlying tool. Relative paths are interpreted relative to
+<code class="docutils literal notranslate"><span class="pre">CMAKE_CURRENT_SOURCE_DIR</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">DEPENDS</span></code></dt><dd><p>Sets up target-level dependencies between <code class="docutils literal notranslate"><span class="pre">sphinx-${BUILDER}</span></code> and the
+user-provided list of targets.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">VARS</span></code></dt><dd><p>List of configuration values passed to Sphinx. List items will be passed as
+command-line args by prepending <code class="docutils literal notranslate"><span class="pre">-D</span></code> to each item.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">TEMPLATE_VARS</span></code></dt><dd><p>List of HTML template values passed to Sphinx. List items will be passed as
+command-line args by prepending <code class="docutils literal notranslate"><span class="pre">-A</span></code> to each item.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">USE_DOXYGEN</span></code></dt><dd><p>Flag denoting the use of Doxygen in the fashion rocm-docs-core expects it.</p>
+</dd>
+</dl>
+</section>
+<section id="variables">
+<h2>Variables<a class="headerlink" href="#variables" title="Permalink to this headline">¶</a></h2>
+<dl class="cmake variable">
+<dt class="sig sig-object cmake" id="variable:SPHINX_EXECUTABLE">
+<span class="sig-name descname"><span class="pre">SPHINX_EXECUTABLE</span></span><a class="headerlink" href="#variable:SPHINX_EXECUTABLE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>This cached variable can be used to set which <code class="docutils literal notranslate"><span class="pre">sphinx-build</span></code> executable to use. By default it will search for <code class="docutils literal notranslate"><span class="pre">sphinx-build</span></code> on the system. The <code class="docutils literal notranslate"><span class="pre">SPHINX_DIR</span></code> environmental variable is taken as a <code class="docutils literal notranslate"><span class="pre">HINT</span></code> while searching.</p>
+<dl class="cmake variable">
+<dt class="sig sig-object cmake" id="variable:DOXYGEN_EXECUTABLE">
+<span class="sig-name descname"><span class="pre">DOXYGEN_EXECUTABLE</span></span><a class="headerlink" href="#variable:DOXYGEN_EXECUTABLE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>This cached variable can be used to set which <code class="docutils literal notranslate"><span class="pre">doxygen</span></code> executable to use. By default it will search for <code class="docutils literal notranslate"><span class="pre">doxygen</span></code> on the system. The <code class="docutils literal notranslate"><span class="pre">DOXYGEN_DIR</span></code> environmental variable is taken as a <code class="docutils literal notranslate"><span class="pre">HINT</span></code> while searching.</p>
+<dl class="cmake variable">
+<dt class="sig sig-object cmake" id="variable:SPHINX_${BUILDER}_DIR">
+<span class="sig-name descname"><span class="pre">SPHINX_${BUILDER}_DIR</span></span><a class="headerlink" href="#variable:SPHINX_${BUILDER}_DIR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>This is the directory where the documentation will be built. By default, it will use the <code class="docutils literal notranslate"><span class="pre">OUTPUT_DIR</span></code> passed to <code class="docutils literal notranslate"><span class="pre">rocm_add_sphinx_doc</span></code> otherwise it will be set to <code class="docutils literal notranslate"><span class="pre">sphinx/${BUILDER}</span></code> directory in the cmake build directory.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ROCMSphinxDoc</a><ul>
+<li><a class="reference internal" href="#commands">Commands</a></li>
+<li><a class="reference internal" href="#variables">Variables</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ROCMSphinxDoc.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="index.html">rocm-cmake  documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">ROCMSphinxDoc</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Paul Fultz II.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.2.0.
+    </div>
+  </body>
+</html>
