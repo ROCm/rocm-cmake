@@ -67,7 +67,7 @@ endfunction()
 function(rocm_variable_watch VAR)
     set_property(GLOBAL APPEND PROPERTY ROCMChecksWatched "${VAR}")
     variable_watch("${VAR}" rocm_check_toolchain_var)
-endfunction
+endfunction()
 
 function(add_subdirectory_unchecked source_directory)
     get_property(watched_vars GLOBAL PROPERTY ROCMChecksWatched)
