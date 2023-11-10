@@ -185,6 +185,9 @@ function(rocm_install_targets)
         set(export_arg EXPORT ${EXPORT_FILE})
         if(T_TYPE STREQUAL "EXECUTABLE")
             unset(export_arg)
+            if(ENABLE_ASAN_PACKAGING)
+                continue()
+            endif()
         endif()
         install(
             TARGETS ${TARGET}
