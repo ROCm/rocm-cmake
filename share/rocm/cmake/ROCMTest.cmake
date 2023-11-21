@@ -5,6 +5,13 @@ include(ROCMCreatePackage)
 include(ROCMInstallTargets)
 include(CTest)
 
+if(NOT BUILD_TESTING)
+    # Do not provide ROCm test infrastructure if building tests is disabled.
+    return()
+endif()
+
+option(ROCM_INSTALL_TESTS "Enable installing of tests for ROCm component" OFF)
+
 find_package(Threads REQUIRED)
 include(ProcessorCount)
 processorcount(_rocm_ctest_parallel_level)
@@ -204,6 +211,11 @@ function(rocm_link_test_dependencies)
 endfunction()
 
 function(rocm_install_test)
+    if(NOT ROCM_INSTALL_TESTS)
+        # Skip test installation if not requested.
+        return()
+    endif()
+
     set(options)
     set(oneValueArgs DESTINATION)
     set(multiValueArgs TARGETS FILES)
@@ -220,6 +232,12 @@ function(rocm_install_test)
             DESTINATION ${INSTALL_PREFIX}/bin)
         rocm_set_install_dir_property(TARGETS ${PARSE_TARGETS} DESTINATION ${INSTALL_PREFIX}/bin)
         get_target_property(INSTALLDIR ${PARSE_TARGETS} ROCM_INSTALL_DIR)
+        if(WIN32)
+            foreach(TEST_TARGET ${PARSE_TARGETS})
+                list(APPEND INSTALL_PDB_FILES $<TARGET_PDB_FILE:${TEST_TARGET}>)
+            endforeach()
+            install(FILES ${INSTALL_PDB_FILES} DESTINATION ${INSTALL_PREFIX}/bin OPTIONAL)
+        endif()    
     endif()
     if(PARSE_FILES)
         install(
