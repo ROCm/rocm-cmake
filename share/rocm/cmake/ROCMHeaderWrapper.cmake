@@ -81,8 +81,6 @@ ${file_contents}
         else()
             if(NOT WIN32)
                 set(HEADER_INSTALL_PREFIX "/usr/local")
-            else()
-                set(HEADER_INSTALL_PREFIX "c:/Program Files/${PROJECT_NAME}")
             endif()
         endif()
         get_filename_component(header_location "${PARSE_HEADER_LOCATION}/${INCLUDE_FILE}"
