@@ -336,8 +336,14 @@ macro(rocm_create_package)
             )
         endif()
         if(PARSE_HEADER_ONLY)
-            set(CPACK_DEBIAN_DEVEL_PACKAGE_PROVIDES "${CPACK_PACKAGE_NAME} (= ${CPACK_PACKAGE_VERSION})")
-            set(CPACK_RPM_DEVEL_PACKAGE_PROVIDES "${CPACK_PACKAGE_NAME} = ${CPACK_PACKAGE_VERSION}")
+            rocm_join_if_set(", "
+                CPACK_DEBIAN_DEVEL_PACKAGE_PROVIDES
+                CPACK_DEBIAN_PACKAGE_PROVIDES
+                "${CPACK_PACKAGE_NAME} (= ${CPACK_PACKAGE_VERSION})")
+            rocm_join_if_set(", "
+                CPACK_RPM_DEVEL_PACKAGE_PROVIDES
+                CPACK_DEBIAN_PACKAGE_PROVIDES
+                "${CPACK_PACKAGE_NAME} = ${CPACK_PACKAGE_VERSION}")
         else()
             rocm_package_add_dependencies(COMPONENT devel DEPENDS "${CPACK_PACKAGE_NAME} >= ${CPACK_PACKAGE_VERSION}")
         endif()
