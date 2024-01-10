@@ -14,3 +14,6 @@ find_dependency(
     HINTS
         "${_new_rocmcmakebuildtools_path}"
         "${_new_rocmcmakebuildtools_path_linux}")
+
+unset(_new_rocmcmakebuildtools_path)
+unset(_new_rocmcmakebuildtools_path_linux)
