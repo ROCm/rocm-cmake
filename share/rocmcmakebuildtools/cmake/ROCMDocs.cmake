@@ -1,6 +1,8 @@
 # ######################################################################################################################
-# Copyright (C) 2021 Advanced Micro Devices, Inc.
+# Copyright (C) 2023 Advanced Micro Devices, Inc.
 # ######################################################################################################################
+
+include_guard(GLOBAL)
 
 if(NOT TARGET doc)
     add_custom_target(doc)
@@ -14,5 +16,5 @@ function(rocm_clean_doc_output DIR)
     set_property(
         DIRECTORY
         APPEND
-        PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${DIR})
+        PROPERTY ADDITIONAL_CLEAN_FILES "${DIR}")
 endfunction()

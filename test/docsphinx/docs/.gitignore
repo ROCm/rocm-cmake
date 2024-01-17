@@ -1,0 +1,10 @@
+/_build/
+/_doxygen/
+/_images/
+/_static/
+/_templates/
+/.doxygen/docBin
+/.doxygen/useful.tag
+/.sphinx/_toc.yml
+/.sphinx/requirements.txt
+/api

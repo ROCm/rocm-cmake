@@ -1,0 +1,15 @@
+/**
+@brief The Useful project main page.
+@author
+@file
+*/
+
+/**
+@mainpage Useful Documentation
+
+@section overview Overview
+
+Useful is a library providing undeniably useful functionality for developing
+awesome applications.
+
+*/
