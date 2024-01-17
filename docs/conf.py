@@ -4,6 +4,8 @@
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
+import re
+
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -14,18 +16,13 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
-setting_all_article_info = True
-
-# TODO: remove this for cross-linking with other projects using intersphinx
-external_projects_remote_repository = ""
-
-external_projects_current_project = "ROCmCMakeBuildTools"
-
-
 # -- Project information -----------------------------------------------------
 
-project = 'ROCmCMakeBuildTools'
+setting_all_article_info = True
 
+external_projects_current_project = "rocmcmakebuildtools"
+
+project = 'ROCmCMakeBuildTools'
 
 # -- General configuration ---------------------------------------------------
 
@@ -37,6 +34,8 @@ extensions = [
     "rocm_docs"
 ]
 
+external_toc_path = "./sphinx/_toc.yml"
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -44,7 +43,6 @@ templates_path = ['_templates']
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -57,3 +55,18 @@ html_theme = 'rocm_docs_theme'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+with open('../CMakeLists.txt', encoding='utf-8') as f:
+    match = re.search(r'rocm_setup_version\(VERSION\s+\"?([0-9.]+)[^0-9.]+', f.read())
+    if not match:
+        raise ValueError("VERSION not found!")
+    version_number = match[1]
+
+version = version_number
+release = version_number
+html_title = f"ROCm CMake Build Tools {version}"
+project = "ROCm CMake Build Tools"
+author = "Advanced Micro Devices, Inc."
+copyright = (
+    "Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved."
+)

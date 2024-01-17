@@ -40,3 +40,6 @@ subtrees:
   - caption: Internal usage
     entries:
       - file: src/ROCMUtilities.rst
+  - caption: About
+    entries:
+      - file: src/license.rst

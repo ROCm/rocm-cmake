@@ -1,4 +1,4 @@
 .vs*/**/*
 build/**/*
-docs/_build/**/*
-docs/.sphinx/_toc.yml
+docs/_build/
+docs/sphinx/_toc.yml
