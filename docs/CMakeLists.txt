@@ -1,5 +1,6 @@
 include(ROCMSphinxDoc)
 rocm_add_sphinx_doc(src
-    BUILDER html 
-    OUTPUT_DIR html 
+    CONFIG_DIR ${CMAKE_SOURCE_DIR}/docs
+    BUILDER html
+    OUTPUT_DIR html
 )
