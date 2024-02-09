@@ -337,7 +337,7 @@ macro(rocm_create_package)
         endif()
         if(PARSE_HEADER_ONLY)
             if(DEFINED CPACK_DEBIAN_DEVEL_PACKAGE_PROVIDES)
-                rocm_join_if_set(", ",
+                rocm_join_if_set(", "
                     CPACK_DEBIAN_DEVEL_PACKAGE_PROVIDES
                     "${CPACK_PACKAGE_NAME} = ${CPACK_PACKAGE_VERSION}"
                 )
@@ -349,7 +349,7 @@ macro(rocm_create_package)
             endif()
 
             if(DEFINED CPACK_RPM_DEVEL_PACKAGE_PROVIDES)
-                rocm_join_if_set(", ",
+                rocm_join_if_set(", "
                     CPACK_RPM_DEVEL_PACKAGE_PROVIDES
                     "${CPACK_PACKAGE_NAME} = ${CPACK_PACKAGE_VERSION}"
                 )
