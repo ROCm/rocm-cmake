@@ -6,7 +6,9 @@
 - AOCMCreatePackage: Allow additional provides on header-only packages
 - ROCMSphinxDoc: Allow separate source and config directories
 ### Changed
-- Renamed CMake package to ROCmCMakeBuildTools
+- Renamed CMake package to ROCmCMakeBuildTools. A wrapper has been provided
+  to ensure that `find_package(ROCM)` continues to work, but it is recommended
+  that developers switch to `find_package(ROCmCMakeBuildTools)`
 - ROCMInstallTargets: Stopped installing executables in ASAN builds
 ### Fixed
 - ROCMClangTidy: Fixed invalid list index in clang tidy
