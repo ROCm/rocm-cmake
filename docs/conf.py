@@ -34,7 +34,7 @@ extensions = [
     "rocm_docs"
 ]
 
-external_toc_path = "../build/docs/_toc.yml"
+external_toc_path = "./_toc.yml"
 external_toc_template_path = "./_toc.yml.in"
 
 # Add any paths that contain templates here, relative to this directory.
