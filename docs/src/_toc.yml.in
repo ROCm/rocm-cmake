@@ -42,4 +42,4 @@ subtrees:
       - file: reference/ROCMUtilities.rst
   - caption: About
     entries:
-      - file: reference/license.rst
+      - file: license.rst
