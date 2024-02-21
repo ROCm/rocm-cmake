@@ -8,12 +8,12 @@ Commands
 
 .. code-block:: cmake
 
-    rocm_install(TARGETS <target>... [...])
-    rocm_install({FILES | PROGRAMS} <file>... [...])
-    rocm_install(DIRECTORY <dir>... [...])
-    rocm_install(SCRIPT <file> [...])
-    rocm_install(CODE <code> [...])
-    rocm_install(EXPORT <export-name> [...])
+    rocm_install(TARGETS <target>... [<arg>...])
+    rocm_install(<FILES | PROGRAMS> <file>... [<arg>...])
+    rocm_install(DIRECTORY <dir>... [<arg>...])
+    rocm_install(SCRIPT <file> [<arg>...])
+    rocm_install(CODE <code> [<arg>...])
+    rocm_install(EXPORT <export-name> [<arg>...])
 
 Wraps installers to install to the correct component (devel or runtime) unless COMPONENT is specified. The TARGETS signature wraps ``rocm_install_targets``, all other signatures wrap ``install``.
 
@@ -48,4 +48,3 @@ Install targets into the appropriate directory. Unless COMPONENT is specified, l
     )
 
 Export the installed targets so they can be consumed with ``find_package``.
-

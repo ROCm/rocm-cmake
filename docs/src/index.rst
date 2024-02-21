@@ -2,10 +2,38 @@
    sphinx-quickstart on Thu Sep 16 18:46:06 2021.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
+.. highlight:: cmake
 
+ROCm CMake Build Tools
+======================
 
-rocm-cmake
-==========
+Summary
+-------
+
+ROCm CMake Build Tools (also stylized as "ROCmCMakeBuildTools" and previously
+known as "rocm-cmake") is a collection of functions that unify and simplify the
+CMake code of the ROCm components, as well as ensuring consistency across these
+components.
+
+Usage
+-----
+
+The ROCm CMake Build Tools are primarily used at build time of a library, and
+as such are not runtime dependencies for any generated libraries, packages,
+or executables.
+
+The tools can be included into a CMake project by running::
+
+   find_package(ROCmCMakeBuildTools)
+   # or
+   find_package(ROCM) # deprecated, but included for backwards compatibility
+
+Once the tools have been included in this manner, individual files may be
+included by running ``include(<file_name>)``. The file names, and the
+functions, variables, and macros accessible using each file are listed below.
+
+Files & Contents
+~~~~~~~~~~~~~~~~
 
 - :any:`ROCMAnalyzers`
    + :any:`rocm_mark_as_analyzer`

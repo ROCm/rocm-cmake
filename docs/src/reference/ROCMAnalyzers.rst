@@ -20,5 +20,3 @@ Variables
 .. cmake:variable:: ROCM_ENABLE_GH_ANNOTATIONS
 
 Set this variable to ``ON`` so that analyzers will emit diagnostics in a format that github can use to annotate pull requests.
-    
-

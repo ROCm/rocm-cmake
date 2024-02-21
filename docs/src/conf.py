@@ -4,6 +4,8 @@
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
+import re
+
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -14,13 +16,13 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
-
 # -- Project information -----------------------------------------------------
 
-project = 'rocm-cmake'
-copyright = '2021, Paul Fultz II'
-author = 'Paul Fultz II'
+setting_all_article_info = True
 
+external_projects_current_project = "rocmcmakebuildtools"
+
+project = 'ROCmCMakeBuildTools'
 
 # -- General configuration ---------------------------------------------------
 
@@ -28,8 +30,12 @@ author = 'Paul Fultz II'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinxcontrib.moderncmakedomain'
+    'sphinxcontrib.moderncmakedomain',
+    "rocm_docs"
 ]
+
+external_toc_path = "./_toc.yml"
+external_toc_template_path = "./_toc.yml.in"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -39,35 +45,29 @@ templates_path = ['_templates']
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-#
-html_theme = 'default'
-html_theme_options = {
-    'footerbgcolor':    '#00182d',
-    'footertextcolor':  '#ffffff',
-    'sidebarbgcolor':   '#e4ece8',
-    'sidebarbtncolor':  '#00a94f',
-    'sidebartextcolor': '#333333',
-    'sidebarlinkcolor': '#00a94f',
-    'relbarbgcolor':    '#00529b',
-    'relbartextcolor':  '#ffffff',
-    'relbarlinkcolor':  '#ffffff',
-    'bgcolor':          '#ffffff',
-    'textcolor':        '#444444',
-    'headbgcolor':      '#f2f2f2',
-    'headtextcolor':    '#003564',
-    'headlinkcolor':    '#3d8ff2',
-    'linkcolor':        '#2b63a8',
-    'visitedlinkcolor': '#2b63a8',
-    'codebgcolor':      '#eeeeee',
-    'codetextcolor':    '#333333',
-}
+
+html_theme = 'rocm_docs_theme'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+with open('../../CMakeLists.txt', encoding='utf-8') as f:
+    match = re.search(r'rocm_setup_version\(VERSION\s+\"?([0-9.]+)[^0-9.]+', f.read())
+    if not match:
+        raise ValueError("VERSION not found!")
+    version_number = match[1]
+
+version = version_number
+release = version_number
+html_title = f"ROCm CMake Build Tools {version}"
+project = "ROCm CMake Build Tools"
+author = "Advanced Micro Devices, Inc."
+copyright = (
+    "Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved."
+)
