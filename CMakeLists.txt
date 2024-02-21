@@ -43,4 +43,4 @@ add_custom_target(format COMMAND cmake-format -i ${CMAKE_FILES} WORKING_DIRECTOR
 enable_testing()
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -C ${CMAKE_CFG_INTDIR})
 add_subdirectory(test)
-add_subdirectory(doc)
+add_subdirectory(docs)

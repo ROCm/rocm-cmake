@@ -1,0 +1,45 @@
+# Variables of the form ${<variable>} are substituted, currently the following
+# list is supported:
+#   - ${branch} (or {branch}) the name of the current branch
+#   - ${url} (or {url}) github url of the current project
+#   - ${project:<project_name>} base url of the documentation of <project_name>
+#     based on intersphinx_mapping.
+# These comments will also be removed.
+defaults:
+  numbered: False
+  maxdepth: 6
+root: index.rst
+subtrees:
+  - caption: Basic Common Functionality
+    entries:
+      - file: reference/ROCMCheckTargetIds.rst
+      - file: reference/ROCMSetupVersion.rst
+      - file: reference/ROCMAnalyzers.rst
+  - caption: Installation & Packaging
+    entries:
+      - file: reference/ROCMInstallTargets.rst
+        subtrees:
+          - entries:
+            - file: reference/ROCMInstallSymlinks.rst
+            - file: reference/ROCMHeaderWrapper.rst
+      - file: reference/ROCMCreatePackage.rst
+        subtrees:
+          - entries:
+            - file: reference/ROCMClients.rst
+            - file: reference/ROCMPackageConfigHelpers.rst
+  - caption: Standard Tooling
+    entries:
+      - file: reference/ROCMClangTidy.rst
+      - file: reference/ROCMCppCheck.rst
+      - file: reference/ROCMTest.rst
+  - caption: Documentation in CMake
+    entries:
+      - file: reference/ROCMDocs.rst
+      - file: reference/ROCMDoxygenDoc.rst
+      - file: reference/ROCMSphinxDoc.rst
+  - caption: Internal usage
+    entries:
+      - file: reference/ROCMUtilities.rst
+  - caption: About
+    entries:
+      - file: license.rst
