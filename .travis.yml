@@ -46,7 +46,7 @@ script:
     - mkdir build
     - cd build
     - cmake -DCMAKE_INSTALL_PREFIX=$INSTALL_PREFIX_PATH ..
-    - make check
+    - make rocm-cmake-check
     - make install
     - rm -rf "$INSTALL_PREFIX_PATH"
 

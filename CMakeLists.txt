@@ -41,6 +41,6 @@ add_custom_target(analyze COMMAND cmake-lint ${CMAKE_FILES} WORKING_DIRECTORY ${
 add_custom_target(format COMMAND cmake-format -i ${CMAKE_FILES} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 enable_testing()
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -C ${CMAKE_CFG_INTDIR})
+add_custom_target(rocm-cmake-check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -C ${CMAKE_CFG_INTDIR})
 add_subdirectory(test)
 add_subdirectory(docs)
