@@ -335,7 +335,7 @@ macro(rocm_create_package)
                 "${CPACK_RPM_DEVEL_PACKAGE_NAME} >= ${CPACK_PACKAGE_VERSION}"
             )
         endif()
-        if(PARSE_HEADER_ONLY)
+        if(PARSE_HEADER_ONLY OR NOT BUILD_SHARED_LIBS)
             rocm_join_if_set(", "
                 CPACK_DEBIAN_DEVEL_PACKAGE_PROVIDES
                 CPACK_DEBIAN_PACKAGE_PROVIDES
