@@ -14,10 +14,10 @@ set(CTEST_PARALLEL_LEVEL
 set(CTEST_TIMEOUT
     5000
     CACHE STRING "CTest timeout")
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -j ${CTEST_PARALLEL_LEVEL} -C
+add_custom_target(rocm-cmake-check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -j ${CTEST_PARALLEL_LEVEL} -C
                                 ${CMAKE_CFG_INTDIR} --timeout ${CTEST_TIMEOUT})
 add_custom_target(tests COMMENT "Build all tests.")
-add_dependencies(check tests)
+add_dependencies(rocm-cmake-check tests)
 
 add_custom_target(install-tests COMMAND ${CMAKE_COMMAND} -DCOMPONENT=tests -P ${CMAKE_BINARY_DIR}/cmake_install.cmake)
 add_dependencies(install-tests tests)
