@@ -20,7 +20,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/share/rocmcmakebuildtool
 include(ROCMCreatePackage)
 include(ROCMSetupVersion)
 
-rocm_setup_version(VERSION 0.11.0)
+rocm_setup_version(VERSION 0.12.0)
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/ROCmCMakeBuildToolsConfigVersion.cmake
@@ -43,4 +43,4 @@ add_custom_target(format COMMAND cmake-format -i ${CMAKE_FILES} WORKING_DIRECTOR
 enable_testing()
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -C ${CMAKE_CFG_INTDIR})
 add_subdirectory(test)
-add_subdirectory(doc)
+add_subdirectory(docs)

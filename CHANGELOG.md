@@ -1,5 +1,17 @@
 # Change Log for rocm-cmake
 
+## [rocm-cmake 0.12.0 for ROCm 6.1.0]
+### Changed
+- ROCMSphinxDoc: Allow separate source and config directories.
+- ROCMCreatePackage: Allow additional `PROVIDES` on header-only packages.
+- ROCMInstallTargets: Don't install executable targets by default for ASAN builds.
+- ROCMTest: Add RPATH for installed tests.
+- Finalize rename to ROCmCMakeBuildTools
+### Fixed
+- ROCMClangTidy: Fixed invalid list index.
+- Test failures when ROCM_CMAKE_GENERATOR is empty.
+
+
 ## [rocm-cmake 0.11.0 for ROCm 6.0.0]
 ### Changed
 - ROCMSphinxDoc: Improved validation, documentation and rocm-docs-core integration.
