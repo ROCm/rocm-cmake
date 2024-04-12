@@ -1,1 +1,2 @@
-rocm-docs-core==0.20.0
+sphinxcontrib-moderncmakedomain==3.19
+rocm-docs-core==0.38.1
