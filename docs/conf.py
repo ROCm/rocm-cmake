@@ -34,8 +34,8 @@ extensions = [
     "rocm_docs"
 ]
 
-external_toc_path = "./_toc.yml"
-external_toc_template_path = "./_toc.yml.in"
+external_toc_path = "./sphinx/_toc.yml"
+external_toc_template_path = "./sphinx/_toc.yml.in"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -57,7 +57,7 @@ html_theme = 'rocm_docs_theme'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-with open('../../CMakeLists.txt', encoding='utf-8') as f:
+with open('../CMakeLists.txt', encoding='utf-8') as f:
     match = re.search(r'rocm_setup_version\(VERSION\s+\"?([0-9.]+)[^0-9.]+', f.read())
     if not match:
         raise ValueError("VERSION not found!")
