@@ -5,6 +5,19 @@
 - ROCmCreatePackage: Accepts a suffix parameter, automatically generating it for static or ASAN builds.
   - Package names will no longer be pulled from `CPACK_<GEN>_PACKAGE_NAME`
   - Runtime packages will no longer be generated for static builds
+## [rocm-cmake 0.12.0 for ROCm 6.1.0]
+### Added
+- ROCMTest: Add rpath to installed tests
+- AOCMCreatePackage: Allow additional provides on header-only packages
+- ROCMSphinxDoc: Allow separate source and config directories
+### Changed
+- Renamed CMake package to ROCmCMakeBuildTools. A wrapper has been provided
+  to ensure that `find_package(ROCM)` continues to work, but it is recommended
+  that developers switch to `find_package(ROCmCMakeBuildTools)`
+- ROCMInstallTargets: Stopped installing executables in ASAN builds
+### Fixed
+- ROCMClangTidy: Fixed invalid list index in clang tidy
+- Fixed test failures when `ROCM_CMAKE_GENERATOR` is an empty string
 
 ## [rocm-cmake 0.11.0 for ROCm 6.0.0]
 ### Changed
