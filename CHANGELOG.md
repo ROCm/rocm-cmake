@@ -1,5 +1,10 @@
 # Change Log for rocm-cmake
 
+## [(Unreleased) rocm-cmake 0.13.0 for ROCm 6.2.0]
+### Changed
+- ROCmCreatePackage: Accepts a suffix parameter, automatically generating it for static or ASAN builds.
+  - Package names will no longer be pulled from `CPACK_<GEN>_PACKAGE_NAME`
+  - Runtime packages will no longer be generated for static builds
 ## [rocm-cmake 0.12.0 for ROCm 6.1.0]
 ### Added
 - ROCMTest: Add rpath to installed tests
