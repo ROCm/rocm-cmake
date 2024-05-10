@@ -49,6 +49,12 @@ macro(test_expect_eq X Y)
     endif()
 endmacro()
 
+macro(test_expect_undef X)
+    if(DEFINED "${X}")
+        message(FATAL_ERROR "EXPECT FAILURE: ${X} IS DEFINED ${ARGN}")
+    endif()
+endmacro()
+
 macro(test_expect_matches X Y)
     if("${X}" STREQUAL "" OR NOT "${X}" MATCHES "${Y}")
         message(FATAL_ERROR "EXPECT FAILURE: ${X} NOT MATCHES ${Y} ${ARGN}")
