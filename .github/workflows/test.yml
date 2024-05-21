@@ -57,7 +57,6 @@ jobs:
         python -m pip install --upgrade setuptools pip wheel
         python -m pip install cget ninja
         python -m pip install -r docs/requirements.txt
-        python -m pip install -r test/docsphinx/docs/.sphinx/requirements.txt
     - name: Install Doxygen
       uses: ssciwr/doxygen-install@v1
     - name: Run tests
