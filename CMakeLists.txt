@@ -4,6 +4,10 @@
 
 cmake_minimum_required (VERSION 3.6)
 
+if(POLICY CMP0095)
+    cmake_policy(SET CMP0095 NEW)
+endif()
+
 set(CMAKE_INSTALL_PREFIX "/opt/rocm" CACHE PATH "")
 
 project(rocm-cmake LANGUAGES NONE)
