@@ -269,7 +269,7 @@ endmacro()
 
 macro(rocm_create_package)
     set(options LDCONFIG PTH HEADER_ONLY)
-    set(oneValueArgs NAME DESCRIPTION SECTION MAINTAINER LDCONFIG_DIR PREFIX)
+    set(oneValueArgs NAME DESCRIPTION SECTION MAINTAINER LDCONFIG_DIR PREFIX SUFFIX)
     set(multiValueArgs DEPENDS COMPONENTS)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -324,18 +324,18 @@ macro(rocm_create_package)
     endif()
 
     if (ROCM_USE_DEV_COMPONENT)
+        rocm_compute_component_package_name(devel "${CPACK_PACKAGE_NAME}" "${PARSE_SUFFIX}" "${PARSE_HEADER_ONLY}")
         list(APPEND PARSE_COMPONENTS devel)
-        set(CPACK_DEBIAN_DEVEL_PACKAGE_NAME "${CPACK_PACKAGE_NAME}-dev")
         rocm_join_if_set(", " CPACK_DEBIAN_RUNTIME_PACKAGE_RECOMMENDS
-            "${CPACK_PACKAGE_NAME}-dev (>=${CPACK_PACKAGE_VERSION})")
+            "${CPACK_DEBIAN_DEVEL_PACKAGE_NAME} (>=${CPACK_PACKAGE_VERSION})")
 
         rocm_find_program_version(rpmbuild GREATER_EQUAL 4.12.0 QUIET)
         if(rpmbuild_VERSION_OK)
             rocm_join_if_set(", " CPACK_RPM_RUNTIME_PACKAGE_SUGGESTS
-                "${CPACK_PACKAGE_NAME}-devel >= ${CPACK_PACKAGE_VERSION}"
+                "${CPACK_RPM_DEVEL_PACKAGE_NAME} >= ${CPACK_PACKAGE_VERSION}"
             )
         endif()
-        if(PARSE_HEADER_ONLY)
+        if(PARSE_HEADER_ONLY OR NOT BUILD_SHARED_LIBS)
             if(DEFINED CPACK_DEBIAN_DEVEL_PACKAGE_PROVIDES)
                 rocm_join_if_set(", "
                     CPACK_DEBIAN_DEVEL_PACKAGE_PROVIDES
@@ -426,7 +426,7 @@ macro(rocm_create_package)
     endif()
     rocm_setup_license(${PARSE_HEADER_ONLY})
     if(PARSE_COMPONENTS)
-        rocm_set_comp_cpackvar(PARSE_HEADER_ONLY "${PARSE_COMPONENTS}")
+        rocm_set_comp_cpackvar(PARSE_HEADER_ONLY "${PARSE_SUFFIX}" "${PARSE_COMPONENTS}")
     endif()
     include(CPack)
     set(ROCM_PACKAGE_CREATED TRUE CACHE INTERNAL "Track whether rocm_create_package has been called.")
@@ -464,7 +464,7 @@ macro(rocm_setup_license HEADER_ONLY)
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
                 DESTINATION share/doc/${_rocm_cpack_package_name}-asan
             )
-        elseif(ROCM_USE_DEV_COMPONENT AND ${HEADER_ONLY})
+        elseif((ROCM_USE_DEV_COMPONENT AND ${HEADER_ONLY}) OR NOT BUILD_SHARED_LIBS)
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
                 DESTINATION share/doc/${_rocm_cpack_package_name}
@@ -479,24 +479,74 @@ macro(rocm_setup_license HEADER_ONLY)
     endif()
 endmacro()
 
-macro(rocm_set_comp_cpackvar HEADER_ONLY components)
+macro(rocm_compute_component_package_name COMPONENT_NAME BASE_NAME NAME_SUFFIX HEADER_ONLY)
+    # both the fully upper and lowercased names of the components will be needed
+    string(TOLOWER ${COMPONENT_NAME} _component_name_lower)
+    string(TOUPPER ${COMPONENT_NAME} _component_name_upper)
+
+    # determine the package name suffix due to specific build conditions
+    if(${NAME_SUFFIX})
+        string(TOLOWER ${NAME_SUFFIX} _component_suffix)
+    else()
+        if(ENABLE_ASAN_PACKAGING)
+            set(_component_suffix asan)
+        elseif(NOT ${HEADER_ONLY} AND NOT ${BUILD_SHARED_LIBS})
+            set(_component_suffix static)
+        endif()
+    endif()
+    if(_component_suffix)
+        set(_component_suffix "-${_component_suffix}")
+    endif()
+
+    # determine the package name component
+    if(_component_name_lower STREQUAL "runtime")
+        set(_rpm_component_partial "")
+        set(_deb_component_partial "")
+    elseif(_component_name_lower STREQUAL "devel")
+        set(_rpm_component_partial "-devel")
+        set(_deb_component_partial "-dev")
+    else()
+        set(_rpm_component_partial "-${_component_name_lower}")
+        set(_deb_component_partial "-${_component_name_lower}")
+    endif()
+
+    # set the package names
+    if(NOT DEFINED CPACK_RPM_${_component_name_upper}_PACKAGE_NAME
+        OR CPACK_RPM_${_component_name_upper}_PACKAGE_NAME STREQUAL ""
+    )
+        set(CPACK_RPM_${_component_name_upper}_PACKAGE_NAME
+            "${BASE_NAME}${_rpm_component_partial}${_component_suffix}")
+    endif()
+    if(NOT DEFINED CPACK_DEBIAN_${_component_name_upper}_PACKAGE_NAME
+        OR CPACK_DEBIAN_${_component_name_upper}_PACKAGE_NAME STREQUAL ""
+    )
+        set(CPACK_DEBIAN_${_component_name_upper}_PACKAGE_NAME
+            "${BASE_NAME}${_deb_component_partial}${_component_suffix}")
+    endif()
+
+    # clean up temporary variables
+    unset(_deb_component_partial)
+    unset(_rpm_component_partial)
+    unset(_component_suffix)
+    unset(_component_name_upper)
+    unset(_component_name_lower)
+endmacro(rocm_compute_component_package_name)
+
+macro(rocm_set_comp_cpackvar HEADER_ONLY NAME_SUFFIX components)
     # Setting component specific variables
     set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
 
     if(NOT ROCM_USE_DEV_COMPONENT OR NOT ${HEADER_ONLY})
-        set(CPACK_RPM_MAIN_COMPONENT "runtime")
+        rocm_compute_component_package_name("runtime" "${CPACK_PACKAGE_NAME}" "${NAME_SUFFIX}" ${HEADER_ONLY})
         if (NOT ENABLE_ASAN_PACKAGING)
-            set(CPACK_RPM_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
-            list(APPEND CPACK_COMPONENTS_ALL runtime)
             set(CPACK_DEBIAN_RUNTIME_FILE_NAME
             "${CPACK_PACKAGE_NAME}_${CPACK_PACKAGE_VERSION}-${DEBIAN_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
-            set(CPACK_DEBIAN_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
         else()
-            set(CPACK_PACKAGE_NAME "${CPACK_PACKAGE_NAME}-asan")
-            set(CPACK_RPM_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
             set(CPACK_RPM_RUNTIME_FILE_NAME "RPM-DEFAULT")
-            set(CPACK_DEBIAN_RUNTIME_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
             set(CPACK_DEBIAN_RUNTIME_FILE_NAME "DEB-DEFAULT")
+        endif()
+        if (NOT ${HEADER_ONLY} AND BUILD_SHARED_LIBS)
+            set(CPACK_RPM_MAIN_COMPONENT "runtime")
             list(APPEND CPACK_COMPONENTS_ALL runtime)
         endif()
     endif()
@@ -512,26 +562,12 @@ macro(rocm_set_comp_cpackvar HEADER_ONLY components)
         string(TOUPPER "${COMPONENT}" COMPONENT_UC)
         set(CPACK_RPM_${COMPONENT_UC}_FILE_NAME "RPM-DEFAULT")
         set(CPACK_DEBIAN_${COMPONENT_UC}_FILE_NAME "DEB-DEFAULT")
-        if(NOT DEFINED CPACK_DEBIAN_${COMPONENT_UC}_PACKAGE_NAME
-            OR CPACK_DEBIAN_${COMPONENT_UC}_PACKAGE_NAME STREQUAL "")
-            if(NOT DEFINED CPACK_DEBIAN_PACKAGE_NAME OR CPACK_DEBIAN_PACKAGE_NAME STREQUAL "")
-                set(CPACK_DEBIAN_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
-            endif()
-            string(TOLOWER "${CPACK_DEBIAN_PACKAGE_NAME}-${COMPONENT}" CPACK_DEBIAN_${COMPONENT_UC}_PACKAGE_NAME)
-        else()
-            string(REGEX REPLACE "<PACKAGE_NAME>" "${CPACK_PACKAGE_NAME}"
-                CPACK_DEBIAN_${COMPONENT_UC}_PACKAGE_NAME "${CPACK_DEBIAN_${COMPONENT_UC}_PACKAGE_NAME}")
-        endif()
-        if(NOT DEFINED CPACK_RPM_${COMPONENT_UC}_PACKAGE_NAME
-            OR CPACK_RPM_${COMPONENT_UC}_PACKAGE_NAME STREQUAL "")
-            if(NOT DEFINED CPACK_RPM_PACKAGE_NAME OR CPACK_RPM_PACKAGE_NAME STREQUAL "")
-                set(CPACK_RPM_PACKAGE_NAME "${CPACK_PACKAGE_NAME}")
-            endif()
-            string(TOLOWER "${CPACK_RPM_PACKAGE_NAME}-${COMPONENT}" CPACK_RPM_${COMPONENT_UC}_PACKAGE_NAME)
-        else()
-            string(REGEX REPLACE "<PACKAGE_NAME>" "${CPACK_PACKAGE_NAME}"
-                CPACK_RPM_${COMPONENT_UC}_PACKAGE_NAME "${CPACK_RPM_${COMPONENT_UC}_PACKAGE_NAME}")
-        endif()
+        rocm_compute_component_package_name("${COMPONENT}" "${CPACK_PACKAGE_NAME}" "${NAME_SUFFIX}" "${HEADER_ONLY}")
+
+        string(REGEX REPLACE "<PACKAGE_NAME>" "${CPACK_PACKAGE_NAME}"
+            CPACK_DEBIAN_${COMPONENT_UC}_PACKAGE_NAME "${CPACK_DEBIAN_${COMPONENT_UC}_PACKAGE_NAME}")
+        string(REGEX REPLACE "<PACKAGE_NAME>" "${CPACK_PACKAGE_NAME}"
+            CPACK_RPM_${COMPONENT_UC}_PACKAGE_NAME "${CPACK_RPM_${COMPONENT_UC}_PACKAGE_NAME}")
     endforeach()
     if(ROCM_PACKAGE_COMPONENT_DEPENDENCIES)
         foreach(COMP_DEP IN LISTS ROCM_PACKAGE_COMPONENT_DEPENDENCIES)
@@ -555,21 +591,16 @@ macro(rocm_package_setup_component COMPONENT_NAME)
 
     list(APPEND ROCM_PACKAGE_COMPONENTS ${COMPONENT_NAME})
 
-    if(NOT DEFINED PARSE_PACKAGE_NAME)
-        string(TOLOWER "${COMPONENT_NAME}" PARSE_PACKAGE_NAME)
-        if(NOT BUILD_SHARED_LIBS)
-            set(PARSE_PACKAGE_NAME "${PARSE_PACKAGE_NAME}-static")
+    if(DEFINED PARSE_PACKAGE_NAME)
+        if(NOT DEFINED PARSE_LIBRARY_NAME)
+            set(PARSE_LIBRARY_NAME "<PACKAGE_NAME>")
         endif()
+
+        string(TOUPPER "${COMPONENT_NAME}" COMPONENT_GNAME)
+
+        set(CPACK_DEBIAN_${COMPONENT_GNAME}_PACKAGE_NAME "${PARSE_LIBRARY_NAME}-${PARSE_PACKAGE_NAME}")
+        set(CPACK_RPM_${COMPONENT_GNAME}_PACKAGE_NAME "${PARSE_LIBRARY_NAME}-${PARSE_PACKAGE_NAME}")
     endif()
-
-    if(NOT DEFINED PARSE_LIBRARY_NAME)
-        set(PARSE_LIBRARY_NAME "<PACKAGE_NAME>")
-    endif()
-
-    string(TOUPPER "${COMPONENT_NAME}" COMPONENT_GNAME)
-
-    set(CPACK_DEBIAN_${COMPONENT_GNAME}_PACKAGE_NAME "${PARSE_LIBRARY_NAME}-${PARSE_PACKAGE_NAME}")
-    set(CPACK_RPM_${COMPONENT_GNAME}_PACKAGE_NAME "${PARSE_LIBRARY_NAME}-${PARSE_PACKAGE_NAME}")
 
     if(DEFINED PARSE_PARENT)
         list(APPEND ROCM_PACKAGE_COMPONENT_DEPENDENCIES "${PARSE_PARENT}->${COMPONENT_NAME}")
