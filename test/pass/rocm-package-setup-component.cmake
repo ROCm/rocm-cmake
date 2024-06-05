@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.10)
+
 use_rocm_cmake()
 include(ROCMCreatePackage)
 include(ROCMClients)
@@ -8,8 +10,8 @@ set(BUILD_SHARED_LIBS ON)
 rocm_package_setup_component(comp-a)
 
 test_expect_eq("${ROCM_PACKAGE_COMPONENTS}" "comp-a")
-test_expect_eq("${CPACK_DEBIAN_COMP-A_PACKAGE_NAME}" "<PACKAGE_NAME>-comp-a")
-test_expect_eq("${CPACK_RPM_COMP-A_PACKAGE_NAME}" "<PACKAGE_NAME>-comp-a")
+test_expect_undef(CPACK_DEBIAN_COMP-A_PACKAGE_NAME)
+test_expect_undef(CPACK_RPM_COMP-A_PACKAGE_NAME)
 
 rocm_package_setup_component(
     comp-b
@@ -30,6 +32,7 @@ rocm_package_setup_component(
         RPM "baz = 3.0"
         COMPONENT comp-a comp-b
     LIBRARY_NAME packaging
+    PACKAGE_NAME comp-c
 )
 
 test_expect_eq("${ROCM_PACKAGE_COMPONENTS}" "comp-a;comp-b;comp-c")
@@ -44,8 +47,8 @@ rocm_package_setup_client_component(
     DEPENDS COMPONENT comp-c
 )
 test_expect_eq("${ROCM_PACKAGE_COMPONENTS}" "comp-a;comp-b;comp-c;client-a")
-test_expect_eq("${CPACK_DEBIAN_CLIENT-A_PACKAGE_NAME}" "<PACKAGE_NAME>-client-a")
-test_expect_eq("${CPACK_RPM_CLIENT-A_PACKAGE_NAME}" "<PACKAGE_NAME>-client-a")
+test_expect_undef(CPACK_DEBIAN_CLIENT-A_PACKAGE_NAME)
+test_expect_undef(CPACK_RPM_CLIENT-A_PACKAGE_NAME)
 test_expect_eq("${CPACK_DEBIAN_CLIENT-A_PACKAGE_DEPENDS}" "")
 test_expect_eq("${CPACK_RPM_CLIENT-A_PACKAGE_REQUIRES}" "")
 test_expect_eq("${ROCM_PACKAGE_COMPONENT_DEPENDENCIES}"
@@ -54,7 +57,7 @@ test_expect_eq("${ROCM_PACKAGE_COMPONENT_DEPENDENCIES}"
 set(CPACK_PACKAGE_NAME "packtest")
 set(CPACK_PACKAGE_VERSION 1.0.0)
 
-rocm_set_comp_cpackvar(FALSE "${ROCM_PACKAGE_COMPONENTS};clients")
+rocm_set_comp_cpackvar(FALSE "" "${ROCM_PACKAGE_COMPONENTS};clients")
 test_expect_eq("${CPACK_COMPONENTS_ALL}" "runtime;comp-a;comp-b;comp-c;client-a;clients")
 
 test_expect_eq("${CPACK_DEBIAN_RUNTIME_PACKAGE_NAME}" "packtest")
