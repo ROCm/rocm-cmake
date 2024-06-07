@@ -1,5 +1,12 @@
+.. meta::
+  :description: ROCm CMake
+  :keywords: ROCm, Cmake, library, api, AMD
+
+.. _rocmSetupVersion:
+
+****************************************************
 ROCMSetupVersion
-================
+****************************************************
 
 Commands
 --------

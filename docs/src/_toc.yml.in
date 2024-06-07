@@ -10,12 +10,7 @@ defaults:
   maxdepth: 6
 root: index.rst
 subtrees:
-  - caption: Basic Common Functionality
-    entries:
-      - file: reference/ROCMCheckTargetIds.rst
-      - file: reference/ROCMSetupVersion.rst
-      - file: reference/ROCMAnalyzers.rst
-  - caption: Installation & Packaging
+  - caption: Installation
     entries:
       - file: reference/ROCMInstallTargets.rst
         subtrees:
@@ -27,7 +22,12 @@ subtrees:
           - entries:
             - file: reference/ROCMClients.rst
             - file: reference/ROCMPackageConfigHelpers.rst
-  - caption: Standard Tooling
+  - caption: Basic functions
+    entries:
+      - file: reference/ROCMCheckTargetIds.rst
+      - file: reference/ROCMSetupVersion.rst
+      - file: reference/ROCMAnalyzers.rst
+  - caption: Standard tooling
     entries:
       - file: reference/ROCMClangTidy.rst
       - file: reference/ROCMCppCheck.rst
@@ -37,7 +37,7 @@ subtrees:
       - file: reference/ROCMDocs.rst
       - file: reference/ROCMDoxygenDoc.rst
       - file: reference/ROCMSphinxDoc.rst
-  - caption: Internal usage
+  - caption: Internal use
     entries:
       - file: reference/ROCMUtilities.rst
   - caption: About
