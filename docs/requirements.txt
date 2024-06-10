@@ -115,6 +115,7 @@ sphinx==5.3.0
     #   sphinx-design
     #   sphinx-external-toc
     #   sphinx-notfound-page
+    #   sphinxcontrib-moderncmakedomain
 sphinx-book-theme==1.0.1
     # via rocm-docs-core
 sphinx-copybutton==0.5.2
@@ -133,7 +134,7 @@ sphinxcontrib-htmlhelp==2.0.1
     # via sphinx
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
-sphinxcontrib-moderncmakedomain==3.19
+sphinxcontrib-moderncmakedomain==3.29.0
     # via -r requirements.in
 sphinxcontrib-qthelp==1.0.3
     # via sphinx
