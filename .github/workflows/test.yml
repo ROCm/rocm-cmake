@@ -59,6 +59,8 @@ jobs:
         python -m pip install -r docs/requirements.txt
     - name: Install Doxygen
       uses: ssciwr/doxygen-install@v1
+      with:
+        version: "1.10.0"
     - name: Run tests
       run: |
         git config --global user.email "you@example.com"
