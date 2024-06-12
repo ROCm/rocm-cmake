@@ -43,14 +43,11 @@ The documentation is structured as follows:
   .. grid-item-card:: Installation
 
     * :ref:`rocminstalltargets`
-
-      * :ref:`rocminstallsymlinks`
-      * :ref:`rocmheaderwrapper`
-
+    * :ref:`rocminstallsymlinks`
+    * :ref:`rocmheaderwrapper`
     * :ref:`rocmcreatepackage`
-
-      * :ref:`rocmclients`
-      * :ref:`rocmconfighelpers`
+    * :ref:`rocmclients`
+    * :ref:`rocmconfighelpers`
 
 
   .. grid-item-card:: Basic functions
@@ -65,9 +62,6 @@ The documentation is structured as follows:
     * :ref:`rocmcppcheck`
     * :ref:`rocmtest`
 
-    * :ref:`genindex`
-    * :ref:`search`
-
   .. grid-item-card:: Documentation in CMake
 
     * :ref:`rocmdocs`
@@ -78,6 +72,8 @@ The documentation is structured as follows:
 
     * :ref:`rocmutilities`
 
+
+For a complete listing of the ROCm CMake modules and functions refer to :ref:`contents`. 
 
 To contribute to the documentation, refer to
 `Contributing to ROCm <https://rocm.docs.amd.com/en/latest/contribute/contributing.html>`_.

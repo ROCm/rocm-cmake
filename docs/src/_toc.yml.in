@@ -13,15 +13,11 @@ subtrees:
   - caption: Installation
     entries:
       - file: reference/ROCMInstallTargets.rst
-        subtrees:
-          - entries:
-            - file: reference/ROCMInstallSymlinks.rst
-            - file: reference/ROCMHeaderWrapper.rst
+      - file: reference/ROCMInstallSymlinks.rst
+      - file: reference/ROCMHeaderWrapper.rst
       - file: reference/ROCMCreatePackage.rst
-        subtrees:
-          - entries:
-            - file: reference/ROCMClients.rst
-            - file: reference/ROCMPackageConfigHelpers.rst
+      - file: reference/ROCMClients.rst
+      - file: reference/ROCMPackageConfigHelpers.rst
   - caption: Basic functions
     entries:
       - file: reference/ROCMCheckTargetIds.rst
