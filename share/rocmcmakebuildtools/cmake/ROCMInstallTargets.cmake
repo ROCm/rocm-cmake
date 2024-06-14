@@ -116,7 +116,7 @@ function(rocm_install)
     endif()
 endfunction()
 
-option(ROCM_SYMLINK_LIBS "Create backwards compatibility symlink for library files." ON)
+option(ROCM_SYMLINK_LIBS "Create backwards compatibility symlink for library files." OFF)
 
 function(rocm_install_targets)
     set(options PRIVATE)
