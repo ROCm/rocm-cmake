@@ -212,27 +212,24 @@ function(rocm_install_targets)
             else()
                 set_property(TARGET ${TARGET} APPEND PROPERTY
                 INSTALL_RPATH "\\\${ORIGIN}/../lib")
-                message(STATUS "------- POLICY CMP0095 NOT SET - INSTALL RPATH.----------")
             endif()
-            # Adding RPATH to the private libraries.
             if(PARSE_PRIVATE)
+                # Adding RPATH to the private libraries.
                 if(POLICY CMP0095)
                     set_property(TARGET ${TARGET} APPEND PROPERTY INSTALL_RPATH "$ORIGIN/../../")
-                    message(STATUS "------- POLICY CMP0095 INSTALL RPATH.-------")
                 else()
                     set_property(TARGET ${TARGET} APPEND PROPERTY
                     INSTALL_RPATH "\\\${ORIGIN}/../../")
-                    message(STATUS "------- POLICY CMP0095 NOT SET - INSTALL RPATH.---------")
                 endif()
-            # Adding RPATH to libraries/executables that are not private.
             else()
+                # Adding RPATH to libraries/executables that are not private.
                 if(POLICY CMP0095)
+                    # Question: We take this path when lib/executable is not private.
+                    # Is it safe to use ${PROJECT_NAME} in this case?
                     set_property(TARGET ${TARGET} APPEND PROPERTY INSTALL_RPATH "$ORIGIN/../lib/${PROJECT_NAME}/lib")
-                    message(STATUS "------- POLICY CMP0095 INSTALL RPATH.-----------")
                 else()
                     set_property(TARGET ${TARGET} APPEND PROPERTY
                     INSTALL_RPATH "\\\${ORIGIN}/../lib/${PROJECT_NAME}/lib")
-                    message(STATUS "------- POLICY CMP0095 NOT SET - INSTALL RPATH.----------")
                 endif()
             endif()
         endif()
