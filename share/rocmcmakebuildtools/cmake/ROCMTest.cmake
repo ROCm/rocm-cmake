@@ -221,9 +221,9 @@ function(rocm_install_test)
     set(INSTALL_PREFIX "$<TARGET_PROPERTY:tests,ROCM_TEST_INSTALLDIR>")
     if(PARSE_TARGETS)
         foreach(TARGET ${PARSE_TARGETS})
-            set_property(TARGET ${TARGET} APPEND PROPERTY INSTALL_RPATH "$ORIGIN/../../../lib")
+            set_property(TARGET ${TARGET} APPEND PROPERTY INSTALL_RPATH "$ORIGIN/../../../../lib")
             # Adding RPATH to public tests to point to private libraries.
-            set_property(TARGET ${TARGET} APPEND PROPERTY INSTALL_RPATH "$ORIGIN/../../../lib/${PROJECT_NAME}/lib")
+            set_property(TARGET ${TARGET} APPEND PROPERTY INSTALL_RPATH "$ORIGIN/../../../../lib/${PROJECT_NAME}/lib")
         endforeach()
         install(
             TARGETS ${PARSE_TARGETS}
