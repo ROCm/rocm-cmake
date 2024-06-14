@@ -3,6 +3,7 @@
 # ######################################################################################################################
 
 cmake_policy(SET CMP0057 NEW)
+cmake_policy(SET CMP0095 NEW)
 
 # todo: consolidate with duplicate in ROCMCreatePackage.cmake
 # Default libdir to "lib", this skips GNUInstallDirs from trying to take a guess if it's unset:
@@ -131,14 +132,10 @@ function(rocm_install_targets)
         set(EXPORT_FILE ${PARSE_EXPORT})
     endif()
 
-    if(POLICY CMP0095)
-        cmake_policy(SET CMP0095 NEW)
-    endif()
-
     if(PARSE_PREFIX)
         set(PREFIX_DIR ${PARSE_PREFIX})
         if(PARSE_PRIVATE)
-            set(BIN_INSTALL_DIR ${PARSE_PREFIX}/${CMAKE_INSTALL_BINDIR}/${PROJECT_NAME})
+            set(BIN_INSTALL_DIR ${PARSE_PREFIX}/${ROCM_INSTALL_LIBDIR}/${PROJECT_NAME}/bin)
             set(LIB_INSTALL_DIR ${PARSE_PREFIX}/${ROCM_INSTALL_LIBDIR}/${PROJECT_NAME}/lib)
             set(INCLUDE_INSTALL_DIR ${PARSE_PREFIX}/${ROCM_INSTALL_LIBDIR}/${PROJECT_NAME}/include)
         else()
@@ -148,7 +145,7 @@ function(rocm_install_targets)
         endif()
     elseif(ENABLE_ASAN_PACKAGING)
         if(PARSE_PRIVATE)
-            set(BIN_INSTALL_DIR ${CMAKE_INSTALL_BINDIR}/asan/${PROJECT_NAME})
+            set(BIN_INSTALL_DIR ${ROCM_INSTALL_LIBDIR}/asan/${PROJECT_NAME}/bin)
             set(LIB_INSTALL_DIR ${ROCM_INSTALL_LIBDIR}/asan/${PROJECT_NAME}/lib)
             set(INCLUDE_INSTALL_DIR ${ROCM_INSTALL_LIBDIR}/asan/${PROJECT_NAME}/include)
         else()
@@ -158,7 +155,7 @@ function(rocm_install_targets)
         endif()
     else()
         if(PARSE_PRIVATE)
-            set(BIN_INSTALL_DIR ${CMAKE_INSTALL_BINDIR}/${PROJECT_NAME})
+            set(BIN_INSTALL_DIR ${ROCM_INSTALL_LIBDIR}/${PROJECT_NAME}/bin)
             set(LIB_INSTALL_DIR ${ROCM_INSTALL_LIBDIR}/${PROJECT_NAME}/lib)
             set(INCLUDE_INSTALL_DIR ${ROCM_INSTALL_LIBDIR}/${PROJECT_NAME}/include)
         else()
@@ -205,32 +202,13 @@ function(rocm_install_targets)
     foreach(TARGET IN LISTS PARSE_TARGETS)
         get_target_property(T_TYPE ${TARGET} TYPE)
         if(NOT T_TYPE STREQUAL "INTERFACE_LIBRARY")
-            # TODO: Create a function to set INSTALL_RPATH
-            if(POLICY CMP0095)
-                set_property(TARGET ${TARGET} APPEND PROPERTY INSTALL_RPATH "$ORIGIN/../lib")
-                message(STATUS "------- POLICY CMP0095 INSTALL RPATH.----------")
-            else()
-                set_property(TARGET ${TARGET} APPEND PROPERTY
-                INSTALL_RPATH "\\\${ORIGIN}/../lib")
-            endif()
+            set_property(TARGET ${TARGET} APPEND PROPERTY INSTALL_RPATH "$ORIGIN/../lib")
             if(PARSE_PRIVATE)
-                # Adding RPATH to the private libraries.
-                if(POLICY CMP0095)
-                    set_property(TARGET ${TARGET} APPEND PROPERTY INSTALL_RPATH "$ORIGIN/../../")
-                else()
-                    set_property(TARGET ${TARGET} APPEND PROPERTY
-                    INSTALL_RPATH "\\\${ORIGIN}/../../")
-                endif()
+                # Adding RPATH to private binaries to point to public libraries.
+                set_property(TARGET ${TARGET} APPEND PROPERTY INSTALL_RPATH "$ORIGIN/../../")
             else()
-                # Adding RPATH to libraries/executables that are not private.
-                if(POLICY CMP0095)
-                    # Question: We take this path when lib/executable is not private.
-                    # Is it safe to use ${PROJECT_NAME} in this case?
-                    set_property(TARGET ${TARGET} APPEND PROPERTY INSTALL_RPATH "$ORIGIN/../lib/${PROJECT_NAME}/lib")
-                else()
-                    set_property(TARGET ${TARGET} APPEND PROPERTY
-                    INSTALL_RPATH "\\\${ORIGIN}/../lib/${PROJECT_NAME}/lib")
-                endif()
+                # Adding RPATH to public binaries to point to private libraries.
+                set_property(TARGET ${TARGET} APPEND PROPERTY INSTALL_RPATH "$ORIGIN/../lib/${PROJECT_NAME}/lib")
             endif()
         endif()
 
