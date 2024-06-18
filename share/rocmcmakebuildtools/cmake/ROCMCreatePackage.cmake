@@ -475,7 +475,7 @@ macro(rocm_compute_component_package_name COMPONENT_NAME BASE_NAME NAME_SUFFIX H
     else()
         if(ENABLE_ASAN_PACKAGING)
             set(_component_suffix asan)
-        elseif(NOT ${HEADER_ONLY} AND NOT ${BUILD_SHARED_LIBS})
+        elseif(NOT ${BUILD_SHARED_LIBS})
             set(_component_suffix static)
         endif()
     endif()
