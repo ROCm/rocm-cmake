@@ -33,47 +33,8 @@ included by running ``include(<file_name>)``. The file names, the
 functions, variables, and macros accessible using each file are described in 
 this documentation.
 
-You can access ROCm CMake on `GitHub repository <https://github.com/ROCm/rocm-cmake>`_.
-
-The documentation is structured as follows:
-
-.. grid:: 2
-  :gutter: 3
-
-  .. grid-item-card:: Installation
-
-    * :ref:`rocminstalltargets`
-    * :ref:`rocminstallsymlinks`
-    * :ref:`rocmheaderwrapper`
-    * :ref:`rocmcreatepackage`
-    * :ref:`rocmclients`
-    * :ref:`rocmconfighelpers`
-
-
-  .. grid-item-card:: Basic functions
-
-    * :ref:`rocmchecktargetids`
-    * :ref:`rocmsetupversion`
-    * :ref:`rocmanalyzers`
-
-  .. grid-item-card:: Standard Tooling
-
-    * :ref:`rocmclangtidy`
-    * :ref:`rocmcppcheck`
-    * :ref:`rocmtest`
-
-  .. grid-item-card:: Documentation in CMake
-
-    * :ref:`rocmdocs`
-    * :ref:`rocmdoxygendoc`
-    * :ref:`rocmsphinxdoc`
-
-  .. grid-item-card:: Internal use
-
-    * :ref:`rocmutilities`
-
-
-For a complete listing of the ROCm CMake modules and functions refer to :ref:`contents`. 
+You can access the build tools on the `ROCm CMake GitHub repository <https://github.com/ROCm/rocm-cmake>`_.
+For a complete listing of the features of ROCm CMake refer to :ref:`contents`. 
 
 To contribute to the documentation, refer to
 `Contributing to ROCm <https://rocm.docs.amd.com/en/latest/contribute/contributing.html>`_.
