@@ -1,5 +1,5 @@
 # ######################################################################################################################
-# Copyright (C) 2019-2021 Advanced Micro Devices, Inc.
+# Copyright (C) 2019-2024 Advanced Micro Devices, Inc.
 # ######################################################################################################################
 
 set(ROCM_WARN_TOOLCHAIN_VAR
@@ -20,6 +20,7 @@ define_property(GLOBAL PROPERTY ROCMChecksSuppressed INHERITED
     BRIEF_DOCS "Property to indicate suppression of ROCMChecks."
     FULL_DOCS "Property to indicate suppression of ROCMChecks."
 )
+set_property(GLOBAL PROPERTY ROCMChecksSuppressed 0)
 define_property(GLOBAL PROPERTY ROCMChecksWatched
     BRIEF_DOCS "Property recording variables watched by ROCMChecks."
     FULL_DOCS "Property recording variables watched by ROCMChecks."
@@ -27,7 +28,7 @@ define_property(GLOBAL PROPERTY ROCMChecksWatched
 
 function(rocm_check_toolchain_var var access value list_file)
     get_property(suppressed GLOBAL PROPERTY ROCMChecksSuppressed)
-    if ((NOT "${suppressed}" STREQUAL "") AND suppressed)
+    if (suppressed GREATER 0)
         return()
     endif()
     set(message_type STATUS)
@@ -69,20 +70,36 @@ function(rocm_variable_watch VAR)
     variable_watch("${VAR}" rocm_check_toolchain_var)
 endfunction()
 
-function(add_subdirectory_unchecked source_directory)
+function(_push_watched_vars)
     get_property(watched_vars GLOBAL PROPERTY ROCMChecksWatched)
-    set_property(GLOBAL PROPERTY ROCMChecksSuppressed "ON")
+    get_property(current_suppression GLOBAL PROPERTY ROCMChecksSuppressed)
+    math(EXPR current_suppression "${current_suppression} + 1")
+    set_property(GLOBAL PROPERTY ROCMChecksSuppressed "${current_suppression}")
     foreach(var IN_LISTS watched_vars)
-        set(_rocmchecks_restore_${var} "${var}" CACHE INTERNAL)
+        set(_rocmchecks_restore_var_${var}_${current_suppression} "${var}" CACHE INTERNAL)
     endforeach()
-    add_subdirectory(${ARGV})
+    set(_rocmchecks_restore_varlist_${current_suppression} "${watched_vars}" CACHE INTERNAL)
+endfunction()
+
+function(_pop_watched_vars)
+    get_property(current_suppression GLOBAL PROPERTY ROCMChecksSuppressed)
+    if(current_suppresion LESS_EQUAL 0)
+        message(WARNING "pop_watched_vars called while without a stack.")
+        return()
+    endif()
+    set(watched_vars $CACHE{_rocmchecks_restore_varlist_${current_suppression}})
+    unset(_rocmchecks_restore_varlist_${current_suppression} CACHE)
     foreach(var IN_LISTS watched_vars)
         if (DEFINED CACHE{${var}})
-            set(${var} "$CACHE{_rocmchecks_restore_${var}}")
+            # how do we restore a cache variable when we don't know its type or docstring?
+            set(${var} "$CACHE{_rocmchecks_restore_var_${var}_${current_suppression}}")
+        else()
+            set(${var} "$CACHE{_rocmchecks_restore_var_${var}_${current_suppression}}")
         endif()
-        unset(_rocmchecks_restore_${var} CACHE)
+        unset(_rocmchecks_restore_var_${var}_${current_suppression} CACHE)
     endforeach()
-    set_property(GLOBAL PROPERTY ROCMChecksSuppressed "OFF")
+    math(EXPR current_suppression "${current_suppresion} - 1")
+    set_property(GLOBAL PROPERTY ROCMChecksSuppressed "${current_suppression}")
 endfunction()
 
 if(UNIX AND (ROCM_WARN_TOOLCHAIN_VAR OR ROCM_ERROR_TOOLCHAIN_VAR))
