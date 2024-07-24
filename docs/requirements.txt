@@ -92,7 +92,7 @@ requests==2.32.3
     # via
     #   pygithub
     #   sphinx
-rocm-docs-core==1.4.0
+rocm-docs-core==1.6.0
     # via -r requirements.in
 smmap==5.0.1
     # via gitdb
@@ -135,8 +135,6 @@ sphinxcontrib-moderncmakedomain==3.29.0
 sphinxcontrib-qthelp==1.0.7
     # via sphinx
 sphinxcontrib-serializinghtml==1.1.10
-    # via sphinx
-tomli==2.0.1
     # via sphinx
 typing-extensions==4.12.2
     # via
