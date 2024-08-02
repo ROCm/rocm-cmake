@@ -16,6 +16,6 @@ python:
    - requirements: docs/sphinx/requirements.txt
 
 sphinx:
-   configuration: docs/conf.py
+   configuration: docs/src/conf.py
 
 formats: []
