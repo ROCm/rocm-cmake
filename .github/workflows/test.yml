@@ -32,7 +32,7 @@ jobs:
       max-parallel: 4
       matrix:
         platform:
-          - ubuntu-20.04
+          - ubuntu-22.04
           - macos-11
           - windows-2019
         cmake-version:
