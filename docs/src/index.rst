@@ -16,9 +16,12 @@ ROCm CMake build tools
 
 ROCm CMake build tools (also known as "rocm-cmake") is a collection of functions 
 that unify and simplify the CMake code of ROCm components, as well as ensuring 
-consistency across these different components. ROCm CMake build tools are primarily 
-used when building a library, and as such are not runtime dependencies for any generated 
-libraries, packages, or executables.
+consistency across these different components. The ROCm CMake build tools are used 
+when building and developing many AMD ROCm libraries, but are not runtime dependencies 
+for any libraries, packages or executables.
+
+.. important::
+   ROCm CMake tools are not required when building or compiling an application that uses ROCm or HIP components. 
 
 The build tools can be included into a CMake project by running:
 
