@@ -336,14 +336,29 @@ macro(rocm_create_package)
             )
         endif()
         if(PARSE_HEADER_ONLY OR NOT BUILD_SHARED_LIBS)
-            rocm_join_if_set(", "
-                CPACK_DEBIAN_DEVEL_PACKAGE_PROVIDES
-                CPACK_DEBIAN_PACKAGE_PROVIDES
-                "${CPACK_PACKAGE_NAME} (= ${CPACK_PACKAGE_VERSION})")
-            rocm_join_if_set(", "
-                CPACK_RPM_DEVEL_PACKAGE_PROVIDES
-                CPACK_DEBIAN_PACKAGE_PROVIDES
-                "${CPACK_PACKAGE_NAME} = ${CPACK_PACKAGE_VERSION}")
+            if(DEFINED CPACK_DEBIAN_DEVEL_PACKAGE_PROVIDES)
+                rocm_join_if_set(", "
+                    CPACK_DEBIAN_DEVEL_PACKAGE_PROVIDES
+                    "${CPACK_PACKAGE_NAME} (= ${CPACK_PACKAGE_VERSION})"
+                )
+            else()
+                rocm_join_if_set(", "
+                    CPACK_DEBIAN_DEVEL_PACKAGE_PROVIDES
+                    "${CPACK_DEBIAN_PACKAGE_PROVIDES}"
+                    "${CPACK_PACKAGE_NAME} (= ${CPACK_PACKAGE_VERSION})")
+            endif()
+
+            if(DEFINED CPACK_RPM_DEVEL_PACKAGE_PROVIDES)
+                rocm_join_if_set(", "
+                    CPACK_RPM_DEVEL_PACKAGE_PROVIDES
+                    "${CPACK_PACKAGE_NAME}"
+                )
+            else()
+                rocm_join_if_set(", "
+                    CPACK_RPM_DEVEL_PACKAGE_PROVIDES
+                    "${CPACK_RPM_PACKAGE_PROVIDES}"
+                    "${CPACK_PACKAGE_NAME}")
+            endif()
         else()
             rocm_package_add_dependencies(COMPONENT devel DEPENDS "${CPACK_PACKAGE_NAME} >= ${CPACK_PACKAGE_VERSION}")
         endif()
