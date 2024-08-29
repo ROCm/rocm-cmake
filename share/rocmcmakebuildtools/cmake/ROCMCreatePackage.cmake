@@ -490,7 +490,7 @@ macro(rocm_compute_component_package_name COMPONENT_NAME BASE_NAME NAME_SUFFIX H
     else()
         if(ENABLE_ASAN_PACKAGING)
             set(_component_suffix asan)
-        elseif(NOT ${HEADER_ONLY} AND NOT ${BUILD_SHARED_LIBS})
+        elseif(NOT ${BUILD_SHARED_LIBS})
             set(_component_suffix static)
         endif()
     endif()
@@ -515,13 +515,13 @@ macro(rocm_compute_component_package_name COMPONENT_NAME BASE_NAME NAME_SUFFIX H
         OR CPACK_RPM_${_component_name_upper}_PACKAGE_NAME STREQUAL ""
     )
         set(CPACK_RPM_${_component_name_upper}_PACKAGE_NAME
-            "${BASE_NAME}${_rpm_component_partial}${_component_suffix}")
+            "${BASE_NAME}${_component_suffix}${_rpm_component_partial}")
     endif()
     if(NOT DEFINED CPACK_DEBIAN_${_component_name_upper}_PACKAGE_NAME
         OR CPACK_DEBIAN_${_component_name_upper}_PACKAGE_NAME STREQUAL ""
     )
         set(CPACK_DEBIAN_${_component_name_upper}_PACKAGE_NAME
-            "${BASE_NAME}${_deb_component_partial}${_component_suffix}")
+            "${BASE_NAME}${_component_suffix}${_deb_component_partial}")
     endif()
 
     # clean up temporary variables
@@ -546,7 +546,9 @@ macro(rocm_set_comp_cpackvar HEADER_ONLY NAME_SUFFIX components)
             set(CPACK_DEBIAN_RUNTIME_FILE_NAME "DEB-DEFAULT")
         endif()
         if (NOT ${HEADER_ONLY} AND BUILD_SHARED_LIBS)
-            set(CPACK_RPM_MAIN_COMPONENT "runtime")
+            if (NOT ENABLE_ASAN_PACKAGING)
+                set(CPACK_RPM_MAIN_COMPONENT "runtime")
+            endif()
             list(APPEND CPACK_COMPONENTS_ALL runtime)
         endif()
     endif()
