@@ -33,7 +33,7 @@ jobs:
       matrix:
         platform:
           - ubuntu-20.04
-          - macos-11
+          - macos-12
           - windows-2019
         cmake-version:
           - 3.20.0
