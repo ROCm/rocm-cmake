@@ -2,6 +2,8 @@
 # Copyright (C) 2024 Advanced Micro Devices, Inc.
 # ######################################################################################################################
 
+include(ROCMCheckTargetIds)
+
 macro(_rocm_get_arch_keyword_list)
     # TODO: These lists are not accurate! They must be updated before this can be merged.
     set(_arches_rocm6.0 gfx900 gfx906:xnack- gfx908:xnack- gfx90a:xnack+ gfx90a:xnack- gfx940 gfx941 gfx942 gfx1010 gfx1012 gfx1030 gfx1100 gfx1101 gfx1102)
@@ -73,5 +75,6 @@ function(rocm_determine_architecture)
     endif()
     # Remove arches listed in block, not listed in allow
     list(REMOVE_ITEM arch_list ${block_list})
+    rocm_check_target_ids(arch_list TARGETS ${arch_list})
     set(${arch_dest} "${arch_list}" CACHE STRING "")
 endfunction(rocm_determine_architecture)
