@@ -1,5 +1,5 @@
 # ######################################################################################################################
-# Copyright (C) 2019-2021 Advanced Micro Devices, Inc.
+# Copyright (C) 2019-2024 Advanced Micro Devices, Inc.
 # ######################################################################################################################
 
 set(ROCM_WARN_TOOLCHAIN_VAR
@@ -16,7 +16,21 @@ if(DEFINED ENV{ROCMCHECKS_ERROR_TOOLCHAIN_VAR})
     set(ROCM_ERROR_TOOLCHAIN_VAR $ENV{ROCMCHECKS_ERROR_TOOLCHAIN_VAR})
 endif()
 
+define_property(GLOBAL PROPERTY ROCMChecksSuppressed INHERITED
+    BRIEF_DOCS "Property to indicate suppression of ROCMChecks."
+    FULL_DOCS "Property to indicate suppression of ROCMChecks."
+)
+set_property(GLOBAL PROPERTY ROCMChecksSuppressed 0)
+define_property(GLOBAL PROPERTY ROCMChecksWatched
+    BRIEF_DOCS "Property recording variables watched by ROCMChecks."
+    FULL_DOCS "Property recording variables watched by ROCMChecks."
+)
+
 function(rocm_check_toolchain_var var access value list_file)
+    get_property(suppressed GLOBAL PROPERTY ROCMChecksSuppressed)
+    if (suppressed GREATER 0)
+        return()
+    endif()
     set(message_type STATUS)
     if(ROCM_ERROR_TOOLCHAIN_VAR)
         set(message_type SEND_ERROR)
@@ -50,17 +64,55 @@ function(rocm_check_toolchain_var var access value list_file)
         endif()
     endif()
 endfunction()
+
+function(rocm_variable_watch VAR)
+    set_property(GLOBAL APPEND PROPERTY ROCMChecksWatched "${VAR}")
+    variable_watch("${VAR}" rocm_check_toolchain_var)
+endfunction()
+
+function(_push_watched_vars)
+    get_property(watched_vars GLOBAL PROPERTY ROCMChecksWatched)
+    get_property(current_suppression GLOBAL PROPERTY ROCMChecksSuppressed)
+    math(EXPR current_suppression "${current_suppression} + 1")
+    set_property(GLOBAL PROPERTY ROCMChecksSuppressed "${current_suppression}")
+    foreach(var IN_LISTS watched_vars)
+        set(_rocmchecks_restore_var_${var}_${current_suppression} "${var}" CACHE INTERNAL)
+    endforeach()
+    set(_rocmchecks_restore_varlist_${current_suppression} "${watched_vars}" CACHE INTERNAL)
+endfunction()
+
+function(_pop_watched_vars)
+    get_property(current_suppression GLOBAL PROPERTY ROCMChecksSuppressed)
+    if(current_suppresion LESS_EQUAL 0)
+        message(WARNING "pop_watched_vars called while without a stack.")
+        return()
+    endif()
+    set(watched_vars $CACHE{_rocmchecks_restore_varlist_${current_suppression}})
+    unset(_rocmchecks_restore_varlist_${current_suppression} CACHE)
+    foreach(var IN_LISTS watched_vars)
+        if (DEFINED CACHE{${var}})
+            # how do we restore a cache variable when we don't know its type or docstring?
+            set(${var} "$CACHE{_rocmchecks_restore_var_${var}_${current_suppression}}")
+        else()
+            set(${var} "$CACHE{_rocmchecks_restore_var_${var}_${current_suppression}}")
+        endif()
+        unset(_rocmchecks_restore_var_${var}_${current_suppression} CACHE)
+    endforeach()
+    math(EXPR current_suppression "${current_suppresion} - 1")
+    set_property(GLOBAL PROPERTY ROCMChecksSuppressed "${current_suppression}")
+endfunction()
+
 if(UNIX AND (ROCM_WARN_TOOLCHAIN_VAR OR ROCM_ERROR_TOOLCHAIN_VAR))
     foreach(LANG C CXX Fortran)
-        variable_watch(CMAKE_${LANG}_COMPILER rocm_check_toolchain_var)
-        variable_watch(CMAKE_${LANG}_FLAGS rocm_check_toolchain_var)
-        variable_watch(CMAKE_${LANG}_LINK_EXECUTABLE rocm_check_toolchain_var)
-        variable_watch(CMAKE_${LANG}_SIZEOF_DATA_PTR rocm_check_toolchain_var)
-        variable_watch(CMAKE_${LANG}_STANDARD_INCLUDE_DIRECTORIES rocm_check_toolchain_var)
-        variable_watch(CMAKE_${LANG}_STANDARD_LIBRARIES rocm_check_toolchain_var)
+        rocm_variable_watch(CMAKE_${LANG}_COMPILER)
+        rocm_variable_watch(CMAKE_${LANG}_FLAGS)
+        rocm_variable_watch(CMAKE_${LANG}_LINK_EXECUTABLE)
+        rocm_variable_watch(CMAKE_${LANG}_SIZEOF_DATA_PTR)
+        rocm_variable_watch(CMAKE_${LANG}_STANDARD_INCLUDE_DIRECTORIES)
+        rocm_variable_watch(CMAKE_${LANG}_STANDARD_LIBRARIES)
     endforeach()
-    variable_watch(CMAKE_EXE_LINKER_FLAGS rocm_check_toolchain_var)
-    variable_watch(CMAKE_MODULE_LINKER_FLAGS rocm_check_toolchain_var)
-    variable_watch(CMAKE_SHARED_LINKER_FLAGS rocm_check_toolchain_var)
-    variable_watch(CMAKE_STATIC_LINKER_FLAGS rocm_check_toolchain_var)
+    rocm_variable_watch(CMAKE_EXE_LINKER_FLAGS)
+    rocm_variable_watch(CMAKE_MODULE_LINKER_FLAGS)
+    rocm_variable_watch(CMAKE_SHARED_LINKER_FLAGS)
+    rocm_variable_watch(CMAKE_STATIC_LINKER_FLAGS)
 endif()
