@@ -177,7 +177,7 @@ function(rocm_install_targets)
                 target_include_directories(${TARGET} PRIVATE ${INCLUDE_PATH})
             endif()
         endforeach()
-        target_include_directories(${TARGET} INTERFACE $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>)
+        target_include_directories(${TARGET} INTERFACE $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${INCLUDE_INSTALL_DIR}>)
     endforeach()
 
     set(runtime "runtime")
