@@ -327,6 +327,7 @@ macro(rocm_create_package)
         rocm_compute_component_package_name(devel "${CPACK_PACKAGE_NAME}" "${PARSE_SUFFIX}" "${PARSE_HEADER_ONLY}")
         list(APPEND PARSE_COMPONENTS devel)
         if(NOT ENABLE_ASAN_PACKAGING)
+            # Since no asan-dev package available, avoid recommends/suggests
             rocm_join_if_set(", " CPACK_DEBIAN_RUNTIME_PACKAGE_RECOMMENDS
                 "${CPACK_DEBIAN_DEVEL_PACKAGE_NAME} (>=${CPACK_PACKAGE_VERSION})")
         endif()
@@ -334,6 +335,7 @@ macro(rocm_create_package)
         rocm_find_program_version(rpmbuild GREATER_EQUAL 4.12.0 QUIET)
         if(rpmbuild_VERSION_OK)
             if(NOT ENABLE_ASAN_PACKAGING)
+                # Since no asan-dev package available, avoid recommends/suggests
                 rocm_join_if_set(", " CPACK_RPM_RUNTIME_PACKAGE_SUGGESTS
                     "${CPACK_RPM_DEVEL_PACKAGE_NAME} >= ${CPACK_PACKAGE_VERSION}"
                 )
