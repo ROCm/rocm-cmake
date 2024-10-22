@@ -23,7 +23,7 @@
   that developers switch to `find_package(ROCmCMakeBuildTools)`
 - ROCMInstallTargets: Stopped installing executables in ASAN builds
 
-### Fixed
+### Resolved issues
 
 - ROCMClangTidy: Fixed invalid list index in clang tidy
 - Fixed test failures when `ROCM_CMAKE_GENERATOR` is an empty string
@@ -35,7 +35,7 @@
 - ROCMSphinxDoc: Improved validation, documentation and rocm-docs-core integration.
 - Rename CMake package to ROCmCMakeBuildTools
 
-### Fixed
+### Resolved issues
 
 - ROCMClangTidy: Fixed extra make flags passed for clang tidy.
 - ROCMTest: Fixed issues when using module in a subdirectory.
@@ -57,17 +57,17 @@
 
 ## [rocm-cmake 0.8.1 for ROCm 5.5]
 
-### Fixed
-
-- ROCMInstallTargets: Added compatibility symlinks for included cmake files in `<ROCM>/lib/cmake/<PACKAGE>`.
-
 ### Changed
 
 - ROCMHeaderWrapper: The wrapper header deprecation message is now a deprecation warning.
 
+### Resolved issues
+
+- ROCMInstallTargets: Added compatibility symlinks for included cmake files in `<ROCM>/lib/cmake/<PACKAGE>`.
+
 ## [rocm-cmake 0.8.0 for ROCm 5.4]
 
-### Fixed
+### Resolved issues
 
 - ROCMCreatePackage: Fixed error in prerm scripts that could break package upgrades when using the `PTH` option.
 - Removed unnecessary requirement for having C and C++ compilers available when building rocm-cmake from source.
@@ -78,16 +78,16 @@
 
 ## [rocm-cmake 0.8.0 for ROCm 5.3]
 
-### Fixed
-
-- Fixed error in prerm scripts created by `rocm_create_package` that could break uninstall for packages using the `PTH` option.
-
 ### Changed
 
 - `ROCM_USE_DEV_COMPONENT` set to on by default for all platforms. This means that Windows will now generate runtime and devel packages by default
 - ROCMInstallTargets now defaults `CMAKE_INSTALL_LIBDIR` to `lib` if not otherwise specified.
 - Changed default Debian compression type to xz and enabled multi-threaded package compression.
 - `rocm_create_package` will no longer warn upon failure to determine version of program rpmbuild.
+
+### Resolved issues
+
+- Fixed error in prerm scripts created by `rocm_create_package` that could break uninstall for packages using the `PTH` option.
 
 ## [0.7.3]
 
@@ -96,7 +96,7 @@
 - Header wrapper functionality included. This is to support the change in header file locations in ROCm 5.2, while providing backwards compatibility via header file wrappers.
   The associated deprecation warning can be disabled by defining `ROCM_NO_WRAPPER_HEADER_WARNING` before including the wrapper header.
 
-### Fixed
+### Resolved issues
 
 - Fixed spurious failures in `rocm_check_target_ids` for target ids with target features when `-Werror` is enabled.
   The `HAVE_<target-id>` result variable has been renamed to `COMPILER_HAS_TARGET_ID_<sanitized-target-id>`.
