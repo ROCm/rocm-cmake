@@ -25,8 +25,8 @@
 
 ### Resolved issues
 
-- ROCMClangTidy: Resolved issues invalid list index in clang tidy
-- Resolved issues test failures when `ROCM_CMAKE_GENERATOR` is an empty string
+- ROCMClangTidy: Fixed invalid list index in clang tidy
+- Fixed test failures when `ROCM_CMAKE_GENERATOR` is an empty string
 
 ## [rocm-cmake 0.11.0 for ROCm 6.0.0]
 
@@ -37,8 +37,8 @@
 
 ### Resolved issues
 
-- ROCMClangTidy: Resolved issues extra make flags passed for clang tidy.
-- ROCMTest: Resolved issues issues when using module in a subdirectory.
+- ROCMClangTidy: Fixed extra make flags passed for clang tidy.
+- ROCMTest: Fixed issues when using module in a subdirectory.
 
 ## [rocm-cmake 0.10.0 for ROCm 5.7.0]
 
@@ -69,7 +69,7 @@
 
 ### Resolved issues
 
-- ROCMCreatePackage: Resolved issues error in prerm scripts that could break package upgrades when using the `PTH` option.
+- ROCMCreatePackage: Fixed error in prerm scripts that could break package upgrades when using the `PTH` option.
 - Removed unnecessary requirement for having C and C++ compilers available when building rocm-cmake from source.
 
 ### Known issues
@@ -87,7 +87,7 @@
 
 ### Resolved issues
 
-- Resolved issues error in prerm scripts created by `rocm_create_package` that could break uninstall for packages using the `PTH` option.
+- Fixed error in prerm scripts created by `rocm_create_package` that could break uninstall for packages using the `PTH` option.
 
 ## [0.7.3]
 
@@ -98,7 +98,7 @@
 
 ### Resolved issues
 
-- Resolved issues spurious failures in `rocm_check_target_ids` for target ids with target features when `-Werror` is enabled.
+- Fixed spurious failures in `rocm_check_target_ids` for target ids with target features when `-Werror` is enabled.
   The `HAVE_<target-id>` result variable has been renamed to `COMPILER_HAS_TARGET_ID_<sanitized-target-id>`.
 
 ## [0.7.2]
