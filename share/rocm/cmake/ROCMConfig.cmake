@@ -9,6 +9,9 @@ get_filename_component(_new_rocmcmakebuildtools_path_linux "${_new_rocmcmakebuil
 
 include(CMakeFindDependencyMacro)
 
+message(DEPRECATION 
+    "Use of find_package(ROCM) is deprecated as of ROCm 6.4. Please use find_package(ROCmCMakeBuildTools)")
+
 find_dependency(
     ROCmCMakeBuildTools
     HINTS
