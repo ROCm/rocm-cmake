@@ -1,5 +1,5 @@
 # ######################################################################################################################
-# Copyright (C) 2023 Advanced Micro Devices, Inc.
+# Copyright (C) 2024 Advanced Micro Devices, Inc.
 # ######################################################################################################################
 
 get_filename_component(_new_rocmcmakebuildtools_path "${CMAKE_CURRENT_LIST_DIR}" DIRECTORY)
