@@ -52,7 +52,7 @@ cmake_dependent_option(ROCM_ENABLE_CPPCHECK "Enable CppCheck" ON CPPCHECK_EXE OF
 
 macro(rocm_enable_cppcheck)
     if(ROCM_ENABLE_CPPCHECK)
-        set(options FORCE INCONCLUSIVE)
+        set(options FORCE INCONCLUSIVE EXHAUSTIVE)
         set(oneValueArgs RULE_FILE)
         set(multiValueArgs CHECKS SUPPRESS DEFINE UNDEFINE INCLUDE SOURCES ADDONS)
 
@@ -84,6 +84,11 @@ macro(rocm_enable_cppcheck)
         set(CPPCHECK_INCONCLUSIVE "")
         if(PARSE_INCONCLUSIVE)
             set(CPPCHECK_INCONCLUSIVE --inconclusive)
+        endif()
+
+        set(CPPCHECK_EXHAUSTIVE "")
+        if(PARSE_EXHAUSTIVE)
+            set(CPPCHECK_EXHAUSTIVE --check-level=exhaustive)
         endif()
 
         if(${CPPCHECK_VERSION} VERSION_LESS "1.80")
@@ -119,7 +124,7 @@ macro(rocm_enable_cppcheck)
         set(CPPCHECK_COMMAND
             ${CPPCHECK_EXE} -q
             # -v --report-progress
-            ${CPPCHECK_FORCE} ${CPPCHECK_INCONCLUSIVE} ${CPPCHECK_BUILD_DIR_FLAG} ${CPPCHECK_PLATFORM_FLAG}
+            ${CPPCHECK_FORCE} ${CPPCHECK_EXHAUSTIVE} ${CPPCHECK_INCONCLUSIVE} ${CPPCHECK_BUILD_DIR_FLAG} ${CPPCHECK_PLATFORM_FLAG}
             ${CPPCHECK_RULE_FILE_ARG} ${CPPCHECK_TEMPLATE_ARG} ${CPPCHECK_ADDONS_ARG} --inline-suppr --error-exitcode=1
             -j ${CPPCHECK_JOBS} ${CPPCHECK_DEFINES} ${CPPCHECK_UNDEFINES} ${CPPCHECK_INCLUDES}
             "--relative-paths=${CMAKE_SOURCE_DIR}" --enable=${CPPCHECK_CHECKS}
