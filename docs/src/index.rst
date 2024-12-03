@@ -4,103 +4,43 @@
    contain the root `toctree` directive.
 .. highlight:: cmake
 
-ROCm CMake Build Tools
-======================
+.. meta::
+  :description: ROCm CMake
+  :keywords: ROCm, Cmake, library, api, AMD
 
-Summary
--------
+.. _rocm-cmake:
 
-ROCm CMake Build Tools (also stylized as "ROCmCMakeBuildTools" and previously
-known as "rocm-cmake") is a collection of functions that unify and simplify the
-CMake code of the ROCm components, as well as ensuring consistency across these
-components.
+****************************************************
+ROCm CMake build tools
+****************************************************
 
-Usage
------
+ROCm CMake build tools (also known as "rocm-cmake") is a collection of functions 
+that unify and simplify the CMake code of ROCm components, as well as ensuring 
+consistency across these different components. The ROCm CMake build tools are used 
+when building and developing many AMD ROCm libraries, but are not runtime dependencies 
+for any libraries, packages or executables.
 
-The ROCm CMake Build Tools are primarily used at build time of a library, and
-as such are not runtime dependencies for any generated libraries, packages,
-or executables.
+.. important::
+   ROCm CMake tools are not required when building or compiling an application that uses ROCm or HIP components. 
 
-The tools can be included into a CMake project by running::
+The build tools can be included into a CMake project by running:
+
+.. code-block:: shell
 
    find_package(ROCmCMakeBuildTools)
    # or
    find_package(ROCM) # deprecated, but included for backwards compatibility
 
 Once the tools have been included in this manner, individual files may be
-included by running ``include(<file_name>)``. The file names, and the
-functions, variables, and macros accessible using each file are listed below.
+included by running ``include(<file_name>)``. The file names, the
+functions, variables, and macros accessible using each file are described in 
+this documentation.
 
-Files & Contents
-~~~~~~~~~~~~~~~~
+You can access the build tools on the `ROCm CMake GitHub repository <https://github.com/ROCm/rocm-cmake>`_.
+For a complete listing of the features of ROCm CMake refer to :ref:`contents`. 
 
-- :any:`ROCMAnalyzers`
-   + :any:`rocm_mark_as_analyzer`
-   + :any:`ROCM_ENABLE_GH_ANNOTATIONS`
-- :any:`ROCMCheckTargetIds`
-   + :any:`rocm_check_target_ids`
-- :any:`ROCMClangTidy`
-   + :any:`rocm_enable_clang_tidy`
-   + :any:`rocm_clang_tidy_check`
-   + :any:`CLANG_TIDY_EXE`
-   + :any:`CLANG_TIDY_CACHE`
-   + :any:`CLANG_TIDY_CACHE_SIZE`
-   + :any:`CLANG_TIDY_DEPEND_ON_TARGET`
-- :any:`ROCMClients`
-   + :any:`rocm_package_setup_client_component`
-- :any:`ROCMCppCheck`
-   + :any:`rocm_enable_cppcheck`
-   + :any:`CPPCHECK_EXE`
-   + :any:`CPPCHECK_BUILD_DIR`
-- :any:`ROCMCreatePackage`
-   + :any:`rocm_create_package`
-   + :any:`rocm_package_add_rpm_dependencies`
-   + :any:`rocm_package_add_deb_dependencies`
-   + :any:`rocm_package_add_dependencies`
-   + :any:`rocm_package_setup_component`
-- :any:`ROCMDocs`
-   + :any:`rocm_mark_as_doc`
-   + :any:`rocm_clean_doc_output`
-- :any:`ROCMDoxygenDoc`
-   + :any:`rocm_add_doxygen_doc`
-   + :any:`DOXYGEN_EXECUTABLE`
-   + :any:`DOT_EXECUTABLE`
-- :any:`ROCMInstallSymlinks`
-   + :any:`rocm_install_symlink_subdir`
-- :any:`ROCMInstallTargets`
-   + :any:`rocm_install`
-   + :any:`rocm_install_targets`
-   + :any:`rocm_export_targets`
-- :any:`ROCMPackageConfigHelpers`
-   + :any:`rocm_configure_package_config_file`
-- :any:`ROCMSetupVersion`
-   + :any:`rocm_get_version`
-   + :any:`rocm_setup_version`
-- :any:`ROCMSphinxDoc`
-   + :any:`rocm_add_doxygen_doc`
-   + :any:`SPHINX_EXECUTABLE`
-   + :any:`SPHINX_${BUILDER}_DIR`
-- :any:`ROCMTest`
-   + :any:`rocm_enable_test_package`
-   + :any:`rocm_add_test`
-   + :any:`rocm_add_test_executable`
-   + :any:`rocm_test_header`
-   + :any:`rocm_test_headers`
-   + :any:`rocm_install_test`
-   + :any:`rocm_mark_as_test`
-   + :any:`rocm_link_test_dependencies`
-   + :any:`rocm_test_link_libraries`
-   + :any:`CTEST_PARALLEL_LEVEL`
-   + :any:`CTEST_TIMEOUT`
-   + :any:`ROCM_TEST_GDB`
-- :any:`ROCMUtilities`
-   + :any:`rocm_join_if_set`
-   + :any:`rocm_defer`
-   + :any:`rocm_find_program_version`
+To contribute to the documentation, refer to
+`Contributing to ROCm <https://rocm.docs.amd.com/en/latest/contribute/contributing.html>`_.
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`search`
+You can find licensing information on the
+`Licensing <https://rocm.docs.amd.com/en/latest/about/license.html>`_ page.
