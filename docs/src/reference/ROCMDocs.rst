@@ -1,5 +1,12 @@
+.. meta::
+  :description: ROCm CMake
+  :keywords: ROCm, Cmake, library, api, AMD
+
+.. _rocmdocs:
+
+****************************************************
 ROCMDocs
-========
+****************************************************
 
 This creates a ``doc`` target which can run all documentation generation for the project.
 
