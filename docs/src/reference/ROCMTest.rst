@@ -1,5 +1,12 @@
+.. meta::
+  :description: ROCm CMake
+  :keywords: ROCm, Cmake, library, api, AMD
+
+.. _rocmtest:
+
+****************************************************
 ROCMTest
-========
+****************************************************
 
 This adds a ``check`` target to build and run the tests using CTest. A ``tests`` target can be used to just build the tests. All the tests are then packaged in the test component. 
 
