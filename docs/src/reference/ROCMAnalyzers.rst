@@ -1,7 +1,14 @@
-ROCMAnalyzers
-=============
+.. meta::
+  :description: ROCm CMake
+  :keywords: ROCm, Cmake, library, api, AMD
 
-This creates a ``analyze`` target which can run all analysis for a project.
+.. _rocmanalyzers:
+
+****************************************************
+ROCMAnalyzers
+****************************************************
+
+This creates an ``analyze`` target which can run all analysis for a project.
 
 Commands
 --------
@@ -19,4 +26,4 @@ Variables
 
 .. cmake:variable:: ROCM_ENABLE_GH_ANNOTATIONS
 
-Set this variable to ``ON`` so that analyzers will emit diagnostics in a format that github can use to annotate pull requests.
+Set this variable to ``ON`` so that analyzers will emit diagnostics in a format that GitHub can use to annotate pull requests.
