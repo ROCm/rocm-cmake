@@ -1,5 +1,6 @@
 * @pfultz2 @lawruble13 @cgmb
 # Documentation files
-docs/* @ROCm/rocm-documentation @pfultz2 @lawruble13 @cgmb
+docs/ @ROCm/rocm-documentation @pfultz2 @lawruble13 @cgmb
 *.md @ROCm/rocm-documentation @pfultz2 @lawruble13 @cgmb
 *.rst @ROCm/rocm-documentation @pfultz2 @lawruble13 @cgmb
+.readthedocs.yaml @ROCm/rocm-documentation @pfultz2 @lawruble13 @cgmb
