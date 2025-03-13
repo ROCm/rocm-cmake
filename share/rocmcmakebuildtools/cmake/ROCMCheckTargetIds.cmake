@@ -33,6 +33,13 @@ function(_rocm_sanitize_target_id TARGET_ID VARIABLE)
     # CMake defines a preprocessor macro with this value, so it must be a valid C identifier
     # Handle + and - for xnack and sramecc so that e.g. xnack+ and xnack- doesn't get folded to
     # the same string by MAKE_C_IDENTIFIER
+    
+    # split components by colon
+    string(REPLACE ":" ";" TARGET_ID_COMPONENTS "${TARGET_ID}")
+    list(GET TARGET_ID_COMPONENTS 0 TARGET_ID_BASE)
+    list(REMOVE_AT TARGET_ID_COMPONENTS 0)
+    string(REPLACE "-" "_" TARGET_ID_BASE "${TARGET_ID_BASE}")
+    string(REPLACE ";" ":" TARGET_ID "${TARGET_ID_BASE}:${TARGET_ID_MODIFIERS}")
     string(REPLACE "_" "__"   TARGET_ID "${TARGET_ID}")
     string(REPLACE "+" "_on"  TARGET_ID "${TARGET_ID}")
     string(REPLACE "-" "_off" TARGET_ID "${TARGET_ID}")
