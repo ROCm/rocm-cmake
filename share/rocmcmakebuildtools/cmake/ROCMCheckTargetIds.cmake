@@ -33,16 +33,22 @@ function(_rocm_sanitize_target_id TARGET_ID VARIABLE)
     # CMake defines a preprocessor macro with this value, so it must be a valid C identifier
     # Handle + and - for xnack and sramecc so that e.g. xnack+ and xnack- doesn't get folded to
     # the same string by MAKE_C_IDENTIFIER
-    
-    # split components by colon
-    string(REPLACE ":" ";" TARGET_ID_COMPONENTS "${TARGET_ID}")
-    list(GET TARGET_ID_COMPONENTS 0 TARGET_ID_BASE)
-    list(REMOVE_AT TARGET_ID_COMPONENTS 0)
-    string(REPLACE "-" "_" TARGET_ID_BASE "${TARGET_ID_BASE}")
-    string(REPLACE ";" ":" TARGET_ID "${TARGET_ID_BASE}:${TARGET_ID_MODIFIERS}")
-    string(REPLACE "_" "__"   TARGET_ID "${TARGET_ID}")
-    string(REPLACE "+" "_on"  TARGET_ID "${TARGET_ID}")
-    string(REPLACE "-" "_off" TARGET_ID "${TARGET_ID}")
+
+    # Target ID syntax:
+    # <target-id> ::== <processor> ( ":" <target-feature> ( "+" | "-" ) )*
+
+    # split target id by colon into a list of components
+    string(REPLACE ":" ";" _components "${TARGET_ID}")
+    list(GET _components 0 _processor)
+    list(REMOVE_AT _components 0)
+    # remove '-' from processor name
+    string(REPLACE "-" "_" _processor "${_processor}")
+    # remove '+' or '-' from target features
+    string(REPLACE "+" "_on"  _components "${_components}")
+    string(REPLACE "-" "_off" _components "${_components}")
+    # join components with a colon
+    string(REPLACE ";" ":" TARGET_ID "${_processor}:${_components}")
+
     string(MAKE_C_IDENTIFIER "${TARGET_ID}" TARGET_ID)
     set(${VARIABLE} "${TARGET_ID}" PARENT_SCOPE)
 endfunction()
