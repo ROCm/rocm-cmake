@@ -43,11 +43,15 @@ function(_rocm_sanitize_target_id TARGET_ID VARIABLE)
     list(REMOVE_AT _components 0)
     # remove '-' from processor name
     string(REPLACE "-" "_" _processor "${_processor}")
-    # remove '+' or '-' from target features
-    string(REPLACE "+" "_on"  _components "${_components}")
-    string(REPLACE "-" "_off" _components "${_components}")
-    # join components with a colon
-    string(REPLACE ";" ":" TARGET_ID "${_processor}:${_components}")
+    if(_components)
+        # remove '+' or '-' from target features
+        string(REPLACE "+" "_on"  _components "${_components}")
+        string(REPLACE "-" "_off" _components "${_components}")
+        # join components with a colon
+        string(REPLACE ";" ":" TARGET_ID "${_processor}:${_components}")
+    else()
+        set(TARGET_ID "${_processor}")
+    endif()
 
     string(MAKE_C_IDENTIFIER "${TARGET_ID}" TARGET_ID)
     set(${VARIABLE} "${TARGET_ID}" PARENT_SCOPE)
