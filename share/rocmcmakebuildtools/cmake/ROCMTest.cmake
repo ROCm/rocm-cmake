@@ -31,7 +31,7 @@ macro(rocm_enable_test_package NAME)
 endmacro()
 
 if(POLICY CMP0079)
-    cmake_policy(SET CMP0079 OLD)
+    cmake_policy(SET CMP0079 NEW)
 endif()
 
 add_library(rocm_test_dependencies INTERFACE)
@@ -287,6 +287,50 @@ function(rocm_test_headers)
             target_link_libraries(header_${TEST_NAME} ${PARSE_DEPENDS})
         endif()
     endforeach()
+endfunction()
+
+function(rocm_test_target_hip_runtime_include)
+    set(options)
+    set(oneValueArgs TARGET)
+    set(multiValueArgs)
+
+    cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    if(PARSE_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR "Unknown keywords given to rocm_test_target_hip_runtime_include(): \"${PARSE_UNPARSED_ARGUMENTS}\"")
+    endif()
+
+    set(NAME ${PARSE_TARGET}_includes_hip_runtime)
+    set(TEST_DIR test_${NAME})
+
+    file(
+        GENERATE
+        OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${TEST_DIR}/run.cmake"
+        CONTENT
+            "
+        execute_process(
+            COMMAND
+                ${CMAKE_CXX_COMPILER}
+                $<$<BOOL:$<TARGET_PROPERTY:${PARSE_TARGET},COMPILE_DEFINITIONS>>:-D$<JOIN:$<TARGET_PROPERTY:${PARSE_TARGET},COMPILE_DEFINITIONS>, -D>>
+                $<$<BOOL:$<TARGET_PROPERTY:${PARSE_TARGET},COMPILE_OPTIONS>>:$<JOIN:$<TARGET_PROPERTY:${PARSE_TARGET},COMPILE_OPTIONS>, >>
+                -M
+                $<$<BOOL:$<TARGET_PROPERTY:${PARSE_TARGET},COMPILE_FEATURES>>:$<JOIN:$<TARGET_PROPERTY:${PARSE_TARGET},COMPILE_FEATURES>, >>
+                $<$<BOOL:$<TARGET_PROPERTY:${PARSE_TARGET},INCLUDE_DIRECTORIES>>:-I$<JOIN:$<TARGET_PROPERTY:${PARSE_TARGET},INCLUDE_DIRECTORIES>, -I>>
+                $<$<BOOL:$<TARGET_PROPERTY:${PARSE_TARGET},SOURCES>>:$<TARGET_PROPERTY:${PARSE_TARGET},SOURCE_DIR>/$<JOIN:$<TARGET_PROPERTY:${PARSE_TARGET},SOURCES>, $<TARGET_PROPERTY:${PARSE_TARGET},SOURCE_DIR>/>>
+            OUTPUT_VARIABLE TARGET_COMMAND
+            RESULT_VARIABLE RESULT
+        )
+        if(NOT RESULT EQUAL 0)
+            message(FATAL_ERROR \"Test failed due to compilation error.\")
+            # TODO: what should we do if this fails?
+        else()
+            if(TARGET_COMMAND MATCHES \"hip_runtime.h\")
+                message(FATAL_ERROR \"Test failed, executable includes hip_runtime.h\")
+            endif()
+        endif()
+    ")
+    set(COMMAND ${CMAKE_COMMAND} -P "${TEST_DIR}/run.cmake")
+    rocm_add_test(NAME ${NAME} COMMAND ${COMMAND})
+    rocm_install_test(FILES "${CMAKE_CURRENT_BINARY_DIR}/${TEST_DIR}/run.cmake" DESTINATION "${TEST_DIR}")
 endfunction()
 
 function(rocm_test_install_ctest)
