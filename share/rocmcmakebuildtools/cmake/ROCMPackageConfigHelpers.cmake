@@ -107,6 +107,7 @@ if (NOT _ROCMCMakeFindDependencyMacro_FOUND)
                 \${rocm_fd_exact_arg}
                 \${rocm_fd_quiet_arg}
                 \${rocm_fd_required_arg}
+                HINTS \"\${PACKAGE_PREFIX_DIR}\"
             )
             string(TOUPPER \${dep} cmake_dep_upper)
             if (NOT \${dep}_FOUND AND NOT \${cmake_dep_upper}_FOUND)
