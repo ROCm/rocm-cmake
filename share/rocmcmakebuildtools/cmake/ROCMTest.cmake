@@ -31,7 +31,7 @@ macro(rocm_enable_test_package NAME)
 endmacro()
 
 if(POLICY CMP0079)
-    cmake_policy(SET CMP0079 OLD)
+    cmake_policy(SET CMP0079 NEW)
 endif()
 
 add_library(rocm_test_dependencies INTERFACE)
