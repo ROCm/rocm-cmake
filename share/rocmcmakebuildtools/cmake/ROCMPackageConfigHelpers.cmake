@@ -87,10 +87,6 @@ include(CMakeFindDependencyMacro OPTIONAL RESULT_VARIABLE _ROCMCMakeFindDependen
 if (NOT _ROCMCMakeFindDependencyMacro_FOUND)
     macro(find_dependency dep)
         if (NOT \${dep}_FOUND)
-            set(rocm_fd_version)
-            if (\${ARGC} GREATER 1)
-                set(rocm_fd_version \${ARGV1})
-            endif()
             set(rocm_fd_exact_arg)
             if(\${CMAKE_FIND_PACKAGE_NAME}_FIND_VERSION_EXACT)
                 set(rocm_fd_exact_arg EXACT)
@@ -103,11 +99,10 @@ if (NOT _ROCMCMakeFindDependencyMacro_FOUND)
             if(\${CMAKE_FIND_PACKAGE_NAME}_FIND_REQUIRED)
                 set(rocm_fd_required_arg REQUIRED)
             endif()
-            find_package(\${dep} \${rocm_fd_version}
+            find_package(\${dep} \${ARGN}
                 \${rocm_fd_exact_arg}
                 \${rocm_fd_quiet_arg}
                 \${rocm_fd_required_arg}
-                HINTS \"\${PACKAGE_PREFIX_DIR}\"
             )
             string(TOUPPER \${dep} cmake_dep_upper)
             if (NOT \${dep}_FOUND AND NOT \${cmake_dep_upper}_FOUND)
