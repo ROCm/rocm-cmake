@@ -36,7 +36,6 @@ find_program(DPKG_EXE dpkg)
 
 set(CMAKE_INSTALL_DEFAULT_COMPONENT_NAME runtime)
 set(ROCM_PACKAGE_CREATED FALSE CACHE INTERNAL "Track whether rocm_create_package has been called.")
-set(HDRONLY_LICENSE_INSTALLDIR "" CACHE INTERNAL "License File Install Directory Name")
 
 function(rocm_package_add_rpm_dependencies)
     set(options QUIET)
@@ -424,14 +423,13 @@ macro(rocm_create_package)
         ")
     endif()
 
+    rocm_setup_license(${PARSE_HEADER_ONLY})
     if(PARSE_PTH)
         rocm_parse_python_syspath(${LIB_DIR} ${PARSE_NAME})
     endif()
     if(PARSE_COMPONENTS)
         rocm_set_comp_cpackvar(PARSE_HEADER_ONLY "${PARSE_SUFFIX}" "${PARSE_COMPONENTS}")
     endif()
-    # License Folder to match with Package Name
-    rocm_setup_license(${PARSE_HEADER_ONLY})
 
     # Lintian Warning Fix: Enable post/pre scripts only if non empty
     file(SIZE ${PROJECT_BINARY_DIR}/debian/postinst _postinst_file_sz)
@@ -484,7 +482,7 @@ macro(rocm_setup_license HEADER_ONLY)
         elseif((ROCM_USE_DEV_COMPONENT AND ${HEADER_ONLY}) OR NOT BUILD_SHARED_LIBS)
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
-                DESTINATION share/doc/${HDRONLY_LICENSE_INSTALLDIR}
+                DESTINATION share/doc/${_rocm_cpack_package_name}
                 COMPONENT devel
             )
         else()
@@ -539,15 +537,6 @@ macro(rocm_compute_component_package_name COMPONENT_NAME BASE_NAME NAME_SUFFIX H
     )
         set(CPACK_DEBIAN_${_component_name_upper}_PACKAGE_NAME
             "${BASE_NAME}${_component_suffix}${_deb_component_partial}")
-    endif()
-
-    # Set install folder for License File
-    if( ROCM_USE_DEV_COMPONENT AND ${HEADER_ONLY} )
-        if( CPACK_RPM_COMPONENT_INSTALL )
-            set( HDRONLY_LICENSE_INSTALLDIR "${BASE_NAME}${_component_suffix}${_rpm_component_partial}")
-        elseif( CPACK_DEB_COMPONENT_INSTALL )
-            set( HDRONLY_LICENSE_INSTALLDIR "${BASE_NAME}${_component_suffix}${_deb_component_partial}")
-        endif()
     endif()
 
     # clean up temporary variables
