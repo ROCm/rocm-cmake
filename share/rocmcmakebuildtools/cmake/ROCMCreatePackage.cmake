@@ -402,7 +402,6 @@ macro(rocm_create_package)
 
     file(WRITE ${PROJECT_BINARY_DIR}/debian/postinst "")
     file(WRITE ${PROJECT_BINARY_DIR}/debian/prerm "")
-
     if(PARSE_LDCONFIG AND NOT ${ROCM_DISABLE_LDCONFIG})
         set(LDCONFIG_DIR ${LIB_DIR})
         if(PARSE_LDCONFIG_DIR)
@@ -414,7 +413,6 @@ macro(rocm_create_package)
             echo \"${LDCONFIG_DIR}\" > /etc/ld.so.conf.d/${PARSE_NAME}.conf
             ldconfig
         ")
-
         file(
             APPEND ${PROJECT_BINARY_DIR}/debian/prerm
             "
