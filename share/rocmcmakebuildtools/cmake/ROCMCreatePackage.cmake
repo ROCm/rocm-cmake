@@ -467,17 +467,20 @@ macro(rocm_setup_license HEADER_ONLY)
 
     if(CPACK_RESOURCE_FILE_LICENSE)
         if(ENABLE_ASAN_PACKAGING)
+            message(STATUS "rocm-cmake: set install license file to ${_rocm_cpack_package_name}-asan.")
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
                 DESTINATION share/doc/${_rocm_cpack_package_name}-asan
             )
         elseif((ROCM_USE_DEV_COMPONENT AND ${HEADER_ONLY}) OR NOT BUILD_SHARED_LIBS)
+            message(STATUS "rocm-cmake: set install license file to ${HDRONLY_LICENSE_INSTALLDIR}.")
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
                 DESTINATION share/doc/${HDRONLY_LICENSE_INSTALLDIR}
                 COMPONENT devel
             )
         else()
+            message(STATUS "rocm-cmake: set install license file to ${_rocm_cpack_package_name}.")
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
                 DESTINATION share/doc/${_rocm_cpack_package_name}
@@ -538,6 +541,7 @@ macro(rocm_compute_component_package_name COMPONENT_NAME BASE_NAME NAME_SUFFIX H
         elseif( CPACK_DEB_COMPONENT_INSTALL )
             set( HDRONLY_LICENSE_INSTALLDIR "${BASE_NAME}${_component_suffix}${_deb_component_partial}")
         endif()
+        message(STATUS "rocm-cmake: set install license file to ${HDRONLY_LICENSE_INSTALLDIR}.")
     endif()
 
     # clean up temporary variables
