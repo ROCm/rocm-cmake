@@ -473,6 +473,9 @@ macro(rocm_setup_license HEADER_ONLY)
                 DESTINATION share/doc/${_rocm_cpack_package_name}-asan
             )
         elseif((ROCM_USE_DEV_COMPONENT AND ${HEADER_ONLY}) OR NOT BUILD_SHARED_LIBS)
+	    if("${HDRONLY_LICENSE_INSTALLDIR}" STREQUAL "")
+                set(HDRONLY_LICENSE_INSTALLDIR "${_rocm_cpack_package_name}")
+	    endif()
             message(STATUS "rocm-cmake: set install license file to ${HDRONLY_LICENSE_INSTALLDIR}.")
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
