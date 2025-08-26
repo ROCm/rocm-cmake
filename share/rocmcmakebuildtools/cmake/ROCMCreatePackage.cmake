@@ -430,22 +430,24 @@ macro(rocm_create_package)
     endif()
 
     # Lintian Warning Fix: Enable post/pre scripts only if non empty
-    file(SIZE ${PROJECT_BINARY_DIR}/debian/postinst _postinst_file_sz)
-    if(${_postinst_file_sz} GREATER 0)
-        set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA
-            "${PROJECT_BINARY_DIR}/debian/postinst;${PROJECT_BINARY_DIR}/debian/prerm")
-        set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE
-            "${PROJECT_BINARY_DIR}/debian/postinst")
-    endif()
-    file(SIZE ${PROJECT_BINARY_DIR}/debian/prerm _prerm_file_sz)
-    if(${_prerm_file_sz} GREATER 0)
-        set(CPACK_RPM_PRE_UNINSTALL_SCRIPT_FILE "${PROJECT_BINARY_DIR}/debian/prerm")
-        set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA
-            "${CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA};${PROJECT_BINARY_DIR}/debian/prerm")
-    endif()
+    rocm_check_and_configure_script_files("${PROJECT_BINARY_DIR}/debian/prerm" "${PROJECT_BINARY_DIR}/debian/postinst")
 
     include(CPack)
     set(ROCM_PACKAGE_CREATED TRUE CACHE INTERNAL "Track whether rocm_create_package has been called.")
+endmacro()
+
+# Check script File Size and then configure
+macro(rocm_check_and_configure_script_files PS_SCRIPT_FILE PR_SCRIPT_FILE)
+    file(SIZE ${PS_SCRIPT_FILE} _postinst_file_sz)
+    if(${_postinst_file_sz} GREATER 0)
+        set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${PS_SCRIPT_FILE}")
+        set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${PS_SCRIPT_FILE}")
+    endif()
+    file(SIZE ${PR_SCRIPT_FILE} _prerm_file_sz)
+    if(${_prerm_file_sz} GREATER 0)
+        set(CPACK_RPM_PRE_UNINSTALL_SCRIPT_FILE "${PR_SCRIPT_FILE}")
+        set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA  "${CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA};${PR_SCRIPT_FILE}")
+    endif()
 endmacro()
 
 macro(rocm_setup_license HEADER_ONLY)
