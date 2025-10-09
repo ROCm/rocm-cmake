@@ -269,7 +269,7 @@ endmacro()
 
 macro(rocm_create_package)
     set(options LDCONFIG PTH HEADER_ONLY)
-    set(oneValueArgs NAME DESCRIPTION SECTION MAINTAINER LDCONFIG_DIR PREFIX SUFFIX)
+    set(oneValueArgs NAME DESCRIPTION SECTION MAINTAINER LINTIAN_OVERRIDES DEBIAN_PKGING MAINTAINER_NM MAINTAINER_EMAIL  LDCONFIG_DIR PREFIX SUFFIX)
     set(multiValueArgs DEPENDS COMPONENTS)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -303,6 +303,10 @@ macro(rocm_create_package)
     set(CPACK_NSIS_MODIFY_PATH On)
     set(CPACK_NSIS_PACKAGE_NAME ${PARSE_NAME})
 
+    set(LINTIAN_OVERRIDES_FLAG ${PARSE_LINTIAN_OVERRIDES})
+    set(DEBIAN_PKGING_FLAG ${PARSE_DEBIAN_PKGING})
+    set(MAINTAINER_NM ${PARSE_MAINTAINER_NM})
+    set(MAINTAINER_EMAIL ${PARSE_MAINTAINER_EMAIL})
     set(CPACK_RPM_PACKAGE_RELOCATABLE Off)
     set(CPACK_RPM_PACKAGE_AUTOREQPROV
         Off
@@ -402,6 +406,10 @@ macro(rocm_create_package)
 
     file(WRITE ${PROJECT_BINARY_DIR}/debian/postinst "")
     file(WRITE ${PROJECT_BINARY_DIR}/debian/prerm "")
+    set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${PROJECT_BINARY_DIR}/debian/postinst;${PROJECT_BINARY_DIR}/debian/prerm")
+    set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${PROJECT_BINARY_DIR}/debian/postinst")
+    set(CPACK_RPM_PRE_UNINSTALL_SCRIPT_FILE "${PROJECT_BINARY_DIR}/debian/prerm")
+
     if(PARSE_LDCONFIG AND NOT ${ROCM_DISABLE_LDCONFIG})
         set(LDCONFIG_DIR ${LIB_DIR})
         if(PARSE_LDCONFIG_DIR)
@@ -413,6 +421,7 @@ macro(rocm_create_package)
             echo \"${LDCONFIG_DIR}\" > /etc/ld.so.conf.d/${PARSE_NAME}.conf
             ldconfig
         ")
+
         file(
             APPEND ${PROJECT_BINARY_DIR}/debian/prerm
             "
@@ -482,17 +491,25 @@ macro(rocm_setup_license HEADER_ONLY)
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
                 DESTINATION share/doc/${_rocm_cpack_package_name}-asan
             )
+            set( COMP_TYPE "asan" )
+	    configure_pkg( ${CPACK_PACKAGE_NAME} ${COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${MAINTAINER_NM} ${MAINTAINER_EMAIL} )
         elseif((ROCM_USE_DEV_COMPONENT AND ${HEADER_ONLY}) OR NOT BUILD_SHARED_LIBS)
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
                 DESTINATION share/doc/${_rocm_cpack_package_name}
                 COMPONENT devel
             )
+            set( COMP_TYPE "devel" )
+            configure_pkg( ${CPACK_PACKAGE_NAME} ${COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${MAINTAINER_NM} ${MAINTAINER_EMAIL} )
         else()
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
                 DESTINATION share/doc/${_rocm_cpack_package_name}
             )
+            set( COMP_TYPE "runtime" )
+	    if(NOT( ${CPACK_PACKAGE_NAME} STREQUAL "rocm-cmake"))
+		configure_pkg( ${CPACK_PACKAGE_NAME} ${COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${MAINTAINER_NM} ${MAINTAINER_EMAIL} )
+	    endif()
         endif()
     endif()
 endmacro()
@@ -635,3 +652,130 @@ macro(rocm_package_setup_component COMPONENT_NAME)
         endforeach()
     endif()
 endmacro()
+
+## Configure Copyright File for Debian Package
+function( configure_pkg PACKAGE_NAME_T COMPONENT_NAME_T PACKAGE_VERSION_T MAINTAINER_NM_T MAINTAINER_EMAIL_T)
+    # Check If Debian Platform
+    find_file (DEBIAN debian_version debconf.conf PATHS /etc)
+    if(DEBIAN)
+      set( DEBIAN_PKGING_FLAG ON CACHE BOOL "Internal Status Flag to indicate Debian Packaging Build" FORCE )
+      set_debian_pkg_cmake_flags( ${PACKAGE_NAME_T} ${PACKAGE_VERSION_T}
+                                  ${MAINTAINER_NM_T} ${MAINTAINER_EMAIL_T} )
+
+      # Create debian directory in build tree
+      file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/DEBIAN")
+
+      # Configure the copyright file
+      configure_file(
+        "${CMAKE_SOURCE_DIR}/DEBIAN/copyright.in"
+        "${CMAKE_BINARY_DIR}/DEBIAN/copyright"
+        @ONLY
+      )
+
+      # Install copyright file
+      install ( FILES "${CMAKE_BINARY_DIR}/DEBIAN/copyright"
+	        DESTINATION "${CMAKE_INSTALL_DOCDIR}"
+	        COMPONENT ${COMPONENT_NAME_T} )
+
+      # Configure the changelog file
+      configure_file(
+        "${CMAKE_SOURCE_DIR}/DEBIAN/changelog.in"
+        "${CMAKE_BINARY_DIR}/DEBIAN/changelog.Debian"
+        @ONLY
+      )
+
+      if( LINTIAN_OVERRIDES_FLAG )
+	      #if(DEFINED BUILD_SHARED_LIBS AND NOT ${BUILD_SHARED_LIBS} STREQUAL "")
+	if(NOT BUILD_SHARED_LIBS)
+	  string(FIND ${DEB_OVERRIDES_INSTALL_FILENM} "static" OUT_VAR1)
+	  if(OUT_VAR1 EQUAL -1)
+	    set( DEB_OVERRIDES_INSTALL_FILENM "${DEB_OVERRIDES_INSTALL_FILENM}-static" )
+          endif()
+	else()
+          if(ENABLE_ASAN_PACKAGING)
+	    string( FIND ${DEB_OVERRIDES_INSTALL_FILENM} "asan" OUT_VAR2)
+	    if(OUT_VAR2 EQUAL -1)
+	      set( DEB_OVERRIDES_INSTALL_FILENM "${DEB_OVERRIDES_INSTALL_FILENM}-asan" )
+	    endif()
+          endif()
+	endif()
+	set( DEB_OVERRIDES_INSTALL_FILENM
+		"${DEB_OVERRIDES_INSTALL_FILENM}" CACHE STRING "Debian Package Lintian Override File Name" FORCE)
+        # Configure the changelog file
+        configure_file(
+          "${CMAKE_SOURCE_DIR}/DEBIAN/overrides.in"
+          "${CMAKE_BINARY_DIR}/DEBIAN/${DEB_OVERRIDES_INSTALL_FILENM}"
+	   FILE_PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
+          @ONLY
+        )
+      endif()
+
+      # Install Change Log
+      find_program ( DEB_GZIP_EXEC gzip )
+      if(EXISTS "${CMAKE_BINARY_DIR}/DEBIAN/changelog.Debian" )
+        execute_process(
+          COMMAND ${DEB_GZIP_EXEC} -f -n -9 "${CMAKE_BINARY_DIR}/DEBIAN/changelog.Debian"
+          WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/DEBIAN"
+          RESULT_VARIABLE result
+          OUTPUT_VARIABLE output
+          ERROR_VARIABLE error
+        )
+        if(NOT ${result} EQUAL 0)
+          message(FATAL_ERROR "Failed to compress: ${error}")
+        endif()
+        install ( FILES "${CMAKE_BINARY_DIR}/DEBIAN/${DEB_CHANGELOG_INSTALL_FILENM}"
+                  DESTINATION ${CMAKE_INSTALL_DOCDIR}
+                  COMPONENT ${COMPONENT_NAME_T})
+      endif()
+    else()
+        # License file
+        install ( FILES ${LICENSE_FILE}
+            DESTINATION ${CMAKE_INSTALL_DOCDIR} RENAME LICENSE.txt
+            COMPONENT ${COMPONENT_NAME_T})
+    endif()
+
+    # Install lintian overrides
+    if( LINTIAN_OVERRIDES_FLAG STREQUAL "ON" AND DEBIAN_PKGING_FLAG STREQUAL "ON")
+      set( OVERRIDE_FILE "${CMAKE_BINARY_DIR}/DEBIAN/${DEB_OVERRIDES_INSTALL_FILENM}" )
+      install ( FILES ${OVERRIDE_FILE}
+	  DESTINATION ${DEB_OVERRIDES_INSTALL_PATH}
+          COMPONENT ${COMPONENT_NAME_T})
+    endif()
+endfunction()
+
+# Set variables for changelog and copyright
+# For Debian specific Packages
+function( set_debian_pkg_cmake_flags DEB_PACKAGE_NAME_T DEB_PACKAGE_VERSION_T DEB_MAINTAINER_NM_T DEB_MAINTAINER_EMAIL_T )
+    # Setting configure flags
+    set( DEB_PACKAGE_NAME             "${DEB_PACKAGE_NAME_T}" CACHE STRING "Debian Package Name" )
+    set( DEB_PACKAGE_VERSION          "${DEB_PACKAGE_VERSION_T}" CACHE STRING "Debian Package Version String" )
+    set( DEB_MAINTAINER_NAME          "${DEB_MAINTAINER_NM_T}" CACHE STRING "Debian Package Maintainer Name" )
+    set( DEB_MAINTAINER_EMAIL         "${DEB_MAINTAINER_EMAIL_T}" CACHE STRING "Debian Package Maintainer Email" )
+    set( DEB_COPYRIGHT_YEAR           "2025" CACHE STRING "Debian Package Copyright Year" )
+    set( DEB_LICENSE                  "MIT" CACHE STRING "Debian Package License Type" )
+    set( DEB_CHANGELOG_INSTALL_FILENM "changelog.Debian.gz" CACHE STRING "Debian Package ChangeLog File Name" )
+
+    if( LINTIAN_OVERRIDES_FLAG )
+      set( DEB_OVERRIDES_INSTALL_FILENM "${DEB_PACKAGE_NAME}" CACHE STRING "Debian Package Lintian Override File Name" )
+      set( DEB_OVERRIDES_INSTALL_PATH   "/usr/share/lintian/overrides/" CACHE STRING "Deb Pkg Lintian Override Install Loc" )
+    endif()
+
+    # Get TimeStamp
+    find_program( DEB_DATE_TIMESTAMP_EXEC date )
+    set ( DEB_TIMESTAMP_FORMAT_OPTION "-R" )
+    execute_process (
+        COMMAND ${DEB_DATE_TIMESTAMP_EXEC} ${DEB_TIMESTAMP_FORMAT_OPTION}
+        OUTPUT_VARIABLE TIMESTAMP_T
+    )
+    set( DEB_TIMESTAMP                "${TIMESTAMP_T}" CACHE STRING "Current Time Stamp for Copyright/Changelog" )
+
+    message(STATUS "DEB_PACKAGE_NAME             : ${DEB_PACKAGE_NAME}" )
+    message(STATUS "DEB_PACKAGE_VERSION          : ${DEB_PACKAGE_VERSION}" )
+    message(STATUS "DEB_MAINTAINER_NAME          : ${DEB_MAINTAINER_NAME}" )
+    message(STATUS "DEB_MAINTAINER_EMAIL         : ${DEB_MAINTAINER_EMAIL}" )
+    message(STATUS "DEB_COPYRIGHT_YEAR           : ${DEB_COPYRIGHT_YEAR}" )
+    message(STATUS "DEB_LICENSE                  : ${DEB_LICENSE}" )
+    message(STATUS "DEB_TIMESTAMP                : ${DEB_TIMESTAMP}" )
+    message(STATUS "DEB_CHANGELOG_INSTALL_FILENM : ${DEB_CHANGELOG_INSTALL_FILENM}" )
+endfunction()
+
