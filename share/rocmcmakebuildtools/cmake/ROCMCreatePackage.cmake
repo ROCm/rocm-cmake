@@ -416,10 +416,6 @@ macro(rocm_create_package)
 
     file(WRITE ${PROJECT_BINARY_DIR}/debian/postinst "")
     file(WRITE ${PROJECT_BINARY_DIR}/debian/prerm "")
-    set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${PROJECT_BINARY_DIR}/debian/postinst;${PROJECT_BINARY_DIR}/debian/prerm")
-    set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${PROJECT_BINARY_DIR}/debian/postinst")
-    set(CPACK_RPM_PRE_UNINSTALL_SCRIPT_FILE "${PROJECT_BINARY_DIR}/debian/prerm")
-
     if(PARSE_LDCONFIG AND NOT ${ROCM_DISABLE_LDCONFIG})
         set(LDCONFIG_DIR ${LIB_DIR})
         if(PARSE_LDCONFIG_DIR)
