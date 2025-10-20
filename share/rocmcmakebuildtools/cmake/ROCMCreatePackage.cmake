@@ -269,7 +269,7 @@ endmacro()
 
 macro(rocm_create_package)
     set(options LDCONFIG PTH HEADER_ONLY)
-    set(oneValueArgs NAME DESCRIPTION SECTION MAINTAINER LINTIAN_OVERRIDES DEBIAN_PKGING PKG_TYPE LDCONFIG_DIR PREFIX SUFFIX)
+    set(oneValueArgs NAME DESCRIPTION SECTION MAINTAINER PKG_TYPE LDCONFIG_DIR PREFIX SUFFIX)
     set(multiValueArgs DEPENDS COMPONENTS)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -303,10 +303,8 @@ macro(rocm_create_package)
     set(CPACK_NSIS_MODIFY_PATH On)
     set(CPACK_NSIS_PACKAGE_NAME ${PARSE_NAME})
 
-    set(LINTIAN_OVERRIDES_FLAG ${PARSE_LINTIAN_OVERRIDES})
-    set(DEBIAN_PKGING_FLAG ${PARSE_DEBIAN_PKGING})
     set(PACKAGE_TYPE ${PARSE_PKG_TYPE})
-    
+  
     if(NOT( ${CPACK_PACKAGE_NAME} STREQUAL "rocm-cmake"))
     	# parse MAINTAINER format: PKG_MAINTAINER_NM <PKG_MAINTAINER_EMAIL>"
     	# parse text before first '<'
@@ -315,6 +313,12 @@ macro(rocm_create_package)
     	# parse text between '<...>'
     	string(REGEX MATCH "<([^>]+)>" _ "${CPACK_DEBIAN_PACKAGE_MAINTAINER}")
     	set(MAINTAINER_EMAIL "${CMAKE_MATCH_1}")
+    endif()
+
+    set(LINTIAN_OVERRIDES_LIST "rocrand")
+    if("${CPACK_PACKAGE_NAME}" IN_LIST LINTIAN_OVERRIDES_LIST)
+    	set(LINTIAN_OVERRIDES_FLAG ON CACHE BOOL "Enable/Disable Lintian Overrides")
+    	set(DEBIAN_PKGING_FLAG ON CACHE BOOL "Internal Status Flag to indicate Debian Packaging Build" )
     endif()
 
     set(CPACK_RPM_PACKAGE_RELOCATABLE Off)

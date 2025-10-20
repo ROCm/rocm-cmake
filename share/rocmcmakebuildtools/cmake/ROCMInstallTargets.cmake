@@ -468,7 +468,7 @@ function( configure_pkg PACKAGE_NAME_T COMPONENT_NAME_T PACKAGE_VERSION_T MAINTA
 
       # Configure the copyright file
       configure_file(
-        "${CMAKE_SOURCE_DIR}/DEBIAN/copyright.in"
+        "${CMAKE_SOURCE_DIR}/../../../rocm-cmake/DEBIAN/copyright.in"
         "${CMAKE_BINARY_DIR}/DEBIAN/copyright"
         @ONLY
       )
@@ -480,7 +480,7 @@ function( configure_pkg PACKAGE_NAME_T COMPONENT_NAME_T PACKAGE_VERSION_T MAINTA
 
       # Configure the changelog file
       configure_file(
-        "${CMAKE_SOURCE_DIR}/DEBIAN/changelog.in"
+        "${CMAKE_SOURCE_DIR}/../../../rocm-cmake/DEBIAN/changelog.in"
         "${CMAKE_BINARY_DIR}/DEBIAN/changelog.Debian"
         @ONLY
       )
@@ -503,7 +503,7 @@ function( configure_pkg PACKAGE_NAME_T COMPONENT_NAME_T PACKAGE_VERSION_T MAINTA
 		"${DEB_OVERRIDES_INSTALL_FILENM}" CACHE STRING "Debian Package Lintian Override File Name" FORCE)
         # Configure the changelog file
         configure_file(
-          "${CMAKE_SOURCE_DIR}/DEBIAN/overrides.in"
+          "${CMAKE_SOURCE_DIR}/../../../rocm-cmake/DEBIAN/overrides.in"
           "${CMAKE_BINARY_DIR}/DEBIAN/${DEB_OVERRIDES_INSTALL_FILENM}"
 	   FILE_PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
           @ONLY
@@ -528,7 +528,7 @@ function( configure_pkg PACKAGE_NAME_T COMPONENT_NAME_T PACKAGE_VERSION_T MAINTA
                   COMPONENT ${COMPONENT_NAME_T})
       endif()
 
-    if( BUILD_ENABLE_LINTIAN_OVERRIDES STREQUAL "ON" AND BUILD_DEBIAN_PKGING_FLAG STREQUAL "ON")
+    if( LINTIAN_OVERRIDES_FLAG STREQUAL "ON" AND DEBIAN_PKGING_FLAG  STREQUAL "ON")
       set( OVERRIDE_FILE "${CMAKE_BINARY_DIR}/DEBIAN/${DEB_OVERRIDES_INSTALL_FILENM}" )
       install ( FILES ${OVERRIDE_FILE}
           DESTINATION ${DEB_OVERRIDES_INSTALL_PATH}
