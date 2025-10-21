@@ -468,7 +468,7 @@ function( configure_pkg PACKAGE_NAME_T COMPONENT_NAME_T PACKAGE_VERSION_T MAINTA
 
       # Configure the copyright file
       configure_file(
-        "${CMAKE_SOURCE_DIR}/../../../rocm-cmake/DEBIAN/copyright.in"
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/DEBIAN/copyright.in"
         "${CMAKE_BINARY_DIR}/DEBIAN/copyright"
         @ONLY
       )
@@ -480,11 +480,11 @@ function( configure_pkg PACKAGE_NAME_T COMPONENT_NAME_T PACKAGE_VERSION_T MAINTA
 
       # Configure the changelog file
       configure_file(
-        "${CMAKE_SOURCE_DIR}/../../../rocm-cmake/DEBIAN/changelog.in"
+        "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/DEBIAN/changelog.in"
         "${CMAKE_BINARY_DIR}/DEBIAN/changelog.Debian"
         @ONLY
       )
-      
+
       if( LINTIAN_OVERRIDES_FLAG )
 	if(NOT BUILD_SHARED_LIBS)
 	  string(FIND ${DEB_OVERRIDES_INSTALL_FILENM} "static" OUT_VAR1)
@@ -503,7 +503,7 @@ function( configure_pkg PACKAGE_NAME_T COMPONENT_NAME_T PACKAGE_VERSION_T MAINTA
 		"${DEB_OVERRIDES_INSTALL_FILENM}" CACHE STRING "Debian Package Lintian Override File Name" FORCE)
         # Configure the changelog file
         configure_file(
-          "${CMAKE_SOURCE_DIR}/../../../rocm-cmake/DEBIAN/overrides.in"
+          "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/DEBIAN/overrides.in"
           "${CMAKE_BINARY_DIR}/DEBIAN/${DEB_OVERRIDES_INSTALL_FILENM}"
 	   FILE_PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
           @ONLY
