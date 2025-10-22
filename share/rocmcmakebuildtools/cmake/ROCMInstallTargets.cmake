@@ -458,7 +458,7 @@ endfunction()
 ## Configure Copyright File for Debian Package
 function( configure_pkg PACKAGE_NAME_T COMPONENT_NAME_T PACKAGE_VERSION_T MAINTAINER_NM_T MAINTAINER_EMAIL_T PACKAGE_TYPE_T)
     # Check If Debian Platform
-    if(PACKAGE_TYPE_T STREQUAL "DEBIAN")
+    if(PACKAGE_TYPE_T STREQUAL "DEB")
       set( DEBIAN_PKGING_FLAG ON CACHE BOOL "Internal Status Flag to indicate Debian Packaging Build" FORCE )
       set_debian_pkg_cmake_flags( ${PACKAGE_NAME_T} ${PACKAGE_VERSION_T}
                                   ${MAINTAINER_NM_T} ${MAINTAINER_EMAIL_T} )

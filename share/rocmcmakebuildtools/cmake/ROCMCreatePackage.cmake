@@ -269,7 +269,7 @@ endmacro()
 
 macro(rocm_create_package)
     set(options LDCONFIG PTH HEADER_ONLY)
-    set(oneValueArgs NAME DESCRIPTION SECTION MAINTAINER PKG_TYPE LDCONFIG_DIR PREFIX SUFFIX)
+    set(oneValueArgs NAME DESCRIPTION SECTION MAINTAINER LDCONFIG_DIR PREFIX SUFFIX)
     set(multiValueArgs DEPENDS COMPONENTS)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -303,8 +303,6 @@ macro(rocm_create_package)
     set(CPACK_NSIS_MODIFY_PATH On)
     set(CPACK_NSIS_PACKAGE_NAME ${PARSE_NAME})
 
-    set(PACKAGE_TYPE ${PARSE_PKG_TYPE})
-  
     if(NOT( ${CPACK_PACKAGE_NAME} STREQUAL "rocm-cmake"))
     	# parse MAINTAINER format: PKG_MAINTAINER_NM <PKG_MAINTAINER_EMAIL>"
     	# parse text before first '<'
@@ -315,11 +313,8 @@ macro(rocm_create_package)
     	set(MAINTAINER_EMAIL "${CMAKE_MATCH_1}")
     endif()
 
-    set(LINTIAN_OVERRIDES_LIST "rocrand")
-    if("${CPACK_PACKAGE_NAME}" IN_LIST LINTIAN_OVERRIDES_LIST)
-    	set(LINTIAN_OVERRIDES_FLAG ON CACHE BOOL "Enable/Disable Lintian Overrides")
-    	set(DEBIAN_PKGING_FLAG ON CACHE BOOL "Internal Status Flag to indicate Debian Packaging Build" )
-    endif()
+    set(LINTIAN_OVERRIDES_FLAG ON CACHE BOOL "Enable/Disable Lintian Overrides")
+    set(DEBIAN_PKGING_FLAG ON CACHE BOOL "Internal Status Flag to indicate Debian Packaging Build" )
 
     set(CPACK_RPM_PACKAGE_RELOCATABLE Off)
     set(CPACK_RPM_PACKAGE_AUTOREQPROV
@@ -502,7 +497,7 @@ macro(rocm_setup_license HEADER_ONLY)
                 DESTINATION share/doc/${_rocm_cpack_package_name}-asan
             )
             set( COMP_TYPE "asan" )
-	    configure_pkg( ${CPACK_PACKAGE_NAME} ${COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${MAINTAINER_NM} ${MAINTAINER_EMAIL} ${PACKAGE_TYPE})
+	    configure_pkg( ${CPACK_PACKAGE_NAME} ${COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${MAINTAINER_NM} ${MAINTAINER_EMAIL} ${CPACK_GENERATOR})
         elseif((ROCM_USE_DEV_COMPONENT AND ${HEADER_ONLY}) OR NOT BUILD_SHARED_LIBS)
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
@@ -510,7 +505,7 @@ macro(rocm_setup_license HEADER_ONLY)
                 COMPONENT devel
             )
             set( COMP_TYPE "devel" )
-            configure_pkg( ${CPACK_PACKAGE_NAME} ${COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${MAINTAINER_NM} ${MAINTAINER_EMAIL} ${PACKAGE_TYPE})
+            configure_pkg( ${CPACK_PACKAGE_NAME} ${COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${MAINTAINER_NM} ${MAINTAINER_EMAIL} ${CPACK_GENERATOR})
         else()
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
@@ -518,7 +513,7 @@ macro(rocm_setup_license HEADER_ONLY)
             )
             set( COMP_TYPE "runtime" )
 	    if(NOT( ${CPACK_PACKAGE_NAME} STREQUAL "rocm-cmake"))
-		configure_pkg( ${CPACK_PACKAGE_NAME} ${COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${MAINTAINER_NM} ${MAINTAINER_EMAIL} ${PACKAGE_TYPE})
+		configure_pkg( ${CPACK_PACKAGE_NAME} ${COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${MAINTAINER_NM} ${MAINTAINER_EMAIL} ${CPACK_GENERATOR})
 	    endif()
         endif()
     endif()
