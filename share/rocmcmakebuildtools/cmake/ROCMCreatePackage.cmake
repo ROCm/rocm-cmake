@@ -497,7 +497,9 @@ macro(rocm_setup_license HEADER_ONLY)
                 DESTINATION share/doc/${_rocm_cpack_package_name}-asan
             )
             set( COMP_TYPE "asan" )
-	    configure_pkg( ${CPACK_PACKAGE_NAME} ${COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${MAINTAINER_NM} ${MAINTAINER_EMAIL} ${CPACK_GENERATOR})
+	    if(NOT( ${CPACK_PACKAGE_NAME} STREQUAL "rocm-cmake"))
+                configure_pkg( ${CPACK_PACKAGE_NAME} ${COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${MAINTAINER_NM} ${MAINTAINER_EMAIL} ${CPACK_GENERATOR})
+            endif()
         elseif((ROCM_USE_DEV_COMPONENT AND ${HEADER_ONLY}) OR NOT BUILD_SHARED_LIBS)
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
@@ -505,7 +507,9 @@ macro(rocm_setup_license HEADER_ONLY)
                 COMPONENT devel
             )
             set( COMP_TYPE "devel" )
-            configure_pkg( ${CPACK_PACKAGE_NAME} ${COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${MAINTAINER_NM} ${MAINTAINER_EMAIL} ${CPACK_GENERATOR})
+	    if(NOT( ${CPACK_PACKAGE_NAME} STREQUAL "rocm-cmake"))
+                configure_pkg( ${CPACK_PACKAGE_NAME} ${COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${MAINTAINER_NM} ${MAINTAINER_EMAIL} ${CPACK_GENERATOR})
+            endif()
         else()
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
@@ -513,7 +517,7 @@ macro(rocm_setup_license HEADER_ONLY)
             )
             set( COMP_TYPE "runtime" )
 	    if(NOT( ${CPACK_PACKAGE_NAME} STREQUAL "rocm-cmake"))
-		configure_pkg( ${CPACK_PACKAGE_NAME} ${COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${MAINTAINER_NM} ${MAINTAINER_EMAIL} ${CPACK_GENERATOR})
+                configure_pkg( ${CPACK_PACKAGE_NAME} ${COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${MAINTAINER_NM} ${MAINTAINER_EMAIL} ${CPACK_GENERATOR})
 	    endif()
         endif()
     endif()
