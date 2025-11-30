@@ -7,6 +7,8 @@
 #define GUARD_SIMPLE_H
 
 void simple();
+void simple2();
+void simple_long();
 
 
 #endif
