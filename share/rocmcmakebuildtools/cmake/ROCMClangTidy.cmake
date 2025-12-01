@@ -238,7 +238,9 @@ function(rocm_clang_tidy_check TARGET)
                         endif()
                         return()
                     endif()
-                    string(REPLACE \"Preprocessing CXX source to \" \"\" PP_FILE \"\${PP_OUT}\")
+                    # Filter out the message so it can handle verbose output
+                    string(REGEX MATCH \"Preprocessing CXX source to [^\\n]*\\\\.i\\n\" PP_SELECT_OUT \"\${PP_OUT}\")
+                    string(REPLACE \"Preprocessing CXX source to \" \"\" PP_FILE \"\${PP_SELECT_OUT}\")
                     string(STRIP \"\${PP_FILE}\" PP_FILE)
                     file(MD5 ${CMAKE_CURRENT_BINARY_DIR}/\${PP_FILE} PP_HASH)
                     execute_process(
