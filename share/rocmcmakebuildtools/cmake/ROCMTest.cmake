@@ -19,7 +19,7 @@ add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -j ${
 add_custom_target(tests COMMENT "Build all tests.")
 add_dependencies(check tests)
 
-add_custom_target(install-tests COMMAND ${CMAKE_COMMAND} -DCOMPONENT=tests -P ${CMAKE_BINARY_DIR}/cmake_install.cmake)
+add_custom_target(install-tests COMMAND ${CMAKE_COMMAND} -DCOMPONENT=tests -DCMAKE_INSTALL_CONFIG_NAME=$<CONFIG> -P ${CMAKE_BINARY_DIR}/cmake_install.cmake)
 add_dependencies(install-tests tests)
 
 rocm_define_property(TARGET "ROCM_TEST_INSTALLDIR" "Install dir for tests")
