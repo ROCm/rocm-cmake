@@ -91,7 +91,16 @@ macro(test_exec)
     string(REPLACE "|" "\;" REAL_EXEC_COMMAND "${ARGN}")
     execute_process(${REAL_EXEC_COMMAND} RESULT_VARIABLE test_exec_RESULT)
     if(NOT test_exec_RESULT EQUAL 0)
-        message(FATAL_ERROR "Process failed: ${EXEC_COMMAND}")
+        # Build a quoted command string that shows argument boundaries clearly
+        set(test_exec_quoted_cmd "")
+        foreach(test_exec_arg ${ARGN})
+            string(APPEND test_exec_quoted_cmd "\"${test_exec_arg}\" ")
+        endforeach()
+
+        message(FATAL_ERROR
+            "Process failed with exit code: ${test_exec_RESULT}\n"
+            "Command: ${test_exec_quoted_cmd}\n"
+        )
     endif()
 endmacro()
 
