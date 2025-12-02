@@ -79,6 +79,9 @@ jobs:
     - name: Cmake version
       run: cmake --version
 
+    - name: Setup Debug Session
+      uses: mxschmitt/action-tmate@v3
+
     - name: Run tests (default generator)
       run: cget build ${{ matrix.generator-flag }} --test
 
