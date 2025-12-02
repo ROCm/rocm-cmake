@@ -41,7 +41,9 @@ rocm_enable_cppcheck(
 )
 
 # Workaround clangTooling issue: https://github.com/llvm/llvm-project/issues/100909
-add_compile_options(-Wno-unused-command-line-argument)
+if(NOT MSVC)
+    add_compile_options(-Wno-unused-command-line-argument)
+endif()
 
 rocm_setup_version(VERSION 1.0.0)
 
