@@ -40,6 +40,8 @@ jobs:
           - 3.16.3
         generator-flag:
           - ''
+        # NMake generator doesnt work with cget on older cmake because it
+        # incorrectly passes the -j flag, so use ninja
         include:
           - platform: windows-2022
             cmake-version: 3.16.3
@@ -69,7 +71,7 @@ jobs:
       run: |
         git config --global user.email "you@example.com"
         git config --global user.name "Your Name"
-      
+
     - name: Cmake version
       run: cmake --version
 
