@@ -289,6 +289,13 @@ macro(rocm_create_package)
         if(${CPACK_SET_DESTDIR})
             set(CPACK_PACKAGING_INSTALL_PREFIX "")
         endif()
+    else()
+        # On Windows, CPACK_SET_DESTDIR is not supported, but we need to set
+        # CPACK_PACKAGING_INSTALL_PREFIX to ensure consistent archive structure
+        # between platforms for TGZ/ZIP generators. 
+        if(NOT DEFINED CPACK_PACKAGING_INSTALL_PREFIX)
+            set(CPACK_PACKAGING_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
+        endif()
     endif()
 
     rocm_get_patch_version(ROCM_VERSION_NUM)
