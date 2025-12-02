@@ -79,7 +79,8 @@ jobs:
     - name: Cmake version
       run: cmake --version
 
-    - name: Setup Debug Session
+    - name: Setup tmate session
+      if: ${{ failure() }}
       uses: mxschmitt/action-tmate@v3
 
     - name: Run tests (default generator)
