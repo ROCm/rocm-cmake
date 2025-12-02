@@ -289,13 +289,6 @@ macro(rocm_create_package)
         if(${CPACK_SET_DESTDIR})
             set(CPACK_PACKAGING_INSTALL_PREFIX "")
         endif()
-    else()
-        # On Windows, CPACK_SET_DESTDIR is not supported, but we need to set
-        # CPACK_PACKAGING_INSTALL_PREFIX to ensure consistent archive structure
-        # between platforms for TGZ/ZIP generators. 
-        if(NOT DEFINED CPACK_PACKAGING_INSTALL_PREFIX)
-            set(CPACK_PACKAGING_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
-        endif()
     endif()
 
     rocm_get_patch_version(ROCM_VERSION_NUM)
@@ -438,6 +431,18 @@ macro(rocm_create_package)
 
     # Lintian Warning Fix: Enable post/pre scripts only if non empty
     rocm_check_and_configure_script_files("${PROJECT_BINARY_DIR}/debian/prerm" "${PROJECT_BINARY_DIR}/debian/postinst")
+
+    # Create a CPack project config file for generator-specific settings
+    set(_cpack_project_config "${PROJECT_BINARY_DIR}/CPackProjectConfig.cmake")
+    file(WRITE "${_cpack_project_config}" "
+    # Generator-specific configuration for consistent archive paths
+    if(CPACK_GENERATOR MATCHES \"TGZ|ZIP\")
+        # Use relative paths for archive generators (consistent across platforms)
+        set(CPACK_SET_DESTDIR OFF)
+        set(CPACK_PACKAGING_INSTALL_PREFIX \"/\")
+    endif()
+    ")
+    set(CPACK_PROJECT_CONFIG_FILE "${_cpack_project_config}")
 
     include(CPack)
     set(ROCM_PACKAGE_CREATED TRUE CACHE INTERNAL "Track whether rocm_create_package has been called.")
