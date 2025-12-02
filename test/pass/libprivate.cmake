@@ -8,7 +8,7 @@ install_dir(
     TARGETS package)
 if(WIN32)
     test_expect_file(${PREFIX}/include/simpleprivate.h)
-    test_expect_file(${PREFIX}/lib/libsimple_private.a)
+    test_expect_file(${PREFIX}/lib/libsimple_private.lib)
 else()
     test_expect_file(${PREFIX}/lib/libprivate/include/simpleprivate.h)
     test_expect_file(${PREFIX}/lib/libprivate/lib/libsimple_private.a)

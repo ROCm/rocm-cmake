@@ -341,7 +341,7 @@ function(rocm_export_targets)
     set(CONFIG_NAME ${PACKAGE_NAME_LOWER}-config)
     set(TARGET_VERSION ${PROJECT_VERSION})
 
-    if(PARSE_PREFIX)
+    if(PARSE_PREFIX AND NOT WIN32)
         set(PREFIX_DIR ${PARSE_PREFIX})
         set(PREFIX_ARG PREFIX ${PREFIX_DIR})
         set(BIN_INSTALL_DIR ${PREFIX_DIR}/${CMAKE_INSTALL_BINDIR})
