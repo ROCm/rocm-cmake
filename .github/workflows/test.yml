@@ -79,10 +79,6 @@ jobs:
     - name: Cmake version
       run: cmake --version
 
-    - name: Setup tmate session
-      if: ${{ failure() }}
-      uses: mxschmitt/action-tmate@v3
-
     - name: Run tests (default generator)
       run: cget build ${{ matrix.generator-flag }} --test
 
@@ -95,3 +91,6 @@ jobs:
     - name: Build docs (Ninja generator)
       run: cget build ${{ matrix.generator-flag }} -T doc
 
+    - name: Setup tmate session
+      if: ${{ failure() }}
+      uses: mxschmitt/action-tmate@v3
