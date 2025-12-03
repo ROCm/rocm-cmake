@@ -116,9 +116,8 @@ function(configure_dir DIR)
     if(WIN32)
         set(BUILD_DIR ${BUILDS_DIR}/${BUILD_RAND})
     else()
-        set(BUILD_DIR
-            ${BUILDS_DIR}/${BUILD_RAND}/longer_pathname_so_that_rpms_can_support_packaging_the_debug_info_for_all_os_profiles/src/out/some-os-version/version/build/rocm-cmake/build
-        )
+        set(LONG_PATH "longer_pathname_so_that_rpms_can_support_packaging_the_debug_info_for_all_os_profiles")
+        set(BUILD_DIR ${BUILDS_DIR}/${BUILD_RAND}/${LONG_PATH}/src/out/some-os-version/version/build/rocm-cmake/build)
     endif()
     if(NOT EXISTS ${BUILD_DIR})
         file(MAKE_DIRECTORY ${BUILD_DIR})
