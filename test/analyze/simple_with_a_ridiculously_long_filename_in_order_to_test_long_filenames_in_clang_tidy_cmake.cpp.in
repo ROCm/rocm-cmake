@@ -4,5 +4,5 @@
 
 #include <simple.h>
 
-void simple()
+void simple_long()
 {}
