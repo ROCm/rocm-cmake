@@ -97,10 +97,7 @@ macro(test_exec)
             string(APPEND test_exec_quoted_cmd "\"${test_exec_arg}\" ")
         endforeach()
 
-        message(FATAL_ERROR
-            "Process failed with exit code: ${test_exec_RESULT}\n"
-            "Command: ${test_exec_quoted_cmd}\n"
-        )
+        message(FATAL_ERROR "Process failed with exit code: ${test_exec_RESULT}\n" "Command: ${test_exec_quoted_cmd}\n")
     endif()
 endmacro()
 
