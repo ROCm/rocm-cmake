@@ -19,13 +19,14 @@ add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure -j ${
 add_custom_target(tests COMMENT "Build all tests.")
 add_dependencies(check tests)
 
-add_custom_target(install-tests COMMAND ${CMAKE_COMMAND} -DCOMPONENT=tests -P ${CMAKE_BINARY_DIR}/cmake_install.cmake)
+add_custom_target(install-tests COMMAND ${CMAKE_COMMAND} -DCOMPONENT=tests -DCMAKE_INSTALL_CONFIG_NAME=$<CONFIG> -P
+                                        ${CMAKE_BINARY_DIR}/cmake_install.cmake)
 add_dependencies(install-tests tests)
 
 rocm_define_property(TARGET "ROCM_TEST_INSTALLDIR" "Install dir for tests")
 macro(rocm_enable_test_package NAME)
     message(STATUS "Enable test package ${NAME}")
-    set_target_properties(tests PROPERTIES ROCM_TEST_INSTALLDIR ${CMAKE_INSTALL_PREFIX}/libexec/installed-tests/${NAME})
+    set_target_properties(tests PROPERTIES ROCM_TEST_INSTALLDIR ${CMAKE_INSTALL_LIBEXECDIR}/installed-tests/${NAME})
     rocm_package_setup_component(tests DEPENDS COMPONENT runtime)
     rocm_defer(rocm_test_install_ctest)
 endmacro()
@@ -89,9 +90,9 @@ function(rocm_save_test)
     set(COMMAND "")
     foreach(ARG ${PARSE_COMMAND})
         if(TARGET ${ARG})
-            set(INSTALL_PREFIX "$<${_rocm_test_genex_eval}:$<TARGET_PROPERTY:${ARG},ROCM_INSTALL_DIR>>")
-            string(APPEND COMMAND
-                    " \"${INSTALL_PREFIX}/$<TARGET_FILE_NAME:${ARG}>\"")
+            set(INSTALL_PREFIX
+                "${CMAKE_INSTALL_PREFIX}/$<${_rocm_test_genex_eval}:$<TARGET_PROPERTY:${ARG},ROCM_INSTALL_DIR>>")
+            string(APPEND COMMAND " \"${INSTALL_PREFIX}/$<TARGET_FILE_NAME:${ARG}>\"")
         else()
             string(APPEND COMMAND " \"${ARG}\"")
         endif()
@@ -159,7 +160,11 @@ function(rocm_add_test)
     set(COMMAND_ARGS ${COMMAND})
     list(REMOVE_AT COMMAND_ARGS 0)
 
-    if(ROCM_TEST_GDB AND TARGET ${COMMAND_EXE})
+    get_property(IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+
+    if(NOT IS_MULTI_CONFIG
+       AND ROCM_TEST_GDB
+       AND TARGET ${COMMAND_EXE})
         set(TEST_DIR ${CMAKE_CURRENT_BINARY_DIR}/gdb/test_${PARSE_NAME})
         file(MAKE_DIRECTORY ${TEST_DIR})
         if(NOT EXISTS ${TEST_DIR})
@@ -221,9 +226,15 @@ function(rocm_install_test)
     set(INSTALL_PREFIX "$<TARGET_PROPERTY:tests,ROCM_TEST_INSTALLDIR>")
     if(PARSE_TARGETS)
         foreach(TARGET ${PARSE_TARGETS})
-            set_property(TARGET ${TARGET} APPEND PROPERTY INSTALL_RPATH "$ORIGIN/../../../../lib")
+            set_property(
+                TARGET ${TARGET}
+                APPEND
+                PROPERTY INSTALL_RPATH "$ORIGIN/../../../../lib")
             # Adding RPATH to public tests to point to private libraries.
-            set_property(TARGET ${TARGET} APPEND PROPERTY INSTALL_RPATH "$ORIGIN/../../../../lib/${PROJECT_NAME}/lib")
+            set_property(
+                TARGET ${TARGET}
+                APPEND
+                PROPERTY INSTALL_RPATH "$ORIGIN/../../../../lib/${PROJECT_NAME}/lib")
         endforeach()
         install(
             TARGETS ${PARSE_TARGETS}

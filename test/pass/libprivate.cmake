@@ -6,6 +6,11 @@ install_dir(
     ${TEST_DIR}/libprivate
     CMAKE_ARGS -DROCM_SYMLINK_LIBS=OFF -DROCM_PREFIX=rocm
     TARGETS package)
-test_expect_file(${PREFIX}/lib/libprivate/include/simpleprivate.h)
-test_expect_file(${PREFIX}/lib/libprivate/lib/libsimple_private.a)
+if(WIN32)
+    test_expect_file(${PREFIX}/include/simpleprivate.h)
+    test_expect_file(${PREFIX}/lib/simple_private.lib)
+else()
+    test_expect_file(${PREFIX}/lib/libprivate/include/simpleprivate.h)
+    test_expect_file(${PREFIX}/lib/libprivate/lib/libsimple_private.a)
+endif()
 install_dir(${TEST_DIR}/libprivate)
