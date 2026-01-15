@@ -44,8 +44,8 @@ function(rocm_check_toolchain_var var access value list_file)
   calling 'cmake -D${var}=\"${value}\"'
   or set in a toolchain file and added with
   'cmake -DCMAKE_TOOLCHAIN_FILE=<toolchain-file>'. ROCMChecks now calling:")
-            message(${message_type} "'${var}' is set at ${CMAKE_CURRENT_LIST_DIR}/CMakeLists.txt:<line#> shown below:")
-            message( "*-----------------------------------------------------------------------------*
+                message(${message_type} "'${var}' is set at ${CMAKE_CURRENT_LIST_DIR}/CMakeLists.txt:<line#> below:")
+                message( "*-----------------------------------------------------------------------------*
 *******************************************************************************
 ")
             endif()
