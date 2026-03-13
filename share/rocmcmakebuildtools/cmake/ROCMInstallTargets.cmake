@@ -233,7 +233,7 @@ function(rocm_install_targets)
                 DESTINATION ${LIB_INSTALL_DIR}
                 COMPONENT ${development}
         )
-        if(WIN32)
+        if(WIN32 AND NOT T_TYPE STREQUAL "INTERFACE_LIBRARY")
             install(FILES $<TARGET_PDB_FILE:${TARGET}>
                 DESTINATION ${BIN_INSTALL_DIR} OPTIONAL)
         endif()
