@@ -70,9 +70,9 @@ endif()
 # Any changes to this file will be overwritten by the next CMake run
 ####################################################################################
 
-get_filename_component(_ROCM_CMAKE_CURRENT_LIST_FILE_REAL \"\${CMAKE_CURRENT_LIST_FILE}\" REALPATH)
-get_filename_component(_ROCM_CMAKE_CURRENT_LIST_DIR_REAL \"\${_ROCM_CMAKE_CURRENT_LIST_FILE_REAL}\" DIRECTORY)
-get_filename_component(PACKAGE_PREFIX_DIR \"\${_ROCM_CMAKE_CURRENT_LIST_DIR_REAL}/${PACKAGE_RELATIVE_PATH}\" ABSOLUTE)
+get_filename_component(_ROCM_CMAKE_CURRENT_LIST_FILE_ABS \"\${CMAKE_CURRENT_LIST_FILE}\" ABSOLUTE)
+get_filename_component(_ROCM_CMAKE_CURRENT_LIST_DIR_ABS \"\${_ROCM_CMAKE_CURRENT_LIST_FILE_ABS}\" DIRECTORY)
+get_filename_component(PACKAGE_PREFIX_DIR \"\${_ROCM_CMAKE_CURRENT_LIST_DIR_ABS}/${PACKAGE_RELATIVE_PATH}\" ABSOLUTE)
 
 ${CHECK_PREFIX}
 
