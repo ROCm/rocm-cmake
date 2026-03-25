@@ -70,9 +70,38 @@ endif()
 # Any changes to this file will be overwritten by the next CMake run
 ####################################################################################
 
-get_filename_component(_ROCM_CMAKE_CURRENT_LIST_FILE_ABS \"\${CMAKE_CURRENT_LIST_FILE}\" ABSOLUTE)
-get_filename_component(_ROCM_CMAKE_CURRENT_LIST_DIR_ABS \"\${_ROCM_CMAKE_CURRENT_LIST_FILE_ABS}\" DIRECTORY)
-get_filename_component(PACKAGE_PREFIX_DIR \"\${_ROCM_CMAKE_CURRENT_LIST_DIR_ABS}/${PACKAGE_RELATIVE_PATH}\" ABSOLUTE)
+# Handle both PREFIX symlinks and CMAKE_INSTALL_MODE=SYMLINK by detecting directory structure.
+# PREFIX symlinks (e.g., /opt/rocm -> /opt/rocm-7.2) preserve the install tree structure,
+# so the real file and symlink have matching relative layouts (lib/cmake/foo/ in both).
+# CMAKE_INSTALL_MODE=SYMLINK creates symlinks from install tree (lib/cmake/foo/) to build
+# directory (build/), which has a different structure, breaking relative path assumptions.
+get_filename_component(
+    _ROCM_CMAKE_CURRENT_LIST_FILE_REAL \"\${CMAKE_CURRENT_LIST_FILE}\" REALPATH)
+get_filename_component(
+    _ROCM_CMAKE_CURRENT_LIST_DIR_REAL \"\${_ROCM_CMAKE_CURRENT_LIST_FILE_REAL}\" DIRECTORY)
+
+# Check if navigating from real dir through install structure returns to real dir.
+# If yes, structure is preserved (PREFIX case); if no, structure differs (INSTALL_MODE case).
+get_filename_component(
+    _ROCM_STRUCTURE_CHECK
+    \"\${_ROCM_CMAKE_CURRENT_LIST_DIR_REAL}/${PACKAGE_RELATIVE_PATH}/${PACKAGE_INSTALL_RELATIVE_DIR}\"
+    ABSOLUTE)
+
+if(\"\${_ROCM_STRUCTURE_CHECK}\" STREQUAL \"\${_ROCM_CMAKE_CURRENT_LIST_DIR_REAL}\")
+    # Structure preserved - use REALPATH (handles PREFIX symlinks like /opt/rocm -> /opt/rocm-7.2)
+    get_filename_component(
+        PACKAGE_PREFIX_DIR \"\${_ROCM_CMAKE_CURRENT_LIST_DIR_REAL}/${PACKAGE_RELATIVE_PATH}\"
+        ABSOLUTE)
+else()
+    # Structure differs - use ABSOLUTE to preserve symlink path (handles CMAKE_INSTALL_MODE=SYMLINK)
+    get_filename_component(
+        _ROCM_CMAKE_CURRENT_LIST_FILE_ABS \"\${CMAKE_CURRENT_LIST_FILE}\" ABSOLUTE)
+    get_filename_component(
+        _ROCM_CMAKE_CURRENT_LIST_DIR_ABS \"\${_ROCM_CMAKE_CURRENT_LIST_FILE_ABS}\" DIRECTORY)
+    get_filename_component(
+        PACKAGE_PREFIX_DIR \"\${_ROCM_CMAKE_CURRENT_LIST_DIR_ABS}/${PACKAGE_RELATIVE_PATH}\"
+        ABSOLUTE)
+endif()
 
 ${CHECK_PREFIX}
 
