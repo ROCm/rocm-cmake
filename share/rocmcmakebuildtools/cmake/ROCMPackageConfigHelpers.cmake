@@ -21,6 +21,16 @@ function(rocm_configure_package_config_file INPUT_FILE OUTPUT_FILE)
         message(FATAL_ERROR "INSTALL_DESTINATION is required for rocm_configure_package_config_file()")
     endif()
 
+    # CMAKE_INSTALL_MODE with symlinks and PREFIX is not supported because the symlink structure
+    # created by rocm_install_symlink_subdir() is incompatible with the config file's
+    # PACKAGE_PREFIX_DIR calculation when symlinks are followed by REALPATH.
+    # CMAKE_INSTALL_MODE symlink modes: SYMLINK, SYMLINK_OR_COPY, ABS_SYMLINK, ABS_SYMLINK_OR_COPY
+    if(PARSE_PREFIX AND NOT WIN32 AND "$ENV{CMAKE_INSTALL_MODE}" MATCHES "SYMLINK")
+        message(FATAL_ERROR
+            "CMAKE_INSTALL_MODE=$ENV{CMAKE_INSTALL_MODE} cannot be used with PREFIX argument. "
+            "Use either CMAKE_INSTALL_MODE with symlinks (without PREFIX) or PREFIX (without CMAKE_INSTALL_MODE symlinks).")
+    endif()
+
     if(IS_ABSOLUTE "${CMAKE_INSTALL_PREFIX}")
         set(INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
     else()
