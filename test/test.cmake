@@ -149,10 +149,20 @@ function(install_dir DIR)
 
     cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-    configure_dir(
-        ${DIR}
-        TARGETS all ${PARSE_TARGETS} install
-        CMAKE_ARGS ${PARSE_CMAKE_ARGS} -DROCM_SYMLINK_LIBS=OFF)
+    # When CMAKE_INSTALL_MODE is SYMLINK, we need to preserve the build directory
+    # because installed files are symlinks pointing to it
+    if("$ENV{CMAKE_INSTALL_MODE}" STREQUAL "SYMLINK")
+        configure_dir(
+            ${DIR}
+            BUILD_DIR_VAR PRESERVED_BUILD_DIR
+            TARGETS all ${PARSE_TARGETS} install
+            CMAKE_ARGS ${PARSE_CMAKE_ARGS} -DROCM_SYMLINK_LIBS=OFF)
+    else()
+        configure_dir(
+            ${DIR}
+            TARGETS all ${PARSE_TARGETS} install
+            CMAKE_ARGS ${PARSE_CMAKE_ARGS} -DROCM_SYMLINK_LIBS=OFF)
+    endif()
 endfunction()
 
 function(write_version_cmake DIR VERSION CONTENT)
