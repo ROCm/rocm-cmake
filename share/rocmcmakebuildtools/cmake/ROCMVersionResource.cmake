@@ -27,8 +27,6 @@ rocm_add_version_resource
 -------------------------
 Add a Windows PE version resource to a DLL or EXE target.
 
-On non-Windows platforms this function does nothing.
-
 Usage:
   rocm_add_version_resource(
     TARGET      <target>
