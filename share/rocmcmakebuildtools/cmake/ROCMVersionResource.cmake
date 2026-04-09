@@ -2,28 +2,6 @@
 # Copyright (C) 2015-2026 Advanced Micro Devices, Inc.
 # ######################################################################################################################
 
-#[=======================================================================[
-rocm_add_version_resource
--------------------------
-Add a Windows PE version resource to a DLL or EXE target.
-
-Usage:
-  rocm_add_version_resource(
-    TARGET      <target>
-    DESCRIPTION <string>
-    [PRODUCT_NAME  <string>]   # defaults to "${PROJECT_NAME}"
-    [COMPANY_NAME  <string>]   # defaults to "Advanced Micro Devices, Inc."
-    [COPYRIGHT     <string>]   # defaults to "Copyright (c) 2015-<year> Advanced Micro Devices, Inc. All rights reserved."
-    [FILENAME      <string>]   # defaults to the target output name + .dll/.exe
-  )
-
-Example:
-  rocm_add_version_resource(
-    TARGET      mylib
-    DESCRIPTION "My ROCm Library"
-  )
-#]=======================================================================]
-
 function(rocm_add_version_resource)
     if(NOT WIN32)
         return()
