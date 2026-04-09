@@ -237,9 +237,7 @@ END
 ")
         target_sources(${TARGET} PRIVATE ${RC_OUTPUT})
         if(TARGET_TYPE STREQUAL "SHARED_LIBRARY" OR TARGET_TYPE STREQUAL "MODULE_LIBRARY")
-            get_source_file_property(RC_OUTPUT_COMPILE_FLAGS ${RC_OUTPUT} COMPILE_FLAGS)
-            set_source_files_properties(${RC_OUTPUT} PROPERTIES
-                    COMPILE_FLAGS "${RC_OUTPUT_COMPILE_FLAGS};-DDLL_BUILD")
+            set_source_files_properties(${RC_OUTPUT} PROPERTIES COMPILE_FLAGS -DDLL_BUILD)
         endif()
         message(STATUS "Added version resource to ${TARGET}: ${DESCRIPTION}")
     endif()
