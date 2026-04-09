@@ -233,7 +233,10 @@ function(rocm_install_targets)
                 DESTINATION ${LIB_INSTALL_DIR}
                 COMPONENT ${development}
         )
-        if(WIN32 AND (T_TYPE STREQUAL "SHARED_LIBRARY" OR T_TYPE STREQUAL "MODULE_LIBRARY" OR T_TYPE STREQUAL "EXECUTABLE"))
+        if(WIN32 AND
+            (T_TYPE STREQUAL "SHARED_LIBRARY" OR
+             T_TYPE STREQUAL "MODULE_LIBRARY" OR
+             T_TYPE STREQUAL "EXECUTABLE"))
             install(FILES $<TARGET_PDB_FILE:${TARGET}>
                 DESTINATION ${BIN_INSTALL_DIR} OPTIONAL)
         endif()
