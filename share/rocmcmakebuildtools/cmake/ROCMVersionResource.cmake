@@ -1,6 +1,26 @@
-# ######################################################################################################################
-# Copyright (C) 2026 Advanced Micro Devices, Inc.
-# ######################################################################################################################
+#####################################################################################
+# The MIT License (MIT)
+#
+# Copyright (c) 2015-2026 Advanced Micro Devices, Inc. All rights reserved.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#####################################################################################
 
 #[=======================================================================[
 rocm_add_version_resource
@@ -15,7 +35,7 @@ Usage:
     DESCRIPTION <string>
     [PRODUCT_NAME  <string>]   # defaults to "${PROJECT_NAME}"
     [COMPANY_NAME  <string>]   # defaults to "Advanced Micro Devices, Inc."
-    [COPYRIGHT     <string>]   # defaults to "Copyright (C) <year> Advanced Micro Devices, Inc."
+    [COPYRIGHT     <string>]   # defaults to "Copyright (c) 2015-<year> Advanced Micro Devices, Inc. All rights reserved."
     [FILENAME      <string>]   # defaults to the target output name + .dll/.exe
   )
 
@@ -52,7 +72,7 @@ function(rocm_add_version_resource)
     endif()
     if(NOT ARG_COPYRIGHT)
         string(TIMESTAMP _year "%Y")
-        set(ARG_COPYRIGHT "Copyright (C) ${_year} Advanced Micro Devices, Inc.")
+        set(ARG_COPYRIGHT "Copyright (c) 2015-${_year} Advanced Micro Devices, Inc. All rights reserved.")
     endif()
 
     get_target_property(_type ${ARG_TARGET} TYPE)
@@ -89,6 +109,22 @@ function(rocm_add_version_resource)
 #define VER_PRODUCTVERSION       @_ver_major@,@_ver_minor@,@_ver_patch@,0
 #define VER_PRODUCTVERSION_STR   "@PROJECT_VERSION@\0"
 
+#ifndef VER_FILEDESCRIPTION_STR
+#define VER_FILEDESCRIPTION_STR  "@_description@\0"
+#endif
+
+#ifndef VER_INTERNALNAME_STR
+#define VER_INTERNALNAME_STR     "@ARG_TARGET@\0"
+#endif
+
+#ifndef VER_ORIGINALFILENAME_STR
+#define VER_ORIGINALFILENAME_STR "@_filename@\0"
+#endif
+
+#ifndef VER_LEGALCOPYRIGHT_STR
+#define VER_LEGALCOPYRIGHT_STR   "@_copyright@\0"
+#endif
+
 VS_VERSION_INFO VERSIONINFO
 FILEVERSION     VER_FILEVERSION
 PRODUCTVERSION  VER_PRODUCTVERSION
@@ -107,11 +143,11 @@ BEGIN
         BLOCK "040904B0"
         BEGIN
             VALUE "CompanyName",      "@_company_name@\0"
-            VALUE "FileDescription",  "@_description@\0"
+            VALUE "FileDescription",  VER_FILEDESCRIPTION_STR
             VALUE "FileVersion",      VER_FILEVERSION_STR
-            VALUE "InternalName",     "@ARG_TARGET@\0"
-            VALUE "LegalCopyright",   "@_copyright@\0"
-            VALUE "OriginalFilename", "@_filename@\0"
+            VALUE "InternalName",     VER_INTERNALNAME_STR
+            VALUE "LegalCopyright",   VER_LEGALCOPYRIGHT_STR
+            VALUE "OriginalFilename", VER_ORIGINALFILENAME_STR
             VALUE "ProductName",      "@_product_name@\0"
             VALUE "ProductVersion",   VER_PRODUCTVERSION_STR
         END
