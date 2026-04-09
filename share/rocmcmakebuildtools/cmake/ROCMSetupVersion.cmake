@@ -1,7 +1,9 @@
 # ######################################################################################################################
 # Copyright (C) 2026 Advanced Micro Devices, Inc.
 # ######################################################################################################################
-cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
+if(WIN32)
+    cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
+endif()
 
 include_guard(GLOBAL)
 
@@ -177,8 +179,11 @@ endfunction()
 function(rocm_add_version_resource TARGET NAME DESCRIPTION)
     if(WIN32)
         get_target_property(TARGET_TYPE ${TARGET} TYPE)
-        if (NOT TARGET_TYPE STREQUAL "EXECUTABLE" AND NOT TARGET_TYPE STREQUAL "SHARED_LIBRARY" AND NOT TARGET_TYPE STREQUAL "MODULE_LIBRARY")
-            message(FATAL_ERROR "${CMAKE_CURRENT_FUNCTION}: only EXECUTABLE, SHARED_LIBRARY, and MODULE_LIBRARY target types are supported")
+        if (NOT TARGET_TYPE STREQUAL "EXECUTABLE" AND
+            NOT TARGET_TYPE STREQUAL "SHARED_LIBRARY" AND
+            NOT TARGET_TYPE STREQUAL "MODULE_LIBRARY")
+            message(FATAL_ERROR "${CMAKE_CURRENT_FUNCTION}: only EXECUTABLE, SHARED_LIBRARY, "
+                    "and MODULE_LIBRARY target types are supported")
         endif()
         get_target_property(FILENAME ${TARGET} OUTPUT_NAME)
         if(NOT FILENAME)
@@ -210,24 +215,24 @@ FILETYPE        VFT_APP
 #endif
 FILESUBTYPE     VFT2_UNKNOWN
 BEGIN
-    BLOCK \"StringFileInfo\"
+  BLOCK \"StringFileInfo\"
+  BEGIN
+    BLOCK \"040904B0\"
     BEGIN
-        BLOCK \"040904B0\"
-        BEGIN
-            VALUE \"CompanyName\",      \"Advanced Micro Devices, Inc.\\0\"
-            VALUE \"FileDescription\",  \"${DESCRIPTION}\\0\"
-            VALUE \"FileVersion\",      \"${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}.0\\0\"
-            VALUE \"InternalName\",     \"${NAME}\\0\"
-            VALUE \"LegalCopyright\",   \"Copyright (c) ${YEAR} Advanced Micro Devices, Inc. All rights reserved.\\0\"
-            VALUE \"OriginalFilename\", \"${FILENAME}\\0\"
-            VALUE \"ProductName\",      \"${NAME} ${FILENAME}\\0\"
-            VALUE \"ProductVersion\",   \"${PROJECT_VERSION}\\0\"
-        END
+      VALUE \"CompanyName\", \"Advanced Micro Devices, Inc.\\0\"
+      VALUE \"FileDescription\", \"${DESCRIPTION}\\0\"
+      VALUE \"FileVersion\", \"${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}.0\\0\"
+      VALUE \"InternalName\", \"${NAME}\\0\"
+      VALUE \"LegalCopyright\", \"Copyright (c) ${YEAR} Advanced Micro Devices, Inc. All rights reserved.\\0\"
+      VALUE \"OriginalFilename\", \"${FILENAME}\\0\"
+      VALUE \"ProductName\", \"${NAME} ${FILENAME}\\0\"
+      VALUE \"ProductVersion\", \"${PROJECT_VERSION}\\0\"
     END
-    BLOCK \"VarFileInfo\"
-    BEGIN
-        VALUE \"Translation\", 0x409, 1200
-    END
+  END
+  BLOCK \"VarFileInfo\"
+  BEGIN
+    VALUE \"Translation\", 0x409, 1200
+  END
 END
 ")
         target_sources(${TARGET} PRIVATE ${RC_OUTPUT})
