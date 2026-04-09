@@ -1,6 +1,9 @@
 # ######################################################################################################################
-# Copyright (C) 2017 Advanced Micro Devices, Inc.
+# Copyright (C) 2026 Advanced Micro Devices, Inc.
 # ######################################################################################################################
+cmake_minimum_required(VERSION 3.17 FATAL_ERROR)
+
+include_guard(GLOBAL)
 
 macro(rocm_set_parent VAR)
     set(${VAR}
@@ -168,5 +171,25 @@ function(rocm_set_soversion LIBRARY_TARGET SOVERSION)
 
         set_target_properties(${LIBRARY_TARGET} PROPERTIES SOVERSION ${LIB_VERSION_MAJOR})
         set_target_properties(${LIBRARY_TARGET} PROPERTIES VERSION ${LIB_VERSION_STRING})
+    endif()
+endfunction()
+
+function(rocm_add_version_resource TARGET NAME DESCRIPTION)
+    if(WIN32)
+        get_target_property(TARGET_TYPE ${TARGET} TYPE)
+        if (NOT TARGET_TYPE STREQUAL "EXECUTABLE" AND NOT TARGET_TYPE STREQUAL "SHARED_LIBRARY" AND NOT TARGET_TYPE STREQUAL "MODULE_LIBRARY")
+            message(FATAL_ERROR "${CMAKE_CURRENT_FUNCTION}: only EXECUTABLE, SHARED_LIBRARY, and MODULE_LIBRARY target types are supported")
+        endif()
+        get_target_property(FILENAME ${TARGET} OUTPUT_NAME)
+        string(TIMESTAMP YEAR "%Y")
+        set(RC_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_version.rc")
+        configure_file(version.rc.in ${RC_OUTPUT} @ONLY)
+        target_sources(${TARGET} PRIVATE ${RC_OUTPUT})
+        if(TARGET_TYPE STREQUAL "SHARED_LIBRARY" OR TARGET_TYPE STREQUAL "MODULE_LIBRARY")
+            get_source_file_property(RC_OUTPUT_COMPILE_FLAGS ${RC_OUTPUT} COMPILE_FLAGS)
+            set_source_files_properties(${RC_OUTPUT} PROPERTIES
+                    COMPILE_FLAGS "${RC_OUTPUT_COMPILE_FLAGS};-DDLL_BUILD")
+        endif()
+        message(STATUS "Added version resource to ${TARGET}: ${DESCRIPTION}")
     endif()
 endfunction()
