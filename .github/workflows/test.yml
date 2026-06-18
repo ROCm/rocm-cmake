@@ -75,13 +75,12 @@ jobs:
         git config --global user.email "you@example.com"
         git config --global user.name "Your Name"
 
-    # Build with clang++ instead of the default cl on windows. clang++ targets
-    # the MSVC ABI, so it needs the MSVC environment to find the headers,
-    # libraries and linker, and it can only be driven through the Ninja
-    # generator (the Visual Studio generator ignores CC/CXX and always uses cl).
-    - name: Setup MSVC environment
+    - name: Install LLVM/Clang
       if: matrix.compiler == 'clang'
-      uses: ilammy/msvc-dev-cmd@v1
+      uses: KyleMayes/install-llvm-action@v2
+      with:
+        version: "20"
+        directory: ${{ runner.temp }}/llvm
 
     - name: Setup clang++
       if: matrix.compiler == 'clang'
