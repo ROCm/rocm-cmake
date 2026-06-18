@@ -283,7 +283,14 @@ function(rocm_test_headers)
         message(FATAL_ERROR "Unknown keywords given to rocm_test_headers(): \"${PARSE_UNPARSED_ARGUMENTS}\"")
     endif()
 
-    file(GLOB HEADERS CONFIGURE_DEPENDS ${PARSE_HEADERS})
+    # CONFIGURE_DEPENDS makes the Ninja generator loop on manifest regeneration
+    # ("build.ninja still dirty after 100 tries") with cmake before 3.20, so
+    # only enable it on newer versions.
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.20)
+        file(GLOB HEADERS CONFIGURE_DEPENDS ${PARSE_HEADERS})
+    else()
+        file(GLOB HEADERS ${PARSE_HEADERS})
+    endif()
 
     foreach(HEADER ${HEADERS})
         file(RELATIVE_PATH HEADER_REL ${CMAKE_SOURCE_DIR} ${HEADER})
