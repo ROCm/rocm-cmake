@@ -100,12 +100,11 @@ jobs:
       if: matrix.compiler != 'clang'
       run: cget build -T doc
 
-    - name: Setup tmate session
-      if: matrix.platform == 'ubuntu-24.04'
-      uses: mxschmitt/action-tmate@v3
+    - name: Clean build
+      run: cget clean -y
 
     - name: Run tests (Ninja generator)
-      run: cget build -Cy --test -DROCM_CMAKE_GENERATOR=Ninja
+      run: cget build --test -DROCM_CMAKE_GENERATOR=Ninja
 
     - name: Build docs (Ninja generator)
       run: cget build -T doc
