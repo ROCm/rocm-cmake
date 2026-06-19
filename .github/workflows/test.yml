@@ -101,7 +101,9 @@ jobs:
       run: cget build -T doc
 
     - name: Clean build
-      run: cget clean -y
+      run: |
+        cget build -Cy
+        cget clean -y
 
     - name: Run tests (Ninja generator)
       run: cget build --test -DROCM_CMAKE_GENERATOR=Ninja
