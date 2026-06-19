@@ -32,12 +32,8 @@ else()
     macro(rocm_eval_code CODE)
         file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/rocm_eval.cmake "${CODE}")
         include(${CMAKE_CURRENT_BINARY_DIR}/rocm_eval.cmake)
-        # include() registers rocm_eval.cmake as a build-system regeneration
-        # dependency, and cmake emits a phony edge declaring it a possibly-missing
-        # input. With the Ninja generator, deleting it makes that phony output
-        # never exist, so the regeneration rule is considered perpetually dirty
-        # and loops ("build.ninja still dirty after 100 tries"). Keep the file for
-        # Ninja; other generators don't have this problem, so clean it up there.
+        # Deleting an include()d file makes Ninja loop on manifest regeneration
+        # ("build.ninja still dirty after 100 tries"), so keep it for Ninja.
         if(NOT CMAKE_GENERATOR MATCHES "Ninja")
             file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/rocm_eval.cmake)
         endif()

@@ -25,14 +25,10 @@ if(ROCM_CMAKE_GENERATOR STREQUAL "${CMAKE_GENERATOR}")
     rocm_cmake_add_test_argument(CMAKE_MAKE_PROGRAM FILEPATH "Make program to relay to test projects")
 endif()
 
-# test.cmake runs in script mode (cmake -P), so it cannot know the static library
-# naming the test projects will use, and the test projects may build with a
-# different generator/compiler than this build. MSVC is not a reliable signal:
-# clang++ is "GNU-like" (MSVC is not set) yet still produces name.lib. Probe once
-# -- with the same generator/toolset and inherited CC/CXX the test projects use --
-# for the actual static library prefix/suffix and relay them so the tests can
-# check the right file names. Default to the unix naming; only Windows needs the
-# probe (which requires a working compiler).
+# Probe the static library naming the test projects use and relay it: cmake -P
+# can't know it, and MSVC is unreliable (clang++ is GNU-like yet still emits
+# name.lib). Use the relayed generator/toolset + inherited CC/CXX; default to
+# unix, probe only on windows.
 set(ROCM_STATIC_LIBRARY_PREFIX "lib")
 set(ROCM_STATIC_LIBRARY_SUFFIX ".a")
 if(CMAKE_HOST_WIN32)
