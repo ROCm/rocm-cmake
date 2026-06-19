@@ -283,16 +283,7 @@ function(rocm_test_headers)
         message(FATAL_ERROR "Unknown keywords given to rocm_test_headers(): \"${PARSE_UNPARSED_ARGUMENTS}\"")
     endif()
 
-    # Older cmake (seen with 3.16.3) gets stuck in a Ninja manifest-regeneration
-    # loop ("build.ninja still dirty after 100 tries"): the CONFIGURE_DEPENDS
-    # glob re-check re-arms the rebuild-manifest rule on every build. Only use it
-    # on newer cmake. NOTE: 3.20 is a heuristic cutoff, not a documented fix
-    # boundary -- CI on the 3.x matrix is what confirms where it is safe.
-    if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.20)
-        file(GLOB HEADERS CONFIGURE_DEPENDS ${PARSE_HEADERS})
-    else()
-        file(GLOB HEADERS ${PARSE_HEADERS})
-    endif()
+    file(GLOB HEADERS CONFIGURE_DEPENDS ${PARSE_HEADERS})
 
     foreach(HEADER ${HEADERS})
         file(RELATIVE_PATH HEADER_REL ${CMAKE_SOURCE_DIR} ${HEADER})
