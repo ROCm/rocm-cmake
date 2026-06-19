@@ -6,7 +6,7 @@ install_dir(
     ${TEST_DIR}/libprivate
     CMAKE_ARGS -DROCM_SYMLINK_LIBS=OFF -DROCM_PREFIX=rocm
     TARGETS package)
-if(MSVC)
+if(ROCM_MSVC)
     test_expect_file(${PREFIX}/include/simpleprivate.h)
     test_expect_file(${PREFIX}/lib/simple_private.lib)
 elseif(WIN32)
