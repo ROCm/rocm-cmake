@@ -37,12 +37,19 @@ jobs:
         cmake-version:
           - 3.31.0
           - 3.22.1
-          - 3.16.3        
+          - 3.16.3
+        compiler:
+          - default
+          - clang
         # There are problems with nmake and ninja with this version of cmake
         # on windows
         exclude:
           - platform: windows-2022
             cmake-version: 3.16.3
+          # clang++ is only tested on windows; linux is already covered by the
+          # default compiler
+          - platform: ubuntu-24.04
+            compiler: clang
 
     steps:
     - uses: actions/checkout@v1
@@ -68,17 +75,38 @@ jobs:
         git config --global user.email "you@example.com"
         git config --global user.name "Your Name"
 
+    - name: Install LLVM/Clang
+      if: matrix.compiler == 'clang'
+      uses: KyleMayes/install-llvm-action@v2
+      with:
+        version: "20"
+        directory: ${{ runner.temp }}/llvm
+
+    - name: Setup clang++
+      if: matrix.compiler == 'clang'
+      shell: bash
+      run: |
+        echo "CC=clang" >> $GITHUB_ENV
+        echo "CXX=clang++" >> $GITHUB_ENV
+
     - name: Cmake version
       run: cmake --version
 
     - name: Run tests (default generator)
+      if: matrix.compiler != 'clang'
       run: cget build --test
 
     - name: Build docs (default generator)
+      if: matrix.compiler != 'clang'
       run: cget build -T doc
 
+    - name: Clean build
+      run: |
+        cget build -Cy
+        cget clean -y
+
     - name: Run tests (Ninja generator)
-      run: cget build -Cy --test -DROCM_CMAKE_GENERATOR=Ninja
+      run: cget build --test -DROCM_CMAKE_GENERATOR=Ninja
 
     - name: Build docs (Ninja generator)
       run: cget build -T doc

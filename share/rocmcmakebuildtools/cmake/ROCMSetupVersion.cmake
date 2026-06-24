@@ -7,6 +7,8 @@ endif()
 
 include_guard(GLOBAL)
 
+include_guard(GLOBAL)
+
 macro(rocm_set_parent VAR)
     set(${VAR}
         ${ARGN}

@@ -94,7 +94,7 @@ macro(rocm_enable_clang_tidy)
     if(ROCM_ENABLE_CLANG_TIDY)
         set(options ALL ANALYZE_TEMPORARY_DTORS ENABLE_ALPHA_CHECKS DEV_WARNINGS_AS_ERRORS)
         set(oneValueArgs HEADER_FILTER)
-        set(multiValueArgs CHECKS ERRORS EXTRA_ARGS CLANG_ARGS)
+        set(multiValueArgs CHECKS ERRORS EXTRA_ARGS CLANG_ARGS TIDY_ARGS)
 
         cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
         string(REPLACE ";" "," CLANG_TIDY_CHECKS "${PARSE_CHECKS}")
@@ -127,6 +127,10 @@ macro(rocm_enable_clang_tidy)
             list(APPEND CLANG_TIDY_EXTRA_ARGS -extra-arg=-Xclang "-extra-arg=${ARG}")
         endforeach()
 
+        foreach(ARG ${PARSE_TIDY_ARGS})
+            list(APPEND CLANG_TIDY_EXTRA_ARGS "${ARG}")
+        endforeach()
+
         set(CLANG_TIDY_USE_COLOR_ARGS)
         if(${CLANG_TIDY_VERSION} VERSION_GREATER "11.0.0"
            AND CLANG_TIDY_USE_COLOR
@@ -150,12 +154,6 @@ macro(rocm_enable_clang_tidy)
             set(CLANG_TIDY_QUIET_ARG "-quiet")
         endif()
 
-        if(EXISTS ${CMAKE_SOURCE_DIR}/.clang-tidy)
-            set(CLANG_TIDY_CONFIG_ARG "--config-file=${CMAKE_SOURCE_DIR}/.clang-tidy")
-        else()
-            set(CLANG_TIDY_CONFIG_ARG)
-        endif()
-
         if(PARSE_HEADER_FILTER)
             string(REPLACE "$" "$$" CLANG_TIDY_HEADER_FILTER "${PARSE_HEADER_FILTER}")
         else()
@@ -163,7 +161,7 @@ macro(rocm_enable_clang_tidy)
         endif()
 
         set(CLANG_TIDY_COMMAND
-            ${CLANG_TIDY_EXE} ${CLANG_TIDY_USE_COLOR_ARGS} ${CLANG_TIDY_CONFIG_ARG} ${CLANG_TIDY_QUIET_ARG}
+            ${CLANG_TIDY_EXE} ${CLANG_TIDY_USE_COLOR_ARGS} ${CLANG_TIDY_QUIET_ARG}
             ${CLANG_TIDY_ENABLE_ALPHA_CHECKS_ARGS} -p "${CMAKE_BINARY_DIR}" "-checks=${CLANG_TIDY_CHECKS}"
             "${CLANG_TIDY_ERRORS_ARG}" ${CLANG_TIDY_EXTRA_ARGS} "-header-filter=${CLANG_TIDY_HEADER_FILTER}")
         execute_process(COMMAND ${CLANG_TIDY_COMMAND} -dump-config OUTPUT_VARIABLE CLANG_TIDY_CONFIG)

@@ -32,7 +32,11 @@ else()
     macro(rocm_eval_code CODE)
         file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/rocm_eval.cmake "${CODE}")
         include(${CMAKE_CURRENT_BINARY_DIR}/rocm_eval.cmake)
-        file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/rocm_eval.cmake)
+        # Deleting an include()d file makes Ninja loop on manifest regeneration
+        # ("build.ninja still dirty after 100 tries"), so keep it for Ninja.
+        if(NOT CMAKE_GENERATOR MATCHES "Ninja")
+            file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/rocm_eval.cmake)
+        endif()
     endmacro()
 endif()
 
