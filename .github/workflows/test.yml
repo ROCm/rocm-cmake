@@ -82,12 +82,12 @@ jobs:
         version: "20"
         directory: ${{ runner.temp }}/llvm
 
-    - name: Setup clang++
+    - name: Setup clang-cl
       if: matrix.compiler == 'clang'
       shell: bash
       run: |
-        echo "CC=clang" >> $GITHUB_ENV
-        echo "CXX=clang++" >> $GITHUB_ENV
+        echo "CC=clang-cl" >> $GITHUB_ENV
+        echo "CXX=clang-cl" >> $GITHUB_ENV
 
     - name: Cmake version
       run: cmake --version
