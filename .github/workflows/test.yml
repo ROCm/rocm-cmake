@@ -88,6 +88,13 @@ jobs:
       run: |
         echo "CC=clang" >> $GITHUB_ENV
         echo "CXX=clang++" >> $GITHUB_ENV
+        echo "CFLAGS=-gcodeview" >> $GITHUB_ENV
+        echo "CXXFLAGS=-gcodeview" >> $GITHUB_ENV
+        echo "LDFLAGS=-fuse-ld=lld-link /DEBUG" >> $GITHUB_ENV
+
+    - name: Setup MSVC for Ninja
+      if: matrix.platform == 'windows-2022' && matrix.compiler == 'default'
+      uses: ilammy/msvc-dev-cmd@v1
 
     - name: Cmake version
       run: cmake --version
