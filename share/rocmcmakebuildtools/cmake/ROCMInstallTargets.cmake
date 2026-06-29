@@ -233,7 +233,8 @@ function(rocm_install_targets)
                 DESTINATION ${LIB_INSTALL_DIR}
                 COMPONENT ${development}
         )
-        if(WIN32 AND
+        if((CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC" OR
+            CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC") AND
             (T_TYPE STREQUAL "SHARED_LIBRARY" OR
              T_TYPE STREQUAL "MODULE_LIBRARY" OR
              T_TYPE STREQUAL "EXECUTABLE"))
