@@ -233,6 +233,14 @@ function(rocm_install_targets)
                 DESTINATION ${LIB_INSTALL_DIR}
                 COMPONENT ${development}
         )
+        if((CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC" OR
+            CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC") AND
+            (T_TYPE STREQUAL "SHARED_LIBRARY" OR
+             T_TYPE STREQUAL "MODULE_LIBRARY" OR
+             T_TYPE STREQUAL "EXECUTABLE"))
+            install(FILES $<TARGET_PDB_FILE:${TARGET}>
+                DESTINATION ${BIN_INSTALL_DIR} OPTIONAL)
+        endif()
         rocm_set_install_dir_property(
             TARGETS ${TARGET}
             RUNTIME_DESTINATION ${BIN_INSTALL_DIR}
