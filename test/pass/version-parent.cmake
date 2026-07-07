@@ -4,8 +4,13 @@
 
 find_program(GIT NAMES git)
 
-# Try to test without git
 file(MAKE_DIRECTORY ${TMP_DIR}/repo)
+test_exec(COMMAND ${GIT} init WORKING_DIRECTORY ${TMP_DIR}/repo)
+foreach(I RANGE 10)
+    file(WRITE ${TMP_DIR}/repo/dummy.txt "commit ${I}")
+    test_exec(COMMAND ${GIT} add dummy.txt WORKING_DIRECTORY ${TMP_DIR}/repo)
+    test_exec(COMMAND ${GIT} commit -m "commit ${I}" WORKING_DIRECTORY ${TMP_DIR}/repo)
+endforeach()
 execute_process(
     COMMAND ${GIT} describe --dirty --long --always --match [0-9]*
     WORKING_DIRECTORY ${TMP_DIR}/repo
@@ -19,9 +24,9 @@ execute_process(
     WORKING_DIRECTORY ${TMP_DIR}/repo
     OUTPUT_VARIABLE REVS
     RESULT_VARIABLE RESULT)
-separate_arguments(REVS UNIX_COMMAND "${REVS}")
-list(GET REVS 10 PARENT)
 string(STRIP "${REVS}" REVS)
+string(REPLACE "\n" ";" REVS "${REVS}")
+list(GET REVS 10 PARENT)
 message("PARENT: ${PARENT}")
 write_version_cmake(
     ${TMP_DIR}/repo
