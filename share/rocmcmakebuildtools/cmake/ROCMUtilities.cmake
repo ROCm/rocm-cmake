@@ -40,9 +40,9 @@ else()
     endmacro()
 endif()
 
-if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.18.0")
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.19.0")
     macro(rocm_defer FNAME)
-        cmake_language(DEFER DIRECTORY ${CMAKE_SOURCE_DIR} CALL ${FNAME}())
+        cmake_language(DEFER DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} CALL ${FNAME}())
     endmacro()
 else()
     macro(rocm_defer FNAME)
@@ -54,6 +54,84 @@ else()
         variable_watch(CMAKE_BACKWARDS_COMPATIBILITY rocm_defer_private_${FNAME}_hook)
     endmacro()
 endif()
+
+function(rocm_test_collect_local_test_props)
+    set(props
+        ATTACHED_FILES
+        ATTACHED_FILES_ON_FAIL
+        COST
+        DEPENDS
+        DISABLED
+        ENVIRONMENT
+        ENVIRONMENT_MODIFICATION
+        FAIL_REGULAR_EXPRESSION
+        FIXTURES_CLEANUP
+        FIXTURES_REQUIRED
+        FIXTURES_SETUP
+        LABELS
+        MEASUREMENT
+        PASS_REGULAR_EXPRESSION
+        PROCESSOR_AFFINITY
+        PROCESSORS
+        REQUIRED_FILES
+        RESOURCE_GROUPS
+        RESOURCE_LOCK
+        RUN_SERIAL
+        SKIP_REGULAR_EXPRESSION
+        SKIP_RETURN_CODE
+        TIMEOUT
+        TIMEOUT_AFTER_MATCH
+        WILL_FAIL
+        WORKING_DIRECTORY)
+    get_property(tests DIRECTORY PROPERTY TESTS)
+    foreach(test IN LISTS tests)
+        foreach(prop IN LISTS props)
+            get_test_property(${test} ${prop} val)
+            if(NOT val STREQUAL "NOTFOUND")
+                set_property(GLOBAL PROPERTY "_rocm_test_prop|${CMAKE_CURRENT_SOURCE_DIR}|${test}|${prop}" "${val}")
+            endif()
+        endforeach()
+    endforeach()
+endfunction()
+
+# Schedules the collector once per directory (only needed before cmake 3.28).
+function(rocm_auto_register_test_props)
+    if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.28.0")
+        return()
+    endif()
+    get_property(scheduled DIRECTORY PROPERTY _rocm_test_props_collector_scheduled)
+    if(NOT scheduled)
+        set_property(DIRECTORY PROPERTY _rocm_test_props_collector_scheduled TRUE)
+        rocm_defer(rocm_test_collect_local_test_props)
+    endif()
+endfunction()
+
+# get_test_property that also reads across directory scopes: built-in DIRECTORY
+# support on cmake 3.28+, otherwise the value rocm_test_collect_local_test_props
+# stashed for that directory.
+function(rocm_get_test_property)
+    cmake_parse_arguments(ARG "" "DIRECTORY" "" ${ARGN})
+    list(LENGTH ARG_UNPARSED_ARGUMENTS _n)
+    if(NOT _n EQUAL 3)
+        message(FATAL_ERROR "rocm_get_test_property: expected <test> <property> [DIRECTORY <dir>] <out-var>")
+    endif()
+    list(GET ARG_UNPARSED_ARGUMENTS 0 _test)
+    list(GET ARG_UNPARSED_ARGUMENTS 1 _prop)
+    list(GET ARG_UNPARSED_ARGUMENTS 2 _out)
+    if(DEFINED ARG_DIRECTORY)
+        get_filename_component(_dir "${ARG_DIRECTORY}" ABSOLUTE)
+    else()
+        set(_dir ${CMAKE_CURRENT_SOURCE_DIR})
+    endif()
+    if(_dir STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+        get_test_property(${_test} ${_prop} _val)
+    elseif(CMAKE_VERSION VERSION_GREATER_EQUAL "3.28.0")
+        get_property(_val TEST ${_test} DIRECTORY "${_dir}" PROPERTY ${_prop})
+    else()
+        get_property(_val GLOBAL PROPERTY "_rocm_test_prop|${_dir}|${_test}|${_prop}")
+    endif()
+    set(${_out} "${_val}" PARENT_SCOPE)
+endfunction()
 
 function(rocm_find_program_version PROGRAM)
     set(options QUIET REQUIRED)
