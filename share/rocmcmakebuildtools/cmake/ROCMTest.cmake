@@ -98,7 +98,33 @@ function(rocm_save_test)
         endif()
     endforeach()
     file(APPEND ${_rocm_test_config_file}.in "add_test(${PARSE_NAME} ${COMMAND})\n")
-    rocm_test_property_names(PROP_NAMES)
+    set(PROP_NAMES
+        ATTACHED_FILES
+        ATTACHED_FILES_ON_FAIL
+        COST
+        DEPENDS
+        DISABLED
+        ENVIRONMENT
+        ENVIRONMENT_MODIFICATION
+        FAIL_REGULAR_EXPRESSION
+        FIXTURES_CLEANUP
+        FIXTURES_REQUIRED
+        FIXTURES_SETUP
+        LABELS
+        MEASUREMENT
+        PASS_REGULAR_EXPRESSION
+        PROCESSOR_AFFINITY
+        PROCESSORS
+        REQUIRED_FILES
+        RESOURCE_GROUPS
+        RESOURCE_LOCK
+        RUN_SERIAL
+        SKIP_REGULAR_EXPRESSION
+        SKIP_RETURN_CODE
+        TIMEOUT
+        TIMEOUT_AFTER_MATCH
+        WILL_FAIL
+        WORKING_DIRECTORY)
     set(PROPS "")
     foreach(PROPERTY ${PROP_NAMES})
         rocm_get_test_property(${PARSE_NAME} ${PROPERTY} DIRECTORY "${PARSE_DIRECTORY}" VALUE)

@@ -55,8 +55,8 @@ else()
     endmacro()
 endif()
 
-function(rocm_test_property_names OUTPUT)
-    set(${OUTPUT}
+function(rocm_test_collect_local_test_props)
+    set(props
         ATTACHED_FILES
         ATTACHED_FILES_ON_FAIL
         COST
@@ -82,14 +82,7 @@ function(rocm_test_property_names OUTPUT)
         TIMEOUT
         TIMEOUT_AFTER_MATCH
         WILL_FAIL
-        WORKING_DIRECTORY
-        PARENT_SCOPE)
-endfunction()
-
-# Stashes the local tests' properties into directory-keyed globals so they can
-# be read from another scope before cmake 3.28. Runs in the test's own scope.
-function(rocm_test_collect_local_test_props)
-    rocm_test_property_names(props)
+        WORKING_DIRECTORY)
     get_property(tests DIRECTORY PROPERTY TESTS)
     foreach(test IN LISTS tests)
         foreach(prop IN LISTS props)
