@@ -2,20 +2,23 @@ name: rocm-cmake
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  cancel:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.6.0
-        with:
-          access_token: ${{ github.token }}
   lint:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      with:
+        fetch-depth: 0
+        persist-credentials: false
     - name: Set up Python 3.10
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
       with:
         python-version: "3.10"
     - name: Install dependencies
@@ -29,27 +32,40 @@ jobs:
   test:
     runs-on: ${{ matrix.platform }}
     strategy:
+      fail-fast: false
       max-parallel: 4
       matrix:
         platform:
-          - ubuntu-20.04
-          - macos-12
-          - windows-2019
+          - ubuntu-24.04
+          - windows-2022
         cmake-version:
-          - 3.20.0
-          - 3.10.2
+          - 3.31.0
+          - 3.22.1
+          - 3.16.3
+        compiler:
+          - default
+          - clang
+        # There are problems with nmake and ninja with this version of cmake
+        # on windows
         exclude:
-          - platform: windows-2019
-            cmake-version: 3.10.2
+          - platform: windows-2022
+            cmake-version: 3.16.3
+          # clang++ is only tested on windows; linux is already covered by the
+          # default compiler
+          - platform: ubuntu-24.04
+            compiler: clang
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      with:
+        fetch-depth: 0
+        persist-credentials: false
     - name: Set up Python 3.10
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
       with:
         python-version: "3.10"
     - name: Setup cmake
-      uses: jwlawson/actions-setup-cmake@v1.9
+      uses: jwlawson/actions-setup-cmake@710e05536f2b819d5918f51a5de5b392e99bba3c # v1.9
       with:
         cmake-version: ${{ matrix.cmake-version }}
     - name: Install dependencies
@@ -58,15 +74,46 @@ jobs:
         python -m pip install cget ninja
         python -m pip install -r docs/requirements.txt
     - name: Install Doxygen
-      uses: ssciwr/doxygen-install@v1
+      uses: ssciwr/doxygen-install@f13be1686235deee0aeb6cdf56640170691dc96b # v1
       with:
         version: "1.10.0"
-    - name: Run tests
+    - name: Setup git
       run: |
         git config --global user.email "you@example.com"
         git config --global user.name "Your Name"
-        cmake --version
-        cget build --test
-        cget build -T doc
-        cget build -Cy --test -DROCM_CMAKE_GENERATOR=Ninja
-        cget build -T doc
+
+    - name: Install LLVM/Clang
+      if: matrix.compiler == 'clang'
+      uses: KyleMayes/install-llvm-action@ebc0426251bc40c7cd31162802432c68818ab8f0 # v2
+      with:
+        version: "20"
+        directory: ${{ runner.temp }}/llvm
+
+    - name: Setup clang++
+      if: matrix.compiler == 'clang'
+      shell: bash
+      run: |
+        echo "CC=clang" >> $GITHUB_ENV
+        echo "CXX=clang++" >> $GITHUB_ENV
+
+    - name: Cmake version
+      run: cmake --version
+
+    - name: Run tests (default generator)
+      if: matrix.compiler != 'clang'
+      run: cget build --test
+
+    - name: Build docs (default generator)
+      if: matrix.compiler != 'clang'
+      run: cget build -T doc
+
+    - name: Clean build
+      run: |
+        cget build -Cy
+        cget clean -y
+
+    - name: Run tests (Ninja generator)
+      run: cget build --test -DROCM_CMAKE_GENERATOR=Ninja
+
+    - name: Build docs (Ninja generator)
+      run: cget build -T doc

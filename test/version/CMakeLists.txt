@@ -2,7 +2,7 @@
 # Copyright (C) 2017 Advanced Micro Devices, Inc.
 ################################################################################
 
-cmake_minimum_required (VERSION 3.5)
+cmake_minimum_required (VERSION 3.5...3.31.0)
 project(simple LANGUAGES NONE)
 
 find_package(ROCmCMakeBuildTools)
