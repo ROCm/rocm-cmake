@@ -303,6 +303,19 @@ macro(rocm_create_package)
     set(CPACK_NSIS_MODIFY_PATH On)
     set(CPACK_NSIS_PACKAGE_NAME ${PARSE_NAME})
 
+    if(NOT( ${CPACK_PACKAGE_NAME} STREQUAL "rocm-cmake"))
+    	# parse MAINTAINER format: PKG_MAINTAINER_NM <PKG_MAINTAINER_EMAIL>"
+    	# parse text before first '<'
+	string(REGEX MATCH "^(.*)\<" _ "${CPACK_DEBIAN_PACKAGE_MAINTAINER}")
+    	set(MAINTAINER_NM "${CMAKE_MATCH_1}")
+    	# parse text between '<...>'
+    	string(REGEX MATCH "<([^>]+)>" _ "${CPACK_DEBIAN_PACKAGE_MAINTAINER}")
+    	set(MAINTAINER_EMAIL "${CMAKE_MATCH_1}")
+    endif()
+
+    set(LINTIAN_OVERRIDES_FLAG ON CACHE BOOL "Enable/Disable Lintian Overrides")
+    set(DEBIAN_PKGING_FLAG ON CACHE BOOL "Internal Status Flag to indicate Debian Packaging Build" )
+
     set(CPACK_RPM_PACKAGE_RELOCATABLE Off)
     set(CPACK_RPM_PACKAGE_AUTOREQPROV
         Off
@@ -494,17 +507,29 @@ macro(rocm_setup_license HEADER_ONLY)
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
                 DESTINATION share/doc/${_rocm_cpack_package_name}-asan
             )
+            set( COMP_TYPE "asan" )
+            if(NOT( ${CPACK_PACKAGE_NAME} STREQUAL "rocm-cmake"))
+                    configure_pkg( ${CPACK_PACKAGE_NAME} ${COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${MAINTAINER_NM} ${MAINTAINER_EMAIL} ${CPACK_GENERATOR})
+                endif()
         elseif((ROCM_USE_DEV_COMPONENT AND ${HEADER_ONLY}) OR NOT BUILD_SHARED_LIBS)
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
                 DESTINATION share/doc/${_rocm_cpack_package_name}
                 COMPONENT devel
             )
+            set( COMP_TYPE "devel" )
+            if(NOT( ${CPACK_PACKAGE_NAME} STREQUAL "rocm-cmake"))
+                    configure_pkg( ${CPACK_PACKAGE_NAME} ${COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${MAINTAINER_NM} ${MAINTAINER_EMAIL} ${CPACK_GENERATOR})
+                endif()
         else()
             install(
                 FILES ${CPACK_RESOURCE_FILE_LICENSE}
                 DESTINATION share/doc/${_rocm_cpack_package_name}
             )
+            set( COMP_TYPE "runtime" )
+            if(NOT( ${CPACK_PACKAGE_NAME} STREQUAL "rocm-cmake"))
+                    configure_pkg( ${CPACK_PACKAGE_NAME} ${COMP_TYPE} ${CPACK_PACKAGE_VERSION} ${MAINTAINER_NM} ${MAINTAINER_EMAIL} ${CPACK_GENERATOR})
+            endif()
         endif()
     endif()
 endmacro()
