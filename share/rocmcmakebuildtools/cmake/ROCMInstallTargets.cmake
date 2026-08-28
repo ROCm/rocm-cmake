@@ -323,7 +323,7 @@ function(rocm_write_package_deps CONFIG_TEMPLATE)
     set(DEPENDS ${ARGN})
     rocm_list_split(DEPENDS PACKAGE DEPENDS_LIST)
     foreach(DEPEND ${DEPENDS_LIST})
-        rocm_write_package_template_function(${CONFIG_TEMPLATE} find_dependency ${${DEPEND}})
+        rocm_write_package_template_function(${CONFIG_TEMPLATE} find_dependency ${${DEPEND}} HINTS "\"\${PACKAGE_PREFIX_DIR}\"")
     endforeach()
 endfunction()
 
