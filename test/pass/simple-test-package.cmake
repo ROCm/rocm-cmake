@@ -9,3 +9,8 @@ test_expect_eq(${NTEST_PACKAGE} 1)
 test_exec(COMMAND ${CMAKE_COMMAND} -E tar t ${TEST_PACKAGE})
 test_exec(COMMAND ${CMAKE_COMMAND} -E tar x ${TEST_PACKAGE} WORKING_DIRECTORY ${PREFIX})
 test_expect_file(${PREFIX}/libexec/installed-tests/simple/CTestTestfile.cmake)
+
+if(CMAKE_VERSION VERSION_GREATER_EQUAL "3.19.0")
+    file(READ ${PREFIX}/libexec/installed-tests/simple/CTestTestfile.cmake CTEST_FILE)
+    test_expect_matches("${CTEST_FILE}" "simple-test PROPERTIES.*LABELS .smoke.")
+endif()
