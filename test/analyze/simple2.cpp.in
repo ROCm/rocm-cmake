@@ -2,6 +2,7 @@
  * Copyright (C) 2020 Advanced Micro Devices, Inc.
  ******************************************************************************/
 
+#include <simple.h>
 
 void simple2()
 {}
