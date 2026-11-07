@@ -404,16 +404,12 @@ function(rocm_export_targets)
         endforeach()
     endif()
 
-    # Optionally include this package's Fortran bindings, which ship as their own
-    # config package. After the targets, because the Fortran target links the
-    # imported C/C++ ones; OPTIONAL, because the file exists only when the
-    # bindings were built. No-op for packages that ship none.
-    set(FORTRAN_CONFIG_NAME ${PACKAGE_NAME_LOWER}-fortran-config.cmake)
-    if(NOT "${FORTRAN_CONFIG_NAME}" IN_LIST INCLUDED_FILES)
-        rocm_write_package_template_function(
-            ${CONFIG_TEMPLATE} include
-            "\"@PACKAGE_CONFIG_PACKAGE_INSTALL_DIR@/${FORTRAN_CONFIG_NAME}\"" OPTIONAL)
-    endif()
+    # Optionally include the Fortran bindings, a separate config package in a
+    # sibling directory. After the targets, which the Fortran target links.
+    set(FORTRAN_PACKAGE_NAME ${PACKAGE_NAME_LOWER}-fortran)
+    rocm_write_package_template_function(
+        ${CONFIG_TEMPLATE} include
+        "\"\${CMAKE_CURRENT_LIST_DIR}/../${FORTRAN_PACKAGE_NAME}/${FORTRAN_PACKAGE_NAME}-config.cmake\"" OPTIONAL)
 
     rocm_configure_package_config_file(
         ${CONFIG_TEMPLATE} ${CMAKE_CURRENT_BINARY_DIR}/${CONFIG_NAME}.cmake
