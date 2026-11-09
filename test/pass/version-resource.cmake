@@ -2,19 +2,20 @@
 # Copyright (C) 2026 Advanced Micro Devices, Inc.
 # ######################################################################################################################
 
-macro(test_expect_contains TEXT SUBSTRING)
-    string(FIND "${TEXT}" "${SUBSTRING}" _test_expect_contains_pos)
-    if(_test_expect_contains_pos EQUAL -1)
+# Functions rather than macros: macro arguments are re-parsed, which breaks on the \0 escapes in .rc text.
+function(test_expect_contains TEXT SUBSTRING)
+    string(FIND "${TEXT}" "${SUBSTRING}" POS)
+    if(POS EQUAL -1)
         message(FATAL_ERROR "EXPECT FAILURE: text does not contain '${SUBSTRING}':\n${TEXT}")
     endif()
-endmacro()
+endfunction()
 
-macro(test_expect_not_contains TEXT SUBSTRING)
-    string(FIND "${TEXT}" "${SUBSTRING}" _test_expect_contains_pos)
-    if(NOT _test_expect_contains_pos EQUAL -1)
+function(test_expect_not_contains TEXT SUBSTRING)
+    string(FIND "${TEXT}" "${SUBSTRING}" POS)
+    if(NOT POS EQUAL -1)
         message(FATAL_ERROR "EXPECT FAILURE: text contains '${SUBSTRING}':\n${TEXT}")
     endif()
-endmacro()
+endfunction()
 
 configure_dir(${TEST_DIR}/versionresource TARGETS all BUILD_DIR_VAR BUILD_DIR)
 
@@ -29,9 +30,16 @@ test_expect_file(${BUILD_DIR}/mylib_version.rc)
 test_expect_file(${BUILD_DIR}/myapp_version.rc)
 test_expect_file(${BUILD_DIR}/mylib2_version.rc)
 
+# OriginalFilename must name the file actually built: mylib.dll with MSVC, libmylib.dll with MinGW.
+file(GLOB_RECURSE MYLIB_DLL ${BUILD_DIR}/*mylib.dll)
+list(LENGTH MYLIB_DLL MYLIB_DLL_COUNT)
+test_expect_eq(${MYLIB_DLL_COUNT} 1)
+get_filename_component(MYLIB_DLL_NAME ${MYLIB_DLL} NAME)
+
 file(READ ${BUILD_DIR}/mylib_version.rc MYLIB_RC)
 test_expect_contains("${MYLIB_RC}" "FILETYPE        VFT_DLL")
-test_expect_contains("${MYLIB_RC}" "\"ProductName\", \"MyLib mylib.dll\\0\"")
+test_expect_contains("${MYLIB_RC}" "\"OriginalFilename\", \"${MYLIB_DLL_NAME}\\0\"")
+test_expect_contains("${MYLIB_RC}" "\"ProductName\", \"MyLib ${MYLIB_DLL_NAME}\\0\"")
 test_expect_not_contains("${MYLIB_RC}" "Comments")
 
 file(READ ${BUILD_DIR}/myapp_version.rc MYAPP_RC)
