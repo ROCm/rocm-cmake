@@ -173,7 +173,22 @@ function(rocm_set_soversion LIBRARY_TARGET SOVERSION)
     endif()
 endfunction()
 
+macro(rocm_version_resource_escape VAR)
+    # RC string literals treat backslash as an escape and double a quote to embed it.
+    string(REPLACE "\\" "\\\\" ${VAR} "${${VAR}}")
+    string(REPLACE "\"" "\"\"" ${VAR} "${${VAR}}")
+endmacro()
+
 function(rocm_add_version_resource TARGET NAME DESCRIPTION)
+    set(options)
+    set(oneValueArgs PRODUCT_NAME COMMENTS)
+    set(multiValueArgs)
+
+    cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    if(PARSE_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR "rocm_add_version_resource: unexpected arguments: ${PARSE_UNPARSED_ARGUMENTS}")
+    endif()
+
     if(WIN32)
         get_target_property(TARGET_TYPE ${TARGET} TYPE)
         if (NOT TARGET_TYPE STREQUAL "EXECUTABLE" AND
@@ -182,19 +197,58 @@ function(rocm_add_version_resource TARGET NAME DESCRIPTION)
             message(FATAL_ERROR "${CMAKE_CURRENT_FUNCTION}: only EXECUTABLE, SHARED_LIBRARY, "
                     "and MODULE_LIBRARY target types are supported")
         endif()
-        get_target_property(FILENAME ${TARGET} OUTPUT_NAME)
-        if(NOT FILENAME)
-            if(TARGET_TYPE STREQUAL "EXECUTABLE")
-                set(FILENAME ${TARGET}${CMAKE_EXECUTABLE_SUFFIX})
-            elseif(TARGET_TYPE STREQUAL "SHARED_LIBRARY")
-                set(FILENAME ${TARGET}${CMAKE_SHARED_LIBRARY_SUFFIX})
-            elseif(TARGET_TYPE STREQUAL "MODULE_LIBRARY")
-                set(FILENAME ${TARGET}${CMAKE_SHARED_MODULE_SUFFIX})
-            endif()
+        get_property(ENABLED_LANGUAGES GLOBAL PROPERTY ENABLED_LANGUAGES)
+        list(FIND ENABLED_LANGUAGES RC RC_LANGUAGE_INDEX)
+        if(RC_LANGUAGE_INDEX EQUAL -1
+           OR NOT CMAKE_RC_COMPILER
+           OR CMAKE_RC_COMPILER MATCHES "NOTFOUND|NOTREQUIRED")
+            message(WARNING "rocm_add_version_resource: no Windows resource compiler is available; "
+                            "${TARGET} will be built without a version resource")
+            return()
+        endif()
+        if(TARGET_TYPE STREQUAL "EXECUTABLE")
+            set(FILETYPE VFT_APP)
+            set(DEFAULT_PREFIX "")
+            set(DEFAULT_SUFFIX "${CMAKE_EXECUTABLE_SUFFIX}")
+        elseif(TARGET_TYPE STREQUAL "SHARED_LIBRARY")
+            set(FILETYPE VFT_DLL)
+            set(DEFAULT_PREFIX "${CMAKE_SHARED_LIBRARY_PREFIX}")
+            set(DEFAULT_SUFFIX "${CMAKE_SHARED_LIBRARY_SUFFIX}")
+        else()
+            set(FILETYPE VFT_DLL)
+            set(DEFAULT_PREFIX "${CMAKE_SHARED_MODULE_PREFIX}")
+            set(DEFAULT_SUFFIX "${CMAKE_SHARED_MODULE_SUFFIX}")
+        endif()
+        get_target_property(FILE_BASENAME ${TARGET} OUTPUT_NAME)
+        if(NOT FILE_BASENAME)
+            set(FILE_BASENAME ${TARGET})
+        endif()
+        get_target_property(FILE_PREFIX ${TARGET} PREFIX)
+        if(FILE_PREFIX MATCHES "-NOTFOUND$")
+            set(FILE_PREFIX "${DEFAULT_PREFIX}")
+        endif()
+        get_target_property(FILE_SUFFIX ${TARGET} SUFFIX)
+        if(FILE_SUFFIX MATCHES "-NOTFOUND$")
+            set(FILE_SUFFIX "${DEFAULT_SUFFIX}")
+        endif()
+        set(FILENAME "${FILE_PREFIX}${FILE_BASENAME}${FILE_SUFFIX}")
+        if(DEFINED PARSE_PRODUCT_NAME)
+            set(PRODUCT_NAME "${PARSE_PRODUCT_NAME}")
+        else()
+            set(PRODUCT_NAME "${NAME} ${FILENAME}")
+        endif()
+        rocm_version_resource_escape(NAME)
+        rocm_version_resource_escape(DESCRIPTION)
+        rocm_version_resource_escape(PRODUCT_NAME)
+        set(COMMENTS_VALUE "")
+        if(DEFINED PARSE_COMMENTS)
+            set(COMMENTS "${PARSE_COMMENTS}")
+            rocm_version_resource_escape(COMMENTS)
+            set(COMMENTS_VALUE "      VALUE \"Comments\", \"${COMMENTS}\\0\"\n")
         endif()
         string(TIMESTAMP YEAR "%Y")
         set(RC_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_version.rc")
-        file(WRITE "${RC_OUTPUT}" "#include <winver.h>
+        set(RC_CONTENT "#include <winver.h>
 VS_VERSION_INFO VERSIONINFO
 FILEVERSION     ${PROJECT_VERSION_MAJOR},${PROJECT_VERSION_MINOR},${PROJECT_VERSION_PATCH},0
 PRODUCTVERSION  ${PROJECT_VERSION_MAJOR},${PROJECT_VERSION_MINOR},${PROJECT_VERSION_PATCH},0
@@ -205,11 +259,7 @@ FILEFLAGS       VS_FF_DEBUG
 FILEFLAGS       0
 #endif
 FILEOS          VOS_NT_WINDOWS32
-#ifdef DLL_BUILD
-FILETYPE        VFT_DLL
-#else
-FILETYPE        VFT_APP
-#endif
+FILETYPE        ${FILETYPE}
 FILESUBTYPE     VFT2_UNKNOWN
 BEGIN
   BLOCK \"StringFileInfo\"
@@ -222,9 +272,9 @@ BEGIN
       VALUE \"InternalName\", \"${NAME}\\0\"
       VALUE \"LegalCopyright\", \"Copyright (c) ${YEAR} Advanced Micro Devices, Inc. All rights reserved.\\0\"
       VALUE \"OriginalFilename\", \"${FILENAME}\\0\"
-      VALUE \"ProductName\", \"${NAME} ${FILENAME}\\0\"
+      VALUE \"ProductName\", \"${PRODUCT_NAME}\\0\"
       VALUE \"ProductVersion\", \"${PROJECT_VERSION}\\0\"
-    END
+${COMMENTS_VALUE}    END
   END
   BLOCK \"VarFileInfo\"
   BEGIN
@@ -232,10 +282,15 @@ BEGIN
   END
 END
 ")
-        target_sources(${TARGET} PRIVATE ${RC_OUTPUT})
-        if(TARGET_TYPE STREQUAL "SHARED_LIBRARY" OR TARGET_TYPE STREQUAL "MODULE_LIBRARY")
-            set_source_files_properties(${RC_OUTPUT} PROPERTIES COMPILE_FLAGS -DDLL_BUILD)
+        # Only rewrite on change so a reconfigure does not force a relink.
+        set(RC_EXISTING "")
+        if(EXISTS "${RC_OUTPUT}")
+            file(READ "${RC_OUTPUT}" RC_EXISTING)
         endif()
+        if(NOT RC_EXISTING STREQUAL RC_CONTENT)
+            file(WRITE "${RC_OUTPUT}" "${RC_CONTENT}")
+        endif()
+        target_sources(${TARGET} PRIVATE ${RC_OUTPUT})
         message(STATUS "Added version resource to ${TARGET}: ${DESCRIPTION}")
     endif()
 endfunction()
