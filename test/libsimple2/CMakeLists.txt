@@ -3,7 +3,7 @@
 ################################################################################
 
 
-cmake_minimum_required (VERSION 3.5)
+cmake_minimum_required (VERSION 3.5...3.31.0)
 project(simple2 CXX)
 
 find_package(ROCmCMakeBuildTools)

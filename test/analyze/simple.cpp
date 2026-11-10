@@ -2,6 +2,7 @@
  * Copyright (C) 2017 Advanced Micro Devices, Inc.
  ******************************************************************************/
 
+#include <simple.h>
 
 void simple()
 {}

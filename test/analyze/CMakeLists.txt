@@ -3,7 +3,7 @@
 ################################################################################
 
 
-cmake_minimum_required (VERSION 3.5)
+cmake_minimum_required (VERSION 3.5...3.31.0)
 project(simple LANGUAGES CXX)
 
 find_package(ROCmCMakeBuildTools)
@@ -40,11 +40,17 @@ rocm_enable_cppcheck(
         threadsafety
 )
 
+# Workaround clangTooling issue: https://github.com/llvm/llvm-project/issues/100909
+if(NOT MSVC)
+    add_compile_options(-Wno-unused-command-line-argument)
+endif()
+
 rocm_setup_version(VERSION 1.0.0)
 
-configure_file(simple2.cpp.in simple2.cpp)
+configure_file(simple2.cpp.in simple.cpp)
+configure_file(simple_with_a_ridiculously_long_filename_in_order_to_test_long_filenames_in_clang_tidy_cmake.cpp.in simple_with_a_ridiculously_long_filename_in_order_to_test_long_filenames_in_clang_tidy_cmake.cpp)
 
-add_library(simple simple.cpp ${CMAKE_CURRENT_BINARY_DIR}/simple2.cpp)
+add_library(simple simple.cpp ${CMAKE_CURRENT_BINARY_DIR}/simple_with_a_ridiculously_long_filename_in_order_to_test_long_filenames_in_clang_tidy_cmake.cpp ${CMAKE_CURRENT_BINARY_DIR}/simple.cpp)
 rocm_install_targets(TARGETS simple INCLUDE include)
 
 

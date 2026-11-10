@@ -1,0 +1,24 @@
+# ######################################################################################################################
+# Copyright (C) 2026 Advanced Micro Devices, Inc.
+# ######################################################################################################################
+
+cmake_minimum_required(VERSION 3.5...3.31.0)
+project(versionresource VERSION 1.2.3 LANGUAGES CXX)
+
+find_package(ROCmCMakeBuildTools)
+
+include(ROCMSetupVersion)
+
+add_library(mylib SHARED mylib.cpp)
+rocm_add_version_resource(mylib "MyLib" "Test version resource library")
+
+add_executable(myapp myapp.cpp)
+target_link_libraries(myapp mylib)
+rocm_add_version_resource(myapp "MyApp" "Test version resource application")
+
+add_library(mylib2 SHARED mylib.cpp)
+set_target_properties(mylib2 PROPERTIES OUTPUT_NAME "renamed" PREFIX "lib")
+rocm_add_version_resource(
+    mylib2 "MyLib2" "Test \"quoted\" description"
+    PRODUCT_NAME "My Product 1.2"
+    COMMENTS "Git commit: 0123abcd; dirty C:\\path")

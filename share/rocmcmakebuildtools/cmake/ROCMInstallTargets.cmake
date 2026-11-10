@@ -1,5 +1,5 @@
 # ######################################################################################################################
-# Copyright (C) 2017 Advanced Micro Devices, Inc.
+# Copyright (C) 2026 Advanced Micro Devices, Inc.
 # ######################################################################################################################
 
 cmake_policy(SET CMP0057 NEW)
@@ -233,6 +233,14 @@ function(rocm_install_targets)
                 DESTINATION ${LIB_INSTALL_DIR}
                 COMPONENT ${development}
         )
+        if((CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC" OR
+            CMAKE_C_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC") AND
+            (T_TYPE STREQUAL "SHARED_LIBRARY" OR
+             T_TYPE STREQUAL "MODULE_LIBRARY" OR
+             T_TYPE STREQUAL "EXECUTABLE"))
+            install(FILES $<TARGET_PDB_FILE:${TARGET}>
+                DESTINATION ${BIN_INSTALL_DIR} OPTIONAL)
+        endif()
         rocm_set_install_dir_property(
             TARGETS ${TARGET}
             RUNTIME_DESTINATION ${BIN_INSTALL_DIR}
@@ -341,7 +349,7 @@ function(rocm_export_targets)
     set(CONFIG_NAME ${PACKAGE_NAME_LOWER}-config)
     set(TARGET_VERSION ${PROJECT_VERSION})
 
-    if(PARSE_PREFIX)
+    if(PARSE_PREFIX AND NOT WIN32)
         set(PREFIX_DIR ${PARSE_PREFIX})
         set(PREFIX_ARG PREFIX ${PREFIX_DIR})
         set(BIN_INSTALL_DIR ${PREFIX_DIR}/${CMAKE_INSTALL_BINDIR})

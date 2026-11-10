@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.10...3.31.0)
 
 use_rocm_cmake()
 include(ROCMCreatePackage)
