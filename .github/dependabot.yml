@@ -10,8 +10,13 @@ updates:
     # "/" covers .github/workflows; composite actions keep their own `uses:`
     # pins, so .github/actions has to be listed separately to get bumped.
     directory: "/"
+    open-pull-requests-limit: 10
     schedule:
       interval: "daily"
+    reviewers:
+      - "pfultz2"
+      - "lawruble13"
+      - "cgmb"
       # Wait a week before adopting newly released action versions.
     cooldown:
       default-days: 7
@@ -22,3 +27,15 @@ updates:
         patterns: ["ROCm/rocm-security-gh*"]
       github-actions:
         patterns: ["*"]
+
+  - package-ecosystem: "pip" # See documentation for possible values
+    directory: "/docs" # Location of package manifests
+    open-pull-requests-limit: 10
+    schedule:
+      interval: "daily"
+    labels:
+      - "documentation"
+      - "dependencies"
+      - "ci:docs-only"
+    reviewers:
+      - "samjwu"
