@@ -15,3 +15,10 @@ rocm_add_version_resource(mylib "MyLib" "Test version resource library")
 add_executable(myapp myapp.cpp)
 target_link_libraries(myapp mylib)
 rocm_add_version_resource(myapp "MyApp" "Test version resource application")
+
+add_library(mylib2 SHARED mylib.cpp)
+set_target_properties(mylib2 PROPERTIES OUTPUT_NAME "renamed" PREFIX "lib")
+rocm_add_version_resource(
+    mylib2 "MyLib2" "Test \"quoted\" description"
+    PRODUCT_NAME "My Product 1.2"
+    COMMENTS "Git commit: 0123abcd; dirty C:\\path")
