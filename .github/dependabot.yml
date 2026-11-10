@@ -3,13 +3,15 @@
 #
 # Dependabot version updates. See
 # https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference
-
 version: 2
 updates:
+  # GitHub Actions dependencies.
+  # "/" covers .github/workflows; composite actions keep their own `uses:`
+  # pins, so .github/actions has to be listed separately to get bumped.
   - package-ecosystem: "github-actions"
-    # "/" covers .github/workflows; composite actions keep their own `uses:`
-    # pins, so .github/actions has to be listed separately to get bumped.
-    directory: "/"
+    directories:
+      - "/"
+      - "/.github/actions/*"
     open-pull-requests-limit: 10
     schedule:
       interval: "daily"
@@ -17,25 +19,32 @@ updates:
       - "pfultz2"
       - "lawruble13"
       - "cgmb"
-      # Wait a week before adopting newly released action versions.
+    # Wait a week before adopting newly released action versions.
+    # ROCm security actions are excluded so they can be updated immediately.
     cooldown:
       default-days: 7
       exclude:
         - "ROCm/rocm-security-gh*"
     groups:
       rocm-security-gh:
-        patterns: ["ROCm/rocm-security-gh*"]
+        patterns:
+          - "ROCm/rocm-security-gh*"
       github-actions:
-        patterns: ["*"]
+        patterns:
+          - "*"
+  # Python dependencies for documentation.
+  - package-ecosystem: "pip"
+    directory: "/docs"
 
-  - package-ecosystem: "pip" # See documentation for possible values
-    directory: "/docs" # Location of package manifests
     open-pull-requests-limit: 10
+
     schedule:
       interval: "daily"
+
     labels:
       - "documentation"
       - "dependencies"
       - "ci:docs-only"
+
     reviewers:
       - "samjwu"
