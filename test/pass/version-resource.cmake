@@ -50,14 +50,14 @@ file(READ ${BUILD_DIR}/mylib2_version.rc MYLIB2_RC)
 test_expect_contains("${MYLIB2_RC}" "\"OriginalFilename\", \"librenamed.dll\\0\"")
 test_expect_contains("${MYLIB2_RC}" "\"ProductName\", \"My Product 1.2\\0\"")
 test_expect_contains("${MYLIB2_RC}" "\"FileDescription\", \"Test \"\"quoted\"\" description\\0\"")
-test_expect_contains("${MYLIB2_RC}" "\"Comments\", \"Git commit: 0123abcd C:\\\\path\\0\"")
+test_expect_contains("${MYLIB2_RC}" "\"Comments\", \"Git commit: 0123abcd; dirty C:\\\\path\\0\"")
 
 # The resource has to reach the linked binary, not just the generated .rc file.
 file(GLOB_RECURSE MYLIB2_DLL ${BUILD_DIR}/librenamed.dll)
 list(LENGTH MYLIB2_DLL MYLIB2_DLL_COUNT)
 test_expect_eq(${MYLIB2_DLL_COUNT} 1)
 file(STRINGS ${MYLIB2_DLL} MYLIB2_DLL_STRINGS ENCODING UTF-16LE)
-test_expect_contains("${MYLIB2_DLL_STRINGS}" "Git commit: 0123abcd C:\\path")
+test_expect_contains("${MYLIB2_DLL_STRINGS}" "dirty C:\\path")
 test_expect_contains("${MYLIB2_DLL_STRINGS}" "Test \"quoted\" description")
 
 # Reconfiguring with unchanged inputs must not rewrite the .rc, or every target relinks.

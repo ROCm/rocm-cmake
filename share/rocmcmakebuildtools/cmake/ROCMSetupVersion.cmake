@@ -184,7 +184,8 @@ function(rocm_add_version_resource TARGET NAME DESCRIPTION)
     set(oneValueArgs PRODUCT_NAME COMMENTS)
     set(multiValueArgs)
 
-    cmake_parse_arguments(PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    # PARSE_ARGV keeps a quoted value containing ';' (e.g. a git subject) as one argument.
+    cmake_parse_arguments(PARSE_ARGV 3 PARSE "${options}" "${oneValueArgs}" "${multiValueArgs}")
     if(PARSE_UNPARSED_ARGUMENTS)
         message(FATAL_ERROR "rocm_add_version_resource: unexpected arguments: ${PARSE_UNPARSED_ARGUMENTS}")
     endif()

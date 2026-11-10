@@ -21,4 +21,4 @@ set_target_properties(mylib2 PROPERTIES OUTPUT_NAME "renamed" PREFIX "lib")
 rocm_add_version_resource(
     mylib2 "MyLib2" "Test \"quoted\" description"
     PRODUCT_NAME "My Product 1.2"
-    COMMENTS "Git commit: 0123abcd C:\\path")
+    COMMENTS "Git commit: 0123abcd; dirty C:\\path")
