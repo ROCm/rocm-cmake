@@ -33,6 +33,11 @@ If the CPACK_GENERATOR has not been specified then if ROCM_PKGTYPE is set
 then use that to set it, otherwise probe the system to see what
 programs are available.
 
+For projects that install only executables, configure with
+``-DROCM_USE_DEV_COMPONENT=OFF`` to package the executables and license
+together. This works with ``BUILD_SHARED_LIBS=OFF`` when the project uses
+``rocm_install_targets()`` and leaves the package component list at its default.
+
 .. cmake:command:: rocm_package_add_rpm_dependencies
 
 .. code-block:: cmake
