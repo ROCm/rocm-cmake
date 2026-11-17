@@ -244,7 +244,6 @@ function(rocm_install_test)
             DESTINATION ${INSTALL_PREFIX}/bin
             EXCLUDE_FROM_ALL)
         rocm_set_install_dir_property(TARGETS ${PARSE_TARGETS} DESTINATION ${INSTALL_PREFIX}/bin)
-        get_target_property(INSTALLDIR ${PARSE_TARGETS} ROCM_INSTALL_DIR)
     endif()
     if(PARSE_FILES)
         install(
