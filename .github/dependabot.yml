@@ -1,20 +1,40 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+# Copyright Advanced Micro Devices, Inc.
+# SPDX-License-Identifier: MIT
+#
+# Dependabot version updates. See
+# https://docs.github.com/en/code-security/reference/supply-chain-security/dependabot-options-reference
 version: 2
 updates:
+  # GitHub Actions dependencies.
+  # "/" covers .github/workflows; composite actions keep their own `uses:`
+  # pins, so .github/actions has to be listed separately to get bumped.
   - package-ecosystem: "github-actions"
-    directory: "/"
+    directories:
+      - "/"
+      - "/.github/actions/*"
     open-pull-requests-limit: 10
     schedule:
-      interval: "weekly"
+      interval: "daily"
     reviewers:
       - "pfultz2"
       - "lawruble13"
       - "cgmb"
-  - package-ecosystem: "pip" # See documentation for possible values
-    directory: "/docs" # Location of package manifests
+    # Wait a week before adopting newly released action versions.
+    # ROCm security actions are excluded so they can be updated immediately.
+    cooldown:
+      default-days: 7
+      exclude:
+        - "ROCm/rocm-security-gh*"
+    groups:
+      rocm-security-gh:
+        patterns:
+          - "ROCm/rocm-security-gh*"
+      github-actions:
+        patterns:
+          - "*"
+  # Python dependencies for documentation.
+  - package-ecosystem: "pip"
+    directory: "/docs"
     open-pull-requests-limit: 10
     schedule:
       interval: "daily"
