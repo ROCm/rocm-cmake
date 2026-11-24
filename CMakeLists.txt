@@ -2,7 +2,7 @@
 # Copyright (C) 2017 Advanced Micro Devices, Inc.
 ################################################################################
 
-cmake_minimum_required (VERSION 3.6)
+cmake_minimum_required (VERSION 3.6...3.31.0)
 
 set(CMAKE_INSTALL_PREFIX "/opt/rocm" CACHE PATH "")
 
@@ -20,7 +20,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/share/rocmcmakebuildtool
 include(ROCMCreatePackage)
 include(ROCMSetupVersion)
 
-rocm_setup_version(VERSION 0.14.0)
+rocm_setup_version(VERSION 0.15.0)
 
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/ROCmCMakeBuildToolsConfigVersion.cmake

@@ -2,7 +2,7 @@
 # Copyright (C) 2023 Advanced Micro Devices, Inc.
 ################################################################################
 
-cmake_minimum_required (VERSION 3.5)
+cmake_minimum_required (VERSION 3.5...3.31.0)
 project(useful LANGUAGES CXX)
 # Ideally should be NONE, but GNUInstallDirs detects platform arch using try_compile
 # https://stackoverflow.com/questions/43379311/why-does-project-affect-cmakes-opinion-on-cmake-sizeof-void-p

@@ -1,6 +1,57 @@
 # Change Log for rocm-cmake
 
-## [(Unreleased) rocm-cmake 0.13.0 for ROCm 6.2.0]
+## [rocm-cmake 0.15.0 for ROCm 10.3.0]
+
+### Added
+
+- Added `PRODUCT_NAME` and `COMMENTS` to `rocm_add_version_resource`
+- Added versioning support for Windows
+- Added support for installing PDB files on Windows
+
+### Changed
+
+- ROCMClangTidy: Added `TIDY_ARGS` to set additional flags and stopped setting the config file by default
+- ROCMChecks: Now allows suppression of warnings for third-party dependencies
+- Updated target ID checks to include a `--hip-link` option to enforce linking
+
+### Resolved issues
+
+- ROCMClangTidy: Fixed handling of long pathnames
+- Fixed Lintian warning for empty pre/post install scripts
+- Fixed property scope issue when reading test properties in subdirectories
+
+## [rocm-cmake 0.14.0 for ROCm 7.1.0]
+
+### Added
+
+- Added `exhaustive` flag to `rocm_enable_cppcheck`
+
+### Changed
+
+- ROCMConfig: Added deprecation message for the `ROCM` name in favor of `ROCmCMakeBuildTools`
+- Updated the upper end of the `cmake_minimum_required` range
+- ROCMInstallTargets: Restored previous behavior on Windows to ensure DLLs are installed to the runtime directory
+- ROCMCreatePackage: Avoided `recommends` and `suggests` for ASAN dev packages
+
+### Resolved issues
+
+- Fixed handling of hyphens in base target IDs and empty target feature lists
+- ROCMCreatePackage: Fixed `PROVIDES` field for header-only devel packages
+
+## [rocm-cmake 0.14.0 for ROCm 6.3.0]
+
+### Added
+
+- ROCMCreatePackage: Added support for static component packaging
+- Added flag to move libraries under the project name
+
+### Changed
+
+- ROCMTest: Added RPATH to tests to point to private libraries
+- ROCMInstallTargets: Executables in ASAN builds are now installed to `bin/asan`
+- `ROCM_SYMLINK_LIBS` is now `OFF` by default
+
+## [rocm-cmake 0.13.0 for ROCm 6.2.0]
 
 ### Changed
 
