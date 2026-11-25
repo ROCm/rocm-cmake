@@ -21,6 +21,16 @@ function(rocm_configure_package_config_file INPUT_FILE OUTPUT_FILE)
         message(FATAL_ERROR "INSTALL_DESTINATION is required for rocm_configure_package_config_file()")
     endif()
 
+    # CMAKE_INSTALL_MODE with symlinks and PREFIX is not supported because the symlink structure
+    # created by rocm_install_symlink_subdir() is incompatible with the config file's
+    # PACKAGE_PREFIX_DIR calculation when symlinks are followed by REALPATH.
+    # CMAKE_INSTALL_MODE symlink modes: SYMLINK, SYMLINK_OR_COPY, ABS_SYMLINK, ABS_SYMLINK_OR_COPY
+    if(PARSE_PREFIX AND NOT WIN32 AND "$ENV{CMAKE_INSTALL_MODE}" MATCHES "SYMLINK")
+        message(FATAL_ERROR
+            "CMAKE_INSTALL_MODE=$ENV{CMAKE_INSTALL_MODE} cannot be used with PREFIX argument. "
+            "Use either CMAKE_INSTALL_MODE with symlinks (without PREFIX) or PREFIX (without CMAKE_INSTALL_MODE symlinks).")
+    endif()
+
     if(IS_ABSOLUTE "${CMAKE_INSTALL_PREFIX}")
         set(INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
     else()
@@ -70,9 +80,38 @@ endif()
 # Any changes to this file will be overwritten by the next CMake run
 ####################################################################################
 
-get_filename_component(_ROCM_CMAKE_CURRENT_LIST_FILE_REAL \"\${CMAKE_CURRENT_LIST_FILE}\" REALPATH)
-get_filename_component(_ROCM_CMAKE_CURRENT_LIST_DIR_REAL \"\${_ROCM_CMAKE_CURRENT_LIST_FILE_REAL}\" DIRECTORY)
-get_filename_component(PACKAGE_PREFIX_DIR \"\${_ROCM_CMAKE_CURRENT_LIST_DIR_REAL}/${PACKAGE_RELATIVE_PATH}\" ABSOLUTE)
+# Handle both PREFIX symlinks and CMAKE_INSTALL_MODE=SYMLINK by detecting directory structure.
+# PREFIX symlinks (e.g., /opt/rocm -> /opt/rocm-7.2) preserve the install tree structure,
+# so the real file and symlink have matching relative layouts (lib/cmake/foo/ in both).
+# CMAKE_INSTALL_MODE=SYMLINK creates symlinks from install tree (lib/cmake/foo/) to build
+# directory (build/), which has a different structure, breaking relative path assumptions.
+get_filename_component(
+    _ROCM_CMAKE_CURRENT_LIST_FILE_REAL \"\${CMAKE_CURRENT_LIST_FILE}\" REALPATH)
+get_filename_component(
+    _ROCM_CMAKE_CURRENT_LIST_DIR_REAL \"\${_ROCM_CMAKE_CURRENT_LIST_FILE_REAL}\" DIRECTORY)
+
+# Check if navigating from real dir through install structure returns to real dir.
+# If yes, structure is preserved (PREFIX case); if no, structure differs (INSTALL_MODE case).
+get_filename_component(
+    _ROCM_STRUCTURE_CHECK
+    \"\${_ROCM_CMAKE_CURRENT_LIST_DIR_REAL}/${PACKAGE_RELATIVE_PATH}/${PACKAGE_INSTALL_RELATIVE_DIR}\"
+    ABSOLUTE)
+
+if(\"\${_ROCM_STRUCTURE_CHECK}\" STREQUAL \"\${_ROCM_CMAKE_CURRENT_LIST_DIR_REAL}\")
+    # Structure preserved - use REALPATH (handles PREFIX symlinks like /opt/rocm -> /opt/rocm-7.2)
+    get_filename_component(
+        PACKAGE_PREFIX_DIR \"\${_ROCM_CMAKE_CURRENT_LIST_DIR_REAL}/${PACKAGE_RELATIVE_PATH}\"
+        ABSOLUTE)
+else()
+    # Structure differs - use ABSOLUTE to preserve symlink path (handles CMAKE_INSTALL_MODE=SYMLINK)
+    get_filename_component(
+        _ROCM_CMAKE_CURRENT_LIST_FILE_ABS \"\${CMAKE_CURRENT_LIST_FILE}\" ABSOLUTE)
+    get_filename_component(
+        _ROCM_CMAKE_CURRENT_LIST_DIR_ABS \"\${_ROCM_CMAKE_CURRENT_LIST_FILE_ABS}\" DIRECTORY)
+    get_filename_component(
+        PACKAGE_PREFIX_DIR \"\${_ROCM_CMAKE_CURRENT_LIST_DIR_ABS}/${PACKAGE_RELATIVE_PATH}\"
+        ABSOLUTE)
+endif()
 
 ${CHECK_PREFIX}
 
