@@ -3,3 +3,4 @@ build/**/*
 docs/_build/
 docs/sphinx/_toc.yml
 .idea/
+CMakeUserPresets.json
