@@ -18,7 +18,7 @@ jobs:
         fetch-depth: 0
         persist-credentials: false
     - name: Set up Python 3.10
-      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
       with:
         python-version: "3.10"
     - name: Install dependencies
@@ -61,7 +61,7 @@ jobs:
         fetch-depth: 0
         persist-credentials: false
     - name: Set up Python 3.10
-      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
       with:
         python-version: "3.10"
     - name: Setup cmake
@@ -74,7 +74,7 @@ jobs:
         python -m pip install cget ninja
         python -m pip install -r docs/requirements.txt
     - name: Install Doxygen
-      uses: ssciwr/doxygen-install@329d88f5a303066a5bd006db7516b1925b86350e # v2.0.1
+      uses: ssciwr/doxygen-install@fa3e94d34131d3990b6b8ba939ab982964aa3758 # v2.0.3
       with:
         version: "1.10.0"
     - name: Setup git
